@@ -1,3 +1,7 @@
+# scheduling for Knepp Model
+# Taken from https://github.com/projectmesa/mesa-examples/tree/master/examples/WolfSheep/wolf_sheep 
+
+
 import random
 from collections import defaultdict
 from mesa.time import RandomActivation
