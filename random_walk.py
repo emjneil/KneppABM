@@ -53,7 +53,6 @@ class RandomWalker(Agent):
             # if yes, pick one of those at random
             my_next_patch = random.choice(my_choices)
             next_move = my_next_patch.pos
-            print(my_next_patch.condition)
         # otherwise, pick any one at random
         else:
             next_move = random.choice(next_moves)
