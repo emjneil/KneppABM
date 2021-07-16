@@ -13,8 +13,8 @@ from mesa.space import MultiGrid
 # ------ Define the agents: roe deer & habitat nodes (grassland, woodland, scrub) ------
   
 class habitatAgent (Agent):
-    def __init__(self, pos, model, condition, trees_here, saplings_here, scrub_here, youngscrub_here, perc_grass_here, perc_bareground_here):
-        super().__init__(pos, model)
+    def __init__(self, unique_id, pos, model, condition, trees_here, saplings_here, scrub_here, youngscrub_here, perc_grass_here, perc_bareground_here):
+        super().__init__(unique_id, model)
         self.condition = condition
         self.pos = pos
         self.trees_here = trees_here
@@ -92,21 +92,21 @@ class habitatAgent (Agent):
                         self.youngscrub_here -= 1
 
         # reassess dominant condition
-        if self.trees_here < 10 and self.scrub_here < 10 and self.perc_grass_here >= 50:
+        if self.trees_here < 25 and self.scrub_here < 25 and self.perc_grass_here >= 50:
             self.condition = "grassland"
-        if self.trees_here < 10 and self.scrub_here < 10 and self.perc_bareground_here >= 50:
+        if self.trees_here < 25 and self.scrub_here < 25 and self.perc_bareground_here >= 50:
             self.condition = "bare_ground"
-        if self.trees_here < 10 and self.scrub_here >= 10:
+        if self.trees_here < 25 and self.scrub_here >= 25:
             self.condition = "thorny_scrubland"
-        if self.trees_here >= 10:
+        if self.trees_here >= 25:
             self.condition = "woodland"
 
 
+
 class roeDeer_agent(RandomWalker):
-    def __init__(self, pos, model, moore, energy, sex):
-        super().__init__(pos, model, moore=moore)
+    def __init__(self, unique_id, pos, model, moore, energy):
+        super().__init__(unique_id, pos, model, moore=moore)
         self.energy = energy
-        self.sex = sex
 
     def step(self):
         # move & reduce energy
@@ -179,28 +179,21 @@ class roeDeer_agent(RandomWalker):
             self.model.grid._remove_agent(self.pos, self)
             self.model.schedule.remove(self)
             living = False
-            
-        # if I am female, and there are males present, I reproduce in May & June (assuming model starts in Jan at beginning of year, May & June = time steps 5&6 out of every 12 months)
-        # are there males?
-        males_here = 0
-        for i in self.model.schedule.agents_by_breed[roeDeer_agent]:
-            if i.sex == "male":
-                males_here +=1
-        if living and males_here > 0 and self.sex == "female" and random.random() < self.model.roeDeer_reproduce and (5 <= self.model.schedule.time < 7 or 17 <= self.model.schedule.time < 19 or 29 <= self.model.schedule.time < 31 or 41 <= self.model.schedule.time < 43 or 53 <= self.model.schedule.time < 55 or 65 <= self.model.schedule.time < 67 or 77 <= self.model.schedule.time < 79 or 89 <= self.model.schedule.time < 91 or 101 <= self.model.schedule.time < 103 or 113 <= self.model.schedule.time < 115 or 125 <= self.model.schedule.time < 127 or 137 <= self.model.schedule.time < 139 or 149 <= self.model.schedule.time < 151 or 161 <= self.model.schedule.time < 163 or 173 <= self.model.schedule.time < 175 or 185 <= self.model.schedule.time < 187 or 197 <= self.model.schedule.time < 199 or 209 <= self.model.schedule.time < 211 or 221 <= self.model.schedule.time < 223 or 233 <= self.model.schedule.time < 235 or 245 <= self.model.schedule.time < 247 or 257 <= self.model.schedule.time < 259 or 269 <= self.model.schedule.time < 271 or 281 <= self.model.schedule.time < 283 or 293 <= self.model.schedule.time < 295):
-                # Create a new roe deer and divide energy:
-                self.energy /= 2
-                self.sex = np.random.choice(["male","female"])
-                fawn = roeDeer_agent(self.pos, self.model, self.moore, self.energy, self.sex)
-                self.model.grid.place_agent(fawn, self.pos)
-                self.model.schedule.add(fawn)
+
+        # I can reproduce in May & June (assuming model starts in Jan at beginning of year, May & June = time steps 5&6 out of every 12 months)
+        if living and random.random() < self.model.roeDeer_reproduce and (5 <= self.model.schedule.time < 7 or 17 <= self.model.schedule.time < 19 or 29 <= self.model.schedule.time < 31 or 41 <= self.model.schedule.time < 43 or 53 <= self.model.schedule.time < 55 or 65 <= self.model.schedule.time < 67 or 77 <= self.model.schedule.time < 79 or 89 <= self.model.schedule.time < 91 or 101 <= self.model.schedule.time < 103 or 113 <= self.model.schedule.time < 115 or 125 <= self.model.schedule.time < 127 or 137 <= self.model.schedule.time < 139 or 149 <= self.model.schedule.time < 151 or 161 <= self.model.schedule.time < 163 or 173 <= self.model.schedule.time < 175 or 185 <= self.model.schedule.time < 187 or 197 <= self.model.schedule.time < 199 or 209 <= self.model.schedule.time < 211 or 221 <= self.model.schedule.time < 223 or 233 <= self.model.schedule.time < 235 or 245 <= self.model.schedule.time < 247 or 257 <= self.model.schedule.time < 259 or 269 <= self.model.schedule.time < 271 or 281 <= self.model.schedule.time < 283 or 293 <= self.model.schedule.time < 295):
+            # Create a new roe deer and divide energy:
+            self.energy /= 2
+            fawn = roeDeer_agent(self.model.next_id(), self.pos, self.model, self.moore, self.energy)
+            self.model.grid.place_agent(fawn, self.pos)
+            self.model.schedule.add(fawn)
 
 
 
 class exmoorPony(RandomWalker):
-    def __init__(self, pos, model, moore, energy, sex):
-        super().__init__(pos, model, moore=moore)
+    def __init__(self, unique_id, pos, model, moore, energy):
+        super().__init__(unique_id, pos, model, moore=moore)
         self.energy = energy
-        self.sex = sex
 
     def step(self):
         # move & reduce energy
@@ -276,10 +269,9 @@ class exmoorPony(RandomWalker):
 
 
 class longhornCattle(RandomWalker):
-    def __init__(self, pos, model, moore, energy, sex):
-        super().__init__(pos, model, moore=moore)
+    def __init__(self, unique_id, pos, model, moore, energy):
+        super().__init__(unique_id, pos, model, moore=moore)
         self.energy = energy
-        self.sex = sex
 
     def step(self):
         # move & reduce energy
@@ -347,22 +339,17 @@ class longhornCattle(RandomWalker):
                 habitat_patch.perc_grass_here = 0
                 habitat_patch.perc_bareground_here = 100
     
-        # if cow''s energy is less than 0, die 
+        # if cow's energy is less than 0, die 
         if self.energy < 0:
             self.model.grid._remove_agent(self.pos, self)
             self.model.schedule.remove(self)
             living = False
             
-        # if I am female, and males are present, I reproduce in April, May, and June (assuming model starts in Jan at beginning of year, April, May & June = time steps 4-6 out of every 12 months)
-        males_here = 0
-        for i in self.model.schedule.agents_by_breed[longhornCattle]:
-            if i.sex == "male":
-                males_here +=1
-        if living and males_here > 0 and self.sex == "female" and random.random() < self.model.cows_reproduce and (4 <= self.model.schedule.time < 7 or 16 <= self.model.schedule.time < 19 or 28 <= self.model.schedule.time < 31 or 40 <= self.model.schedule.time < 43 or 52 <= self.model.schedule.time < 55 or 64 <= self.model.schedule.time < 67 or 76 <= self.model.schedule.time < 79 or 88 <= self.model.schedule.time < 91 or 100 <= self.model.schedule.time < 103 or 112 <= self.model.schedule.time < 115 or 124 <= self.model.schedule.time < 127 or 136 <= self.model.schedule.time < 139 or 148 <= self.model.schedule.time < 151 or 160 <= self.model.schedule.time < 163 or 172 <= self.model.schedule.time < 175 or 184 <= self.model.schedule.time < 187 or 196 <= self.model.schedule.time < 199 or 208 <= self.model.schedule.time < 211 or 220 <= self.model.schedule.time < 223 or 232 <= self.model.schedule.time < 235 or 244 <= self.model.schedule.time < 247 or 256 <= self.model.schedule.time < 259 or 268 <= self.model.schedule.time < 271 or 280 <= self.model.schedule.time < 283 or 292 <= self.model.schedule.time < 295):
+        # I reproduce in April, May, and June (assuming model starts in Jan at beginning of year, April, May & June = time steps 4-6 out of every 12 months)
+        if living and random.random() < self.model.cows_reproduce and (4 <= self.model.schedule.time < 7 or 16 <= self.model.schedule.time < 19 or 28 <= self.model.schedule.time < 31 or 40 <= self.model.schedule.time < 43 or 52 <= self.model.schedule.time < 55 or 64 <= self.model.schedule.time < 67 or 76 <= self.model.schedule.time < 79 or 88 <= self.model.schedule.time < 91 or 100 <= self.model.schedule.time < 103 or 112 <= self.model.schedule.time < 115 or 124 <= self.model.schedule.time < 127 or 136 <= self.model.schedule.time < 139 or 148 <= self.model.schedule.time < 151 or 160 <= self.model.schedule.time < 163 or 172 <= self.model.schedule.time < 175 or 184 <= self.model.schedule.time < 187 or 196 <= self.model.schedule.time < 199 or 208 <= self.model.schedule.time < 211 or 220 <= self.model.schedule.time < 223 or 232 <= self.model.schedule.time < 235 or 244 <= self.model.schedule.time < 247 or 256 <= self.model.schedule.time < 259 or 268 <= self.model.schedule.time < 271 or 280 <= self.model.schedule.time < 283 or 292 <= self.model.schedule.time < 295):
             # Create a new cow and divide energy:
             self.energy /= 2
-            self.sex = np.random.choice(["male","female"])
-            calf = longhornCattle(self.pos, self.model, self.moore, self.energy, self.sex)
+            calf = longhornCattle(self.model.next_id(), self.pos, self.model, self.moore, self.energy)
             self.model.grid.place_agent(calf, self.pos)
             self.model.schedule.add(calf)
 
@@ -370,10 +357,9 @@ class longhornCattle(RandomWalker):
 
 
 class fallowDeer(RandomWalker):
-    def __init__(self, pos, model, moore, energy, sex):
-        super().__init__(pos, model, moore=moore)
+    def __init__(self, unique_id, pos, model, moore, energy):
+        super().__init__(unique_id, pos, model, moore=moore)
         self.energy = energy
-        self.sex = sex
 
     def step(self):
         # move & reduce energy
@@ -447,25 +433,19 @@ class fallowDeer(RandomWalker):
             self.model.schedule.remove(self)
             living = False
             
-        # if I am female, I reproduce in May & June (assuming model starts in Jan at beginning of year, May & June = time steps 5&6 out of every 12 months)
-        males_here = 0
-        for i in self.model.schedule.agents_by_breed[fallowDeer]:
-            if i.sex == "male":
-                males_here +=1
-        if living and males_here > 0 and self.sex == "female" and random.random() < self.model.fallowDeer_reproduce and (5 <= self.model.schedule.time < 7 or 17 <= self.model.schedule.time < 19 or 29 <= self.model.schedule.time < 31 or 41 <= self.model.schedule.time < 43 or 53 <= self.model.schedule.time < 55 or 65 <= self.model.schedule.time < 67 or 77 <= self.model.schedule.time < 79 or 89 <= self.model.schedule.time < 91 or 101 <= self.model.schedule.time < 103 or 113 <= self.model.schedule.time < 115 or 125 <= self.model.schedule.time < 127 or 137 <= self.model.schedule.time < 139 or 149 <= self.model.schedule.time < 151 or 161 <= self.model.schedule.time < 163 or 173 <= self.model.schedule.time < 175 or 185 <= self.model.schedule.time < 187 or 197 <= self.model.schedule.time < 199 or 209 <= self.model.schedule.time < 211 or 221 <= self.model.schedule.time < 223 or 233 <= self.model.schedule.time < 235 or 245 <= self.model.schedule.time < 247 or 257 <= self.model.schedule.time < 259 or 269 <= self.model.schedule.time < 271 or 281 <= self.model.schedule.time < 283 or 293 <= self.model.schedule.time < 295):
+        # I reproduce in May & June (assuming model starts in Jan at beginning of year, May & June = time steps 5&6 out of every 12 months)
+        if living and random.random() < self.model.fallowDeer_reproduce and (5 <= self.model.schedule.time < 7 or 17 <= self.model.schedule.time < 19 or 29 <= self.model.schedule.time < 31 or 41 <= self.model.schedule.time < 43 or 53 <= self.model.schedule.time < 55 or 65 <= self.model.schedule.time < 67 or 77 <= self.model.schedule.time < 79 or 89 <= self.model.schedule.time < 91 or 101 <= self.model.schedule.time < 103 or 113 <= self.model.schedule.time < 115 or 125 <= self.model.schedule.time < 127 or 137 <= self.model.schedule.time < 139 or 149 <= self.model.schedule.time < 151 or 161 <= self.model.schedule.time < 163 or 173 <= self.model.schedule.time < 175 or 185 <= self.model.schedule.time < 187 or 197 <= self.model.schedule.time < 199 or 209 <= self.model.schedule.time < 211 or 221 <= self.model.schedule.time < 223 or 233 <= self.model.schedule.time < 235 or 245 <= self.model.schedule.time < 247 or 257 <= self.model.schedule.time < 259 or 269 <= self.model.schedule.time < 271 or 281 <= self.model.schedule.time < 283 or 293 <= self.model.schedule.time < 295):
             # Create a new fallow deer and divide energy:
             self.energy /= 2
-            self.sex = np.random.choice(["male","female"])
-            fawn = fallowDeer(self.pos, self.model, self.moore, self.energy, self.sex)
+            fawn = fallowDeer(self.model.next_id(), self.pos, self.model, self.moore, self.energy)
             self.model.grid.place_agent(fawn, self.pos)
             self.model.schedule.add(fawn)
 
 
 class redDeer(RandomWalker):
-    def __init__(self, pos, model, moore, energy, sex):
-        super().__init__(pos, model, moore=moore)
+    def __init__(self, unique_id, pos, model, moore, energy):
+        super().__init__(unique_id, pos, model, moore=moore)
         self.energy = energy
-        self.sex = sex
 
     def step(self):
         # move & reduce energy
@@ -537,16 +517,12 @@ class redDeer(RandomWalker):
             self.model.grid._remove_agent(self.pos, self)
             self.model.schedule.remove(self)
             living = False
-        # if I am female, I reproduce in May & June (assuming model starts in Jan at beginning of year, May & June = time steps 5&6 out of every 12 months)
-        males_here = 0
-        for i in self.model.schedule.agents_by_breed[redDeer]:
-            if i.sex == "male":
-                males_here +=1
-        if living and males_here < 0 and self.sex == "female" and random.random() < self.model.redDeer_reproduce and (5 <= self.model.schedule.time < 7 or 17 <= self.model.schedule.time < 19 or 29 <= self.model.schedule.time < 31 or 41 <= self.model.schedule.time < 43 or 53 <= self.model.schedule.time < 55 or 65 <= self.model.schedule.time < 67 or 77 <= self.model.schedule.time < 79 or 89 <= self.model.schedule.time < 91 or 101 <= self.model.schedule.time < 103 or 113 <= self.model.schedule.time < 115 or 125 <= self.model.schedule.time < 127 or 137 <= self.model.schedule.time < 139 or 149 <= self.model.schedule.time < 151 or 161 <= self.model.schedule.time < 163 or 173 <= self.model.schedule.time < 175 or 185 <= self.model.schedule.time < 187 or 197 <= self.model.schedule.time < 199 or 209 <= self.model.schedule.time < 211 or 221 <= self.model.schedule.time < 223 or 233 <= self.model.schedule.time < 235 or 245 <= self.model.schedule.time < 247 or 257 <= self.model.schedule.time < 259 or 269 <= self.model.schedule.time < 271 or 281 <= self.model.schedule.time < 283 or 293 <= self.model.schedule.time < 295):
+        # I reproduce in May & June (assuming model starts in Jan at beginning of year, May & June = time steps 5&6 out of every 12 months)
+
+        if living and random.random() < self.model.redDeer_reproduce and (5 <= self.model.schedule.time < 7 or 17 <= self.model.schedule.time < 19 or 29 <= self.model.schedule.time < 31 or 41 <= self.model.schedule.time < 43 or 53 <= self.model.schedule.time < 55 or 65 <= self.model.schedule.time < 67 or 77 <= self.model.schedule.time < 79 or 89 <= self.model.schedule.time < 91 or 101 <= self.model.schedule.time < 103 or 113 <= self.model.schedule.time < 115 or 125 <= self.model.schedule.time < 127 or 137 <= self.model.schedule.time < 139 or 149 <= self.model.schedule.time < 151 or 161 <= self.model.schedule.time < 163 or 173 <= self.model.schedule.time < 175 or 185 <= self.model.schedule.time < 187 or 197 <= self.model.schedule.time < 199 or 209 <= self.model.schedule.time < 211 or 221 <= self.model.schedule.time < 223 or 233 <= self.model.schedule.time < 235 or 245 <= self.model.schedule.time < 247 or 257 <= self.model.schedule.time < 259 or 269 <= self.model.schedule.time < 271 or 281 <= self.model.schedule.time < 283 or 293 <= self.model.schedule.time < 295):
             # Create a new roe deer and divide energy:
             self.energy /= 2
-            self.sex = np.random.choice(["male","female"])
-            fawn = redDeer(self.pos, self.model, self.moore, self.energy, self.sex)
+            fawn = redDeer(self.model.next_id(), self.pos, self.model, self.moore, self.energy)
             self.model.grid.place_agent(fawn, self.pos)
             self.model.schedule.add(fawn)
 
@@ -555,10 +531,9 @@ class redDeer(RandomWalker):
 
 
 class tamworthPigs(RandomWalker):
-    def __init__(self, pos, model, moore, energy, sex):
-        super().__init__(pos, model, moore=moore)
+    def __init__(self, unique_id, pos, model, moore, energy):
+        super().__init__(unique_id, pos, model, moore=moore)
         self.energy = energy
-        self.sex = sex
 
     def step(self):
         # move & reduce energy
@@ -614,18 +589,13 @@ class tamworthPigs(RandomWalker):
             self.model.schedule.remove(self)
             living = False
             
-        # if I am female, pigs reproduce Jan - July (1 - 7, < 8)
-        males_here = 0
-        for i in self.model.schedule.agents_by_breed[tamworthPigs]:
-            if i.sex == "male":
-                males_here +=1
-        if living and males_here > 0 and self.sex == "female" and random.random() < self.model.pigs_reproduce and (1 <= self.model.schedule.time < 8 or 13 <= self.model.schedule.time < 20 or 25 <= self.model.schedule.time < 32 or 37 <= self.model.schedule.time < 44 or 49 <= self.model.schedule.time < 56 or 61 <= self.model.schedule.time < 68 or 73 <= self.model.schedule.time < 80 or 85 <= self.model.schedule.time < 92 or 97 <= self.model.schedule.time < 104 or 109 <= self.model.schedule.time < 116 or 121 <= self.model.schedule.time < 128 or 133 <= self.model.schedule.time < 140 or 145 <= self.model.schedule.time < 152 or 157 <= self.model.schedule.time < 164 or 169 <= self.model.schedule.time < 176 or 181 <= self.model.schedule.time < 188 or 193 <= self.model.schedule.time < 200 or 205 <= self.model.schedule.time < 212 or 217 <= self.model.schedule.time < 224 or 229 <= self.model.schedule.time < 236 or 241 <= self.model.schedule.time < 248 or 253 <= self.model.schedule.time < 260 or 265 <= self.model.schedule.time < 272 or 277 <= self.model.schedule.time < 284 or 289 <= self.model.schedule.time < 296):
+        # pigs reproduce Jan - July (1 - 7, < 8)
+        if living and random.random() < self.model.pigs_reproduce and (1 <= self.model.schedule.time < 8 or 13 <= self.model.schedule.time < 20 or 25 <= self.model.schedule.time < 32 or 37 <= self.model.schedule.time < 44 or 49 <= self.model.schedule.time < 56 or 61 <= self.model.schedule.time < 68 or 73 <= self.model.schedule.time < 80 or 85 <= self.model.schedule.time < 92 or 97 <= self.model.schedule.time < 104 or 109 <= self.model.schedule.time < 116 or 121 <= self.model.schedule.time < 128 or 133 <= self.model.schedule.time < 140 or 145 <= self.model.schedule.time < 152 or 157 <= self.model.schedule.time < 164 or 169 <= self.model.schedule.time < 176 or 181 <= self.model.schedule.time < 188 or 193 <= self.model.schedule.time < 200 or 205 <= self.model.schedule.time < 212 or 217 <= self.model.schedule.time < 224 or 229 <= self.model.schedule.time < 236 or 241 <= self.model.schedule.time < 248 or 253 <= self.model.schedule.time < 260 or 265 <= self.model.schedule.time < 272 or 277 <= self.model.schedule.time < 284 or 289 <= self.model.schedule.time < 296):
             # Pick a number of piglets to have
             for _ in range(random.randint(1,10)):
             # Create a new piglet and divide energy:
                 self.energy /= 2
-                self.sex = np.random.choice(["male","female"])
-                piglet = longhornCattle(self.pos, self.model, self.moore, self.energy, self.sex)
+                piglet = longhornCattle(self.model.next_id(), self.pos, self.model, self.moore, self.energy)
                 self.model.grid.place_agent(piglet, self.pos)
                 self.model.schedule.add(piglet)
 
@@ -635,23 +605,23 @@ class tamworthPigs(RandomWalker):
 
 class KneppModel(Model):
 
-    def __init__(self, chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
-        chance_scrubOutcompetedByTree, chance_grassOutcompetedByTreeScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub,chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
-        initial_roeDeer, initial_grassland, initial_woodland, initial_scrubland, initial_ponies, initial_cows, initial_fallowDeer, initial_redDeer, initial_pigs,
-        ratio_mf_cows, ratio_mf_fallowDeer, ratio_mf_redDeer, ratio_mf_pigs,
-        roeDeer_reproduce, roeDeer_gain_from_grass, roeDeer_gain_from_Trees, roeDeer_gain_from_Scrub, roeDeer_gain_from_Saplings, roeDeer_gain_from_YoungScrub,
-        roeDeer_impactGrass, roeDeer_saplingsEaten, roeDeer_youngScrubEaten, roeDeer_treesEaten, roeDeer_scrubEaten,
-        ponies_gain_from_grass, ponies_gain_from_Trees, ponies_gain_from_Scrub, ponies_gain_from_Saplings, ponies_gain_from_YoungScrub, 
-        ponies_impactGrass, ponies_saplingsEaten, ponies_youngScrubEaten, ponies_treesEaten, ponies_scrubEaten, 
-        cows_reproduce, cows_gain_from_grass, cows_gain_from_Trees, cows_gain_from_Scrub, cows_gain_from_Saplings, cows_gain_from_YoungScrub, 
-        cows_impactGrass, cows_saplingsEaten, cows_youngScrubEaten, cows_treesEaten, cows_scrubEaten, 
-        fallowDeer_reproduce, fallowDeer_gain_from_grass, fallowDeer_gain_from_Trees, fallowDeer_gain_from_Scrub, fallowDeer_gain_from_Saplings, fallowDeer_gain_from_YoungScrub, 
-        fallowDeer_impactGrass, fallowDeer_saplingsEaten, fallowDeer_youngScrubEaten, fallowDeer_treesEaten, fallowDeer_scrubEaten, 
-        redDeer_reproduce, redDeer_gain_from_grass, redDeer_gain_from_Trees, redDeer_gain_from_Scrub, redDeer_gain_from_Saplings, redDeer_gain_from_YoungScrub, 
-        redDeer_impactGrass, redDeer_saplingsEaten, redDeer_youngScrubEaten, redDeer_treesEaten, redDeer_scrubEaten, 
-        pigs_reproduce, pigs_gain_from_grass, pigs_gain_from_Saplings, pigs_gain_from_YoungScrub, 
-        pigs_impactGrass, pigs_saplingsEaten, pigs_youngScrubEaten, 
-        width, height):
+    def __init__(self,             
+            chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
+            chance_scrubOutcompetedByTree, chance_grassOutcompetedByTreeScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
+            initial_roeDeer, initial_grassland, initial_woodland, initial_scrubland, initial_ponies, initial_cows, initial_fallowDeer, initial_redDeer, initial_pigs,
+            roeDeer_reproduce, roeDeer_gain_from_grass, roeDeer_gain_from_Trees, roeDeer_gain_from_Scrub, roeDeer_gain_from_Saplings, roeDeer_gain_from_YoungScrub,
+            roeDeer_impactGrass, roeDeer_saplingsEaten, roeDeer_youngScrubEaten, roeDeer_treesEaten, roeDeer_scrubEaten,
+            ponies_gain_from_grass, ponies_gain_from_Trees, ponies_gain_from_Scrub, ponies_gain_from_Saplings, ponies_gain_from_YoungScrub, 
+            ponies_impactGrass, ponies_saplingsEaten, ponies_youngScrubEaten, ponies_treesEaten, ponies_scrubEaten, 
+            cows_reproduce, cows_gain_from_grass, cows_gain_from_Trees, cows_gain_from_Scrub, cows_gain_from_Saplings, cows_gain_from_YoungScrub, 
+            cows_impactGrass, cows_saplingsEaten, cows_youngScrubEaten, cows_treesEaten, cows_scrubEaten, 
+            fallowDeer_reproduce, fallowDeer_gain_from_grass, fallowDeer_gain_from_Trees, fallowDeer_gain_from_Scrub, fallowDeer_gain_from_Saplings, fallowDeer_gain_from_YoungScrub, 
+            fallowDeer_impactGrass, fallowDeer_saplingsEaten, fallowDeer_youngScrubEaten, fallowDeer_treesEaten, fallowDeer_scrubEaten,
+            redDeer_reproduce, redDeer_gain_from_grass, redDeer_gain_from_Trees, redDeer_gain_from_Scrub, redDeer_gain_from_Saplings, redDeer_gain_from_YoungScrub, 
+            redDeer_impactGrass, redDeer_saplingsEaten, redDeer_youngScrubEaten, redDeer_treesEaten, redDeer_scrubEaten, 
+            pigs_reproduce, pigs_gain_from_grass, pigs_gain_from_Saplings, pigs_gain_from_YoungScrub, 
+            pigs_impactGrass, pigs_saplingsEaten, pigs_youngScrubEaten, 
+            width, height):
 
         # set parameters
         self.initial_roeDeer = initial_roeDeer
@@ -663,10 +633,6 @@ class KneppModel(Model):
         self.initial_fallowDeer = initial_fallowDeer
         self.initial_redDeer = initial_redDeer
         self.initial_pigs = initial_pigs
-        self.ratio_mf_cows = ratio_mf_cows
-        self.ratio_mf_fallowDeer = ratio_mf_fallowDeer
-        self.ratio_mf_redDeer = ratio_mf_redDeer
-        self.ratio_mf_pigs = ratio_mf_pigs
         self.chance_reproduceSapling = chance_reproduceSapling
         self.chance_reproduceYoungScrub = chance_reproduceYoungScrub
         self.chance_regrowGrass = chance_regrowGrass
@@ -752,54 +718,56 @@ class KneppModel(Model):
         self.grid = MultiGrid(width, height, True) # this grid allows for multiple agents on same cell
         self.schedule = RandomActivationByBreed(self)
         self.running = True
+        self.current_id = 0
 
-
+        
         # Create habitat patches
+        if (initial_woodland + initial_grassland + initial_scrubland) >= 100:
+            # rescale it to 100
+            prob_grassland = initial_grassland/(initial_woodland + initial_grassland + initial_scrubland)
+            prob_scrubland = initial_scrubland/(initial_woodland + initial_grassland + initial_scrubland)
+            prob_woodland = initial_woodland/(initial_woodland + initial_grassland + initial_scrubland)
+            # make bare ground = 0 
+            prob_bare_ground = 0
+        else:
+            prob_grassland = initial_grassland/100
+            prob_scrubland = initial_scrubland/100
+            prob_woodland = initial_woodland/100
+            prob_bare_ground = 1-((initial_grassland + initial_scrubland + initial_woodland)/100)
+        count = 0
         for _, x, y in self.grid.coord_iter():
-            # generate % dominant habitat condition (woodland, scrub, grassland, any remaining = bare ground)
-            if (initial_woodland + initial_grassland + initial_scrubland) >= 100:
-                # rescale it to 100
-                prob_grassland = initial_grassland/(initial_woodland + initial_grassland + initial_scrubland)
-                prob_scrubland = initial_scrubland/(initial_woodland + initial_grassland + initial_scrubland)
-                prob_woodland = initial_woodland/(initial_woodland + initial_grassland + initial_scrubland)
-                # make bare ground = 0 
-                prob_bare_ground = 0
-            else:
-                prob_grassland = initial_grassland/100
-                prob_scrubland = initial_scrubland/100
-                prob_woodland = initial_woodland/100
-                prob_bare_ground = 1-((initial_grassland + initial_scrubland + initial_woodland)/100)
             condition = np.random.choice(["grassland", "thorny_scrubland", "woodland", "bare_ground"], p=[prob_grassland, prob_scrubland, prob_woodland, prob_bare_ground])            
             # put a random number of trees, shrubs, etc., depending on dominant condition
             if condition == "grassland": # more than 50% grassland, no more than 10 mature trees/shrubs
-                trees_here = random.randint(0, 10)
+                count +=1
+                trees_here = random.randint(0, 25)
                 saplings_here = random.randint(0, 1000)
-                scrub_here = random.randint(0, 10)
+                scrub_here = random.randint(0, 25)
                 youngscrub_here = random.randint(0, 1000)
                 perc_grass_here = random.randint(50, 100)
                 perc_bareground_here = 100 - perc_grass_here
             if condition == "bare_ground": # more than 50% bare ground
-                trees_here = random.randint(0, 10)
+                trees_here = random.randint(0, 25)
                 saplings_here = random.randint(0, 1000)
-                scrub_here = random.randint(0, 10)
+                scrub_here = random.randint(0, 25)
                 youngscrub_here = random.randint(0, 1000)
                 perc_bareground_here = random.randint(50, 100)
                 perc_grass_here = 100 - perc_bareground_here
             if condition == "thorny_scrubland":  # at least 10 scrub plants, no more than 10 trees
-                trees_here = random.randint(0, 10)
+                trees_here = random.randint(0, 25)
                 saplings_here = random.randint(0, 1000)
-                scrub_here = random.randint(10, 100)
+                scrub_here = random.randint(25, 100)
                 youngscrub_here = random.randint(0, 1000)
                 perc_grass_here = random.randint(0, 100)
                 perc_bareground_here = 100 - perc_grass_here
             if condition == "woodland":  # woodland has 10-100 trees
-                trees_here = random.randint(10, 100)
+                trees_here = random.randint(25, 100)
                 saplings_here = random.randint(0, 1000)
                 scrub_here = random.randint(0, 100)
                 youngscrub_here = random.randint(0, 1000)
                 perc_grass_here = random.randint(0, 100)
                 perc_bareground_here = 100 - perc_grass_here
-            patch = habitatAgent((x, y), self, condition, trees_here, saplings_here, scrub_here, youngscrub_here, perc_grass_here, perc_bareground_here)
+            patch = habitatAgent(self.next_id(), (x, y), self, condition, trees_here, saplings_here, scrub_here, youngscrub_here, perc_grass_here, perc_bareground_here)
             self.grid.place_agent(patch, (x, y))
             self.schedule.add(patch)
 
@@ -809,8 +777,7 @@ class KneppModel(Model):
             x = random.randrange(self.width)
             y = random.randrange(self.height)
             energy = np.random.uniform(0, 1)
-            sex = np.random.choice(["male","female"])
-            roeDeer = roeDeer_agent((x, y), self, True, energy, sex)
+            roeDeer = roeDeer_agent(self.next_id(), (x, y), self, True, energy)
             self.grid.place_agent(roeDeer, (x, y))
             self.schedule.add(roeDeer)
 
@@ -819,18 +786,17 @@ class KneppModel(Model):
             x = random.randrange(self.width)
             y = random.randrange(self.height)
             energy = np.random.uniform(0, 1)
-            sex = "female" # no breeding males (no stallions)
-            pony = exmoorPony((x, y), self, True, energy, sex)
+            pony = exmoorPony(self.next_id(), (x, y), self, True, energy)
             self.grid.place_agent(pony, (x, y))
             self.schedule.add(pony)
+
 
         # Create cows
         for i in range(self.initial_cows):
             x = random.randrange(self.width)
             y = random.randrange(self.height)
             energy = np.random.uniform(0, 1)
-            sex = np.random.choice(["male","female"], p=[ratio_mf_cows, (1-ratio_mf_cows)]) # 50% unless otherwise known
-            cow = longhornCattle((x, y), self, True, energy, sex)
+            cow = longhornCattle(self.next_id(), (x, y), self, True, energy)
             self.grid.place_agent(cow, (x, y))
             self.schedule.add(cow)
 
@@ -840,8 +806,7 @@ class KneppModel(Model):
             x = random.randrange(self.width)
             y = random.randrange(self.height)
             energy = np.random.uniform(0, 1) 
-            sex = np.random.choice(["male","female"], p=[ratio_mf_fallowDeer, (1-ratio_mf_fallowDeer)]) # 50% unless otherwise known
-            fallow = fallowDeer((x, y), self, True, energy, sex)
+            fallow = fallowDeer(self.next_id(), (x, y), self, True, energy)
             self.grid.place_agent(fallow, (x, y))
             self.schedule.add(fallow)
 
@@ -851,18 +816,17 @@ class KneppModel(Model):
             x = random.randrange(self.width)
             y = random.randrange(self.height)
             energy = np.random.uniform(0, 1)
-            sex = np.random.choice(["male","female"], p=[ratio_mf_redDeer, (1-ratio_mf_redDeer)]) # 50% unless otherwise known
-            red = redDeer((x, y), self, True, energy, sex)
+            red = redDeer(self.next_id(), (x, y), self, True, energy)
             self.grid.place_agent(red, (x, y))
             self.schedule.add(red)
+
 
         # Create pigs
         for i in range(self.initial_pigs):
             x = random.randrange(self.width)
             y = random.randrange(self.height)
             energy = np.random.uniform(0, 1)
-            sex = np.random.choice(["male","female"], p=[ratio_mf_pigs, (1-ratio_mf_pigs)]) # 50% unless otherwise known
-            pigs = tamworthPigs((x, y), self, True, energy, sex)
+            pigs = tamworthPigs(self.next_id(), (x, y), self, True, energy)
             self.grid.place_agent(pigs, (x, y))
             self.schedule.add(pigs)
 
@@ -870,7 +834,8 @@ class KneppModel(Model):
 
 
         # get data organized
-        self.datacollector = DataCollector(model_reporters = {
+        self.datacollector = DataCollector(
+                            model_reporters = {
                             "Time": lambda m: m.schedule.time, 
                             "Roe deer": lambda m: m.schedule.get_breed_count(roeDeer_agent),
                             "Exmoor pony": lambda m: m.schedule.get_breed_count(exmoorPony),
@@ -881,9 +846,12 @@ class KneppModel(Model):
                             "Grassland": lambda m: self.count_condition(m, "grassland"),
                             "Woodland": lambda m: self.count_condition(m, "woodland"),
                             "Thorny Scrub": lambda m: self.count_condition(m, "thorny_scrubland"),
-                            "Bare ground": lambda m: self.count_condition(m, "bare_ground"),
-                            })
-
+                            "Bare ground": lambda m: self.count_condition(m, "bare_ground")
+                            }
+                            # agent_reporters={
+                            # "Habitat position": lambda m: self.agent_position(m, habitatAgent) # function that checks if I'm habitat, if so, return number
+                            # }
+                            )
 
     def step(self):
         self.schedule.step()
@@ -893,17 +861,15 @@ class KneppModel(Model):
     def count_condition(self, model, habitat_condition):
         # want to count grass, wood, scrub, bare ground in each patch
         count = 0
-        for agent in model.schedule.agents_by_breed[habitatAgent]:
-            if agent.condition == habitat_condition:
+        for key, value in model.schedule.agents_by_breed[habitatAgent].items():
+            if value.condition == habitat_condition:
                 count += 1
-        return count
+        # return percentage of entire area
+        return int((count/1800)*100)
 
 
-# def count_males(model, herbivore):
-#     # want to count grass, wood, scrub, bare ground in each patch
-#     for i in model.schedule.agents_by_breed[herbivore]:
-#         if i.sex == "male":
-#             return True
-#     else:
-#         return False
-
+    def run_model(self, months):
+        
+        for i in range(months):
+            self.step()
+            print("time", self.schedule.time)

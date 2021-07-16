@@ -10,15 +10,12 @@ def run_model():
 
     # define number of simulations
     number_simulations = 10
-    # time for first ODE (January 2005- March 2009, ~ 50 months)
-    time_firstModel = 50
     # make list of variables
     final_results_list = []
     final_parameters = []
+    final_results_agents_list = []
     run_number = 0
 
-
-    # run the model for 50 months, 10 times
     for _ in range(number_simulations):
         # keep track of the runs
         run_number +=1
@@ -32,10 +29,6 @@ def run_model():
         initial_fallowDeer = 0
         initial_redDeer = 0
         initial_pigs = 0
-        ratio_mf_cows = 0
-        ratio_mf_fallowDeer = 0
-        ratio_mf_redDeer = 0
-        ratio_mf_pigs = 0
         # habitats
         chance_reproduceSapling = np.random.uniform(0,1)
         chance_reproduceYoungScrub = np.random.uniform(0,1)
@@ -123,7 +116,6 @@ def run_model():
             chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
             chance_scrubOutcompetedByTree, chance_grassOutcompetedByTreeScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
             initial_roeDeer, initial_grassland, initial_woodland, initial_scrubland, initial_ponies, initial_cows, initial_fallowDeer, initial_redDeer, initial_pigs,
-            ratio_mf_cows, ratio_mf_fallowDeer, ratio_mf_redDeer, ratio_mf_pigs,
             roeDeer_reproduce, roeDeer_gain_from_grass, roeDeer_gain_from_Trees, roeDeer_gain_from_Scrub, roeDeer_gain_from_Saplings, roeDeer_gain_from_YoungScrub, 
             roeDeer_impactGrass, roeDeer_saplingsEaten, roeDeer_youngScrubEaten, roeDeer_treesEaten, roeDeer_scrubEaten,
             ponies_gain_from_grass, ponies_gain_from_Trees, ponies_gain_from_Scrub, ponies_gain_from_Saplings, ponies_gain_from_YoungScrub, 
@@ -146,7 +138,6 @@ def run_model():
             chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
             chance_scrubOutcompetedByTree, chance_grassOutcompetedByTreeScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
             initial_roeDeer, initial_grassland, initial_woodland, initial_scrubland, initial_ponies, initial_cows, initial_fallowDeer, initial_redDeer, initial_pigs,
-            ratio_mf_cows, ratio_mf_fallowDeer, ratio_mf_redDeer, ratio_mf_pigs,
             roeDeer_reproduce, roeDeer_gain_from_grass, roeDeer_gain_from_Trees, roeDeer_gain_from_Scrub, roeDeer_gain_from_Saplings, roeDeer_gain_from_YoungScrub,
             roeDeer_impactGrass, roeDeer_saplingsEaten, roeDeer_youngScrubEaten, roeDeer_treesEaten, roeDeer_scrubEaten,
             ponies_gain_from_grass, ponies_gain_from_Trees, ponies_gain_from_Scrub, ponies_gain_from_Saplings, ponies_gain_from_YoungScrub, 
@@ -159,20 +150,23 @@ def run_model():
             redDeer_impactGrass, redDeer_saplingsEaten, redDeer_youngScrubEaten, redDeer_treesEaten, redDeer_scrubEaten, 
             pigs_reproduce, pigs_gain_from_grass, pigs_gain_from_Saplings, pigs_gain_from_YoungScrub, 
             pigs_impactGrass, pigs_saplingsEaten, pigs_youngScrubEaten, 
-            width = 10, height = 10)
+            width = 50, height = 36)
         
         # run for 50 months (Jan 2005 - March 2009)
-        for _ in range(time_firstModel): 
-            # run the model
-            model.step()
+        model.run_model(50)
 
-        # remember the results
+        # remember the results of the model (dominant conditions, # of agents)
         results = model.datacollector.get_model_vars_dataframe()
         final_results_list.append(results)
+        # these are the final conditions of each of the agents, to plug into the post-reintro model
+        results_agents = model.datacollector.get_agent_vars_dataframe()
+        final_results_agents_list.append(results_agents)
+        # print("results:", results_agents)
+        
 
     # append to dataframe
     final_results = pd.concat(final_results_list)
-
+    final_results_agents = pd.concat(final_results_agents_list)
 
     variables = [
         # number of runs
@@ -199,11 +193,6 @@ def run_model():
         "initial_fallowDeer",
         "initial_redDeer",
         "initial_pigs",
-        # reintroduced herbivore m/f ratios
-        "ratio_mf_cows", 
-        "ratio_mf_fallowDeer", 
-        "ratio_mf_redDeer", 
-        "ratio_mf_pigs",
         # roe deer variables
         "roeDeer_reproduce",
         "roeDeer_gain_from_grass",
@@ -283,11 +272,10 @@ def run_model():
     # # # FILTER RUNS # # #
 
     accepted_year = final_results[(final_results["Time"] == 50) &
-                                (final_results["Roe deer"] <= 40) & (final_results["Roe deer"] >= 12)]
-                                # (final_results["Grassland"] <= 90) & (final_results["Grassland"] >= 49) &
-                                # (final_results["Woodland"] <= 27) & (final_results["Woodland"] >= 7)]
-                                # (final_results["Thorny Scrub"] <= 21) & (final_results["Thorny Scrub"] >= 1)
-                                # ]
+                                (final_results["Roe deer"] <= 40) & (final_results["Roe deer"] >= 12) &
+                                (final_results["Grassland"] <= 90) & (final_results["Grassland"] >= 49) &
+                                (final_results["Woodland"] <= 27) & (final_results["Woodland"] >= 7) &
+                                (final_results["Thorny Scrub"] <= 21) & (final_results["Thorny Scrub"] >= 1)]
 
     # accepted final_results (all time-steps)
     all_accepted_runs = final_results[final_results['run_number'].isin(accepted_year['run_number'])]
@@ -295,11 +283,17 @@ def run_model():
     # accepted parameters
     accepted_parameters = final_parameters[final_parameters['run_number'].isin(accepted_year['run_number'])]
 
-    # with pd.option_context('display.max_columns',None):
-    #     print(final_results[(final_results["Time"] == 50)])
 
-    # with pd.option_context('display.max_rows',None, 'display.max_columns',None):
-    #     print("accepted_years: \n", accepted_year)
+    # with pd.option_context('display.max_columns',None):
+    #     print(final_results)
+
+    with pd.option_context('display.max_columns',None):
+        print(final_results[(final_results["Time"] == 50)])
+
+    with pd.option_context('display.max_rows',None, 'display.max_columns',None):
+        print("accepted_years: \n", accepted_year)
         
     return accepted_parameters, all_accepted_runs, accepted_year, variables
 
+
+run_model()

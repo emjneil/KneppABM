@@ -15,7 +15,3 @@
         }
     ]
 }
-
-"terminal.integrated.env.osx": {
-    "PATH": ""
-}

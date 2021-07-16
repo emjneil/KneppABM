@@ -16,7 +16,7 @@ def agent_portrayal(agent):
 
     if type(agent) is roeDeer_agent:
         portrayal["Shape"] = "deerShape.png"
-        portrayal["scale"] = 0.4
+        portrayal["scale"] = 0.8
         portrayal["Layer"] = 1
         portrayal["Filled"] = "true"
         
@@ -40,38 +40,38 @@ def agent_portrayal(agent):
 
     if type(agent) is longhornCattle:
         portrayal["Shape"] = "cowShape.png"
-        portrayal["scale"] = 0.6
+        portrayal["scale"] = 0.9
         portrayal["Layer"] = 1
         portrayal["Filled"] = "true"
 
     if type(agent) is redDeer:
         portrayal["Shape"] = "redDeerShape.png"
-        portrayal["scale"] = 0.6
+        portrayal["scale"] = 0.9
         portrayal["Layer"] = 1
         portrayal["Filled"] = "true"
         
     if type(agent) is exmoorPony:
         portrayal["Shape"] = "ponyShape.png"
-        portrayal["scale"] = 0.5
+        portrayal["scale"] = 0.9
         portrayal["Layer"] = 1
         portrayal["Filled"] = "true"
 
     if type(agent) is fallowDeer:
         portrayal["Shape"] = "fallowDeerShape.png"
-        portrayal["scale"] = 0.5
+        portrayal["scale"] = 0.9
         portrayal["Layer"] = 1
         portrayal["Filled"] = "true"
 
     if type(agent) is tamworthPigs:
         portrayal["Shape"] = "pigShape.png"
-        portrayal["scale"] = 0.4
+        portrayal["scale"] = 0.8
         portrayal["Layer"] = 1
         portrayal["Filled"] = "true"
         
     return portrayal
 
 
-canvas_element = CanvasGrid(agent_portrayal, 10, 10, 500, 500)
+canvas_element = CanvasGrid(agent_portrayal, 50, 36, 500, 500)
 chart_element = ChartModule([{"Label": "Roe deer", "Color": "#666666"},
                             {"Label": "Red deer", "Color": "#BC473A"},
                             {"Label": "Fallow deer", "Color": "#F16529"},
@@ -88,7 +88,7 @@ chart_element = ChartModule([{"Label": "Roe deer", "Color": "#666666"},
 server = ModularServer(KneppModel, [canvas_element, chart_element],
                        "KneppModel", {"chance_reproduceSapling":0.5, "chance_reproduceYoungScrub":0.5, "chance_regrowGrass":0.5, "chance_saplingBecomingTree":0.5, "chance_youngScrubMatures":0.5,
                         "chance_scrubOutcompetedByTree":0.5, "chance_grassOutcompetedByTreeScrub":0.5, "chance_saplingOutcompetedByTree":0.5, "chance_saplingOutcompetedByScrub":0.5, "chance_youngScrubOutcompetedByScrub":0.5, "chance_youngScrubOutcompetedByTree":0.5,
-                        "initial_roeDeer":10, "initial_grassland":71, "initial_woodland":12, "initial_scrubland":1, "initial_ponies": 2, "initial_cows": 3, "initial_fallowDeer": 10, "initial_redDeer":5, "initial_pigs":5,
+                        "initial_roeDeer":10, "initial_grassland":71, "initial_woodland":12, "initial_scrubland":1, "initial_ponies": 0, "initial_cows": 0, "initial_fallowDeer": 0, "initial_redDeer":0, "initial_pigs":0,
                         "roeDeer_reproduce":0.5, "roeDeer_gain_from_grass":0.005, "roeDeer_gain_from_Trees":0.005, "roeDeer_gain_from_Scrub":0.005, "roeDeer_gain_from_Saplings":0.005, "roeDeer_gain_from_YoungScrub":0.005, 
                         "roeDeer_impactGrass": 5, "roeDeer_saplingsEaten":100, "roeDeer_youngScrubEaten":100, "roeDeer_treesEaten":10, "roeDeer_scrubEaten":10,
                         "ponies_gain_from_grass": 0.5, "ponies_gain_from_Trees": 0.5, "ponies_gain_from_Scrub": 0.5, "ponies_gain_from_Saplings": 0.5, "ponies_gain_from_YoungScrub": 0.5, 
@@ -100,7 +100,7 @@ server = ModularServer(KneppModel, [canvas_element, chart_element],
                         "redDeer_reproduce": 0.5, "redDeer_gain_from_grass": 0.5, "redDeer_gain_from_Trees": 0.5, "redDeer_gain_from_Scrub": 0.5, "redDeer_gain_from_Saplings": 0.5, "redDeer_gain_from_YoungScrub": 0.5, 
                         "redDeer_impactGrass": 5, "redDeer_saplingsEaten": 5, "redDeer_youngScrubEaten": 5, "redDeer_treesEaten": 5, "redDeer_scrubEaten": 5, 
                         "pigs_reproduce": 0.5, "pigs_gain_from_grass": 0.5, "pigs_gain_from_Saplings": 0.5, "pigs_gain_from_YoungScrub": 0.5, 
-                        "pigs_impactGrass": 75, "pigs_saplingsEaten": 5, "pigs_youngScrubEaten": 5, "width":10, "height":10})
+                        "pigs_impactGrass": 75, "pigs_saplingsEaten": 5, "pigs_youngScrubEaten": 5, "width":50, "height":36})
 
 server.port = 8521 # The default
 server.launch()

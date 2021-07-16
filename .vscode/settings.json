@@ -1,5 +1,7 @@
-{
-    "python.pythonPath": "python 3.8",
-    "code-runner.executorMap.python": "python3 -u"
+{   
+    "python.pythonPath": "python3",
+    
+    "code-runner.executorMap": {
+        "python": "/usr/bin/python3"
     }
-
+}
