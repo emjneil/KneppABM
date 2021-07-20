@@ -27,6 +27,7 @@ class RandomActivationByBreed(RandomActivation):
         agent_class = type(agent)
         self.agents_by_breed[agent_class][agent.unique_id] = agent
 
+
     def remove(self, agent):
         """
         Remove all instances of a given agent from the schedule.
@@ -36,6 +37,7 @@ class RandomActivationByBreed(RandomActivation):
 
         agent_class = type(agent)
         del self.agents_by_breed[agent_class][agent.unique_id]
+
 
     def step(self, by_breed=True):
         """
