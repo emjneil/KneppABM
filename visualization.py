@@ -1,5 +1,4 @@
 # # # Visualizing the Knepp ABC/ABM model # # #
-# from run_preReintroduction_model import run_model
 from KneppModel_ABM import KneppModel, roeDeer_agent, habitatAgent, fallowDeer, redDeer, tamworthPigs, exmoorPony, longhornCattle
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
@@ -71,7 +70,7 @@ def agent_portrayal(agent):
     return portrayal
 
 
-canvas_element = CanvasGrid(agent_portrayal, 50, 36, 500, 500)
+canvas_element = CanvasGrid(agent_portrayal, 50, 36, 500, 360)
 chart_element = ChartModule([{"Label": "Roe deer", "Color": "#666666"},
                             {"Label": "Red deer", "Color": "#BC473A"},
                             {"Label": "Fallow deer", "Color": "#F16529"},
@@ -88,8 +87,8 @@ chart_element = ChartModule([{"Label": "Roe deer", "Color": "#666666"},
 server = ModularServer(KneppModel, [canvas_element, chart_element],
                        "KneppModel", {"chance_reproduceSapling":0.5, "chance_reproduceYoungScrub":0.5, "chance_regrowGrass":0.5, "chance_saplingBecomingTree":0.5, "chance_youngScrubMatures":0.5,
                         "chance_scrubOutcompetedByTree":0.5, "chance_grassOutcompetedByTreeScrub":0.5, "chance_saplingOutcompetedByTree":0.5, "chance_saplingOutcompetedByScrub":0.5, "chance_youngScrubOutcompetedByScrub":0.5, "chance_youngScrubOutcompetedByTree":0.5,
-                        "initial_roeDeer":10, "initial_grassland":71, "initial_woodland":12, "initial_scrubland":1, "initial_ponies": 0, "initial_cows": 0, "initial_fallowDeer": 0, "initial_redDeer":0, "initial_pigs":0,
-                        "roeDeer_reproduce":0.5, "roeDeer_gain_from_grass":0.005, "roeDeer_gain_from_Trees":0.005, "roeDeer_gain_from_Scrub":0.005, "roeDeer_gain_from_Saplings":0.005, "roeDeer_gain_from_YoungScrub":0.005, 
+                        "initial_roeDeer":12, "initial_grassland":71, "initial_woodland":12, "initial_scrubland":1, 
+                        "roeDeer_reproduce":0.05, "roeDeer_gain_from_grass":0.5, "roeDeer_gain_from_Trees":0.25, "roeDeer_gain_from_Scrub":0.25, "roeDeer_gain_from_Saplings":0.15, "roeDeer_gain_from_YoungScrub":0.15, 
                         "roeDeer_impactGrass": 5, "roeDeer_saplingsEaten":100, "roeDeer_youngScrubEaten":100, "roeDeer_treesEaten":10, "roeDeer_scrubEaten":10,
                         "ponies_gain_from_grass": 0.5, "ponies_gain_from_Trees": 0.5, "ponies_gain_from_Scrub": 0.5, "ponies_gain_from_Saplings": 0.5, "ponies_gain_from_YoungScrub": 0.5, 
                         "ponies_impactGrass": 25, "ponies_saplingsEaten": 5, "ponies_youngScrubEaten": 5, "ponies_treesEaten": 5, "ponies_scrubEaten": 5, 
