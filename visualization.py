@@ -70,7 +70,7 @@ def agent_portrayal(agent):
     return portrayal
 
 
-canvas_element = CanvasGrid(agent_portrayal, 50, 36, 500, 360)
+canvas_element = CanvasGrid(agent_portrayal, 50, 36, 750, 540)
 chart_element = ChartModule([{"Label": "Roe deer", "Color": "#666666"},
                             {"Label": "Red deer", "Color": "#BC473A"},
                             {"Label": "Fallow deer", "Color": "#F16529"},

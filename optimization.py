@@ -1,9 +1,7 @@
 # ------ Optimization of the Knepp ABM model --------
 from KneppModel_ABM import KneppModel 
 import numpy as np
-import pandas as pd
 from scipy.optimize import differential_evolution
-import pandas as pd
 import numpy as np
 
 
@@ -105,8 +103,6 @@ def objectiveFunction(x):
     ponies_treesEaten = int(organized_trees[3])
     cows_treesEaten = int(organized_trees[4])
 
-
-
     model = KneppModel(
         chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
         chance_scrubOutcompetedByTree, chance_grassOutcompetedByTreeScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
@@ -204,11 +200,10 @@ def objectiveFunction(x):
         ((((list(results.loc[results['Time'] == 184, 'Thorny Scrub'])[0])-28)**2)/28) +
         ((((list(results.loc[results['Time'] == 184, 'Woodland'])[0])-19)**2)/19))
                          
- 
 
-    if filtered_result < 10000:
-        print(filtered_result)
-        print(results[results['Time'] == 184])
+    # if filtered_result < 1000:
+    print(filtered_result)
+    print(results[results['Time'] == 184])
 
     return filtered_result
    
@@ -227,12 +222,11 @@ param_bds = (
     # red deer parameters
     (0,1), (0,1),(0,1),(0,1),(0,1),(0,1),
     # exmoor pony parameters
-    (0,1), (0,1),(0,1),(0,1),(0,1),
+    (0,1),(0,1),(0,1),(0,1),(0,1),
     # cattle parameters
     (0,1), (0,1),(0,1),(0,1),(0,1),(0,1),
     # pig parameters
-    (0,1), (0,1),(0,1),(0,1)
-    )
+    (0,1), (0,1),(0,1),(0,1))
 
 grass_impact_bds = ((0,100), (0,100), (0,100), (0,100), (0,100), (0,100))
 saplings_impact_bds = ((0,100), (0,100), (0,100), (0,100), (0,100), (0,100))

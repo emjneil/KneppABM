@@ -1,27 +1,21 @@
-
 # ------ ABM of the Knepp Estate (2005-2046) --------
 from KneppModel_ABM import KneppModel 
 import numpy as np
 import random
 import pandas as pd
 import timeit
-# import seaborn as sns
-# import numpy.matlib
-# import matplotlib.pyplot as plt
-# from scipy import stats
 
 
-# time the program
-start = timeit.default_timer()
-
-
-
-                                                    # # # # Run the model # # # # 
+# # # # Run the model # # # # 
 
 
 def run_all_models():
+    
+    # time the program
+    start = timeit.default_timer()
+
     # define number of simulations
-    number_simulations =  1
+    number_simulations =  10
     # make list of variables
     final_results_list = []
     final_parameters = []
@@ -258,99 +252,149 @@ def run_all_models():
     # check out the parameters used
     final_parameters = pd.DataFrame(data=final_parameters, columns=variables)
 
-    # accepted runs are those that made it to year 184, plus this last filtering criteria
-    all_accepted_runs = final_results[(final_results["Time"] == 185)
-                                # (final_results["Roe deer"] <= 40) & (final_results["Roe deer"] >= 20)
-                                # (final_results["Grassland"] <= 69) & (final_results["Grassland"] >= 49) &
-                                # (final_results["Woodland"] <= 35) & (final_results["Woodland"] >= 21) &
-                                # (final_results["Thorny Scrub"] <= 29) & (final_results["Thorny Scrub"] >= 9)
-                                ]
+    # filter the runs and tag the dataframe
+    # pre-reintroduction model
+    accepted_preReintro = final_results[(final_results["Time"] == 50) &
+    (final_results["Roe deer"] <= 40) & (final_results["Roe deer"] >= 12) & 
+    (final_results["Grassland"] <= 90) & (final_results["Grassland"] >= 49) & 
+    (final_results["Woodland"] <= 27) & (final_results["Woodland"] >= 7) & 
+    (final_results["Thorny Scrub"] <= 21) & (final_results["Thorny Scrub"] >= 1)]
+    print("number passed pre-reintro filters:", len(accepted_preReintro))
+    # April 2015
+    accepted_April2015 = accepted_preReintro[(accepted_preReintro["Time"] == 123) &
+    (accepted_preReintro["Longhorn cattle"] <= 127) & (accepted_preReintro["Longhorn cattle"] >= 104) &
+    (accepted_preReintro["Tamworth pigs"] <= 24) & (accepted_preReintro["Tamworth pigs"] >= 20)]
+    print("number passed April 2015 filters:", len(accepted_April2015))
+    # May 2015
+    accepted_May2015 = accepted_April2015[(accepted_April2015["Time"] == 124) &
+    (accepted_April2015["Longhorn cattle"] <= 142) & (accepted_April2015["Longhorn cattle"] >= 116)]
+    print("number passed May 2015 filters:", len(accepted_May2015))
+    # June 2015
+    accepted_June2015 = accepted_May2015[(accepted_May2015["Time"] == 125) &
+    (accepted_May2015["Longhorn cattle"] <= 142) & (accepted_May2015["Longhorn cattle"] >= 116)]
+    print("number passed June 2015 filters:", len(accepted_June2015))
+    # Feb 2016
+    accepted_Feb2016 = accepted_June2015[(accepted_June2015["Time"] == 133) &
+    (accepted_June2015["Exmoor pony"] == 10)]
+    print("number passed February 2016 filters:", len(accepted_Feb2016))
+    # March 2016
+    accepted_March2016 = accepted_Feb2016[(accepted_Feb2016["Time"] == 134) &
+    (accepted_Feb2016["Fallow deer"] <= 154) & (accepted_Feb2016["Fallow deer"] >= 126) &
+    (accepted_Feb2016["Red deer"] <= 29) & (accepted_Feb2016["Red deer"] >= 23) &
+    (accepted_Feb2016["Tamworth pigs"] <= 10) & (accepted_Feb2016["Tamworth pigs"] >= 8)]
+    print("number passed March 2016 filters:", len(accepted_March2016))
+    # April 2016
+    accepted_April2016 = accepted_March2016[(accepted_March2016["Time"] == 135) &
+    (accepted_March2016["Longhorn cattle"] <= 113) & (accepted_March2016["Longhorn cattle"] >= 93)]
+    print("number passed April 2016 filters:", len(accepted_April2016))
+    # May 2016
+    accepted_May2016 = accepted_April2016[(accepted_April2016["Time"] == 136) &
+    (accepted_April2016["Longhorn cattle"] <= 119) & (accepted_April2016["Longhorn cattle"] >= 97) &
+    (accepted_April2016["Tamworth pigs"] <= 19) & (accepted_April2016["Tamworth pigs"] >= 15)]
+    print("number passed May 2016 filters:", len(accepted_May2016))
+    # June 2016
+    accepted_June2016 = accepted_May2016[(accepted_May2016["Time"] == 137) &
+    (accepted_May2016["Longhorn cattle"] <= 98) & (accepted_May2016["Longhorn cattle"] >= 80)]
+    print("number passed June 2016 filters:", len(accepted_June2016))
+    # Feb 2017
+    accepted_Feb2017 = accepted_June2016[(accepted_June2016["Time"] == 145) &
+    (accepted_June2016["Exmoor pony"] == 11)]
+    print("number passed Feb 2017 filters:", len(accepted_Feb2017))
+    # March 2017
+    accepted_March2017 = accepted_Feb2017[(accepted_Feb2017["Time"] == 146) &
+    (accepted_Feb2017["Fallow deer"] <= 182) & (accepted_Feb2017["Fallow deer"] >= 149) ]
+    print("number passed March 2017 filters:", len(accepted_March2017))
+    # April 2017
+    accepted_April2017 = accepted_March2017[(accepted_March2017["Time"] == 147) &
+    (accepted_March2017["Longhorn cattle"] <= 110) & (accepted_March2017["Longhorn cattle"] >= 90) &
+    (accepted_March2017["Tamworth pigs"] <= 24) & (accepted_March2017["Tamworth pigs"] >= 20)]
+    print("number passed April 2017 filters:", len(accepted_April2017))
+    # May 2017
+    accepted_May2017 = accepted_April2017[(accepted_April2017["Time"] == 148) &
+    (accepted_April2017["Longhorn cattle"] <= 120) & (accepted_April2017["Longhorn cattle"] >= 98)]
+    print("number passed May 2017 filters:", len(accepted_May2017))
+    # June 2017
+    accepted_June2017 = accepted_May2017[(accepted_May2017["Time"] == 149) &
+    (accepted_May2017["Longhorn cattle"] <= 103) & (accepted_May2017["Longhorn cattle"] >= 85)]
+    print("number passed June 2017 filters:", len(accepted_June2017))
+    # January 2018
+    accepted_Jan2018 = accepted_June2017[(accepted_June2017["Time"] == 156) &
+    (accepted_June2017["Tamworth pigs"] <= 13) & (accepted_June2017["Tamworth pigs"] >= 11)]
+    print("number passed January 2018 filters:", len(accepted_Jan2018))
+    # February 2018
+    accepted_Feb2018 = accepted_Jan2018[(accepted_Jan2018["Time"] == 157) &
+    (accepted_Jan2018["Tamworth pigs"] <= 18) & (accepted_Jan2018["Tamworth pigs"] >= 14) &
+    (accepted_Jan2018["Exmoor pony"] == 10)]
+    print("number passed Feb 2018 filters:", len(accepted_Feb2018)) 
+    # March 2018
+    accepted_March2018 = accepted_Feb2018[(accepted_Feb2018["Time"] == 158) &
+    (accepted_Feb2018["Fallow deer"] <= 276) & (accepted_Feb2018["Fallow deer"] >= 226) &
+    (accepted_Feb2018["Red deer"] <= 26) & (accepted_Feb2018["Red deer"] >= 22)]
+    print("number passed March 2018 filters:", len(accepted_March2018)) 
+    # April 2018
+    accepted_April2018 = accepted_March2018[(accepted_March2018["Time"] == 159) &
+    (accepted_March2018["Longhorn cattle"] <= 111) & (accepted_March2018["Longhorn cattle"] >= 91)]
+    print("number passed April 2018 filters:", len(accepted_April2018)) 
+     # May 2018
+    accepted_May2018 = accepted_April2018[(accepted_April2018["Time"] == 160) &
+    (accepted_April2018["Longhorn cattle"] <= 129) & (accepted_April2018["Longhorn cattle"] >= 105) &
+    (accepted_April2018["Tamworth pigs"] <= 25) & (accepted_April2018["Tamworth pigs"] >= 21)]
+    print("number passed May 2018 filters:", len(accepted_May2018)) 
+    # June 2018
+    accepted_June2018 = accepted_May2018[(accepted_May2018["Time"] == 161) &
+    (accepted_May2018["Longhorn cattle"] <= 113) & (accepted_May2018["Longhorn cattle"] >= 93)]
+    print("number passed June 2018 filters:", len(accepted_June2018)) 
+    # March 2019
+    accepted_March2019 = accepted_June2018[(accepted_June2018["Time"] == 170) &
+    (accepted_June2018["Fallow deer"] <= 306) & (accepted_June2018["Fallow deer"] >= 250) &
+    (accepted_June2018["Red deer"] <= 41) & (accepted_June2018["Red deer"] >= 33)]
+    print("number passed March 2019 filters:", len(accepted_March2019)) 
+    # April 2019
+    accepted_April2019 = accepted_March2019[(accepted_March2019["Time"] == 171) &
+    (accepted_March2019["Longhorn cattle"] <= 111) & (accepted_March2019["Longhorn cattle"] >= 91)]
+    print("number passed April 2019 filters:", len(accepted_April2019)) 
+    # May 2019
+    accepted_May2019 = accepted_April2019[(accepted_April2019["Time"] == 172) &
+    (accepted_April2019["Longhorn cattle"] <= 121) & (accepted_April2019["Longhorn cattle"] >= 99)]
+    print("number passed May 2019 filters:", len(accepted_May2019))
+    # June 2019
+    accepted_June2019 = accepted_May2019[(accepted_May2019["Time"] == 173) &
+    (accepted_May2019["Longhorn cattle"] <= 98) & (accepted_May2019["Longhorn cattle"] >= 80)]
+    print("number passed June 2019 filters:", len(accepted_June2019)) 
+    # July 2019
+    accepted_July2019 = accepted_June2019[(accepted_June2019["Time"] == 174) &
+    (accepted_June2019["Tamworth pigs"] <= 10) & (accepted_June2019["Tamworth pigs"] >= 8)]
+    print("number passed July 2019 filters:", len(accepted_July2019)) 
+    # March 2020
+    accepted_March2020 = accepted_July2019[(accepted_July2019["Time"] == 182) &
+    (accepted_July2019["Fallow deer"] <= 272) & (accepted_July2019["Fallow deer"] >= 222) &
+    (accepted_July2019["Red deer"] <= 39) & (accepted_July2019["Red deer"] >= 32)]
+    print("number passed March 2020 filters:", len(accepted_March2020)) 
+    # May 2020
+    all_accepted_runs = accepted_March2020[(accepted_March2020["Time"] == 184) &
+    (accepted_March2020["Tamworth pigs"] <= 21) & (accepted_March2020["Tamworth pigs"] >= 17) &
+    (accepted_March2020["Exmoor pony"] == 15) &
+    (accepted_March2020["Roe deer"] <= 40) & (accepted_March2020["Roe deer"] >= 20) &
+    (accepted_March2020["Grassland"] <= 69) & (accepted_March2020["Grassland"] >= 49) &
+    (accepted_March2020["Thorny Scrub"] <= 35) & (accepted_March2020["Thorny Scrub"] >= 21) &
+    (accepted_March2020["Woodland"] <= 29) & (accepted_March2020["Woodland"] >= 9)]
+    print("number passed all filters:", len(all_accepted_runs))
+
 
     # accepted parameters
     accepted_parameters = final_parameters[final_parameters['run_number'].isin(all_accepted_runs['run_number'])]
+    # tag the accepted simulations
+    final_results['accepted?'] = np.where(final_results['run_number'].isin(accepted_parameters['run_number']), 'Accepted', 'Rejected')
 
-    with pd.option_context('display.max_columns',None):
-        print(final_results[(final_results["Time"] == 185)])
-
+    # with pd.option_context('display.max_columns',None):
+    #     print("final results unfiltered", final_results[(final_results["Time"] == 184)])
+    
     with pd.option_context('display.max_rows',None, 'display.max_columns',None):
         print("accepted_years: \n", all_accepted_runs)
-        
-    return number_simulations, final_results, accepted_parameters, all_accepted_runs, variables
 
-run_all_models()
+    
+    # calculate the time it takes to run per node, currently 8.5min for 1k runs
+    stop = timeit.default_timer()
+    print('Total time: ', (stop - start)) 
 
-# def graph_runs():
-#     number_simulations, final_results, accepted_parameters, all_accepted_runs, variables = run_all_models()
-#     # reshape dataframe
-#     # accepted_shape = np.repeat(final_runs['accepted?'], len(8))
-#     grouping_variable = np.repeat(all_accepted_runs['run_number'], len(8))
-#     y_values = all_accepted_runs.drop(['run_number', 'Time'], axis=1).values.flatten()
-#     species_list = np.tile(8, 185*number_simulations)
-#     indices = np.repeat(all_accepted_runs['Time'],len(8))
-#     final_df = pd.DataFrame(
-#     {'Abundance %': y_values, 'runNumber': grouping_variable, 'Ecosystem Element': species_list, 'Time': indices})
-#     # calculate median 
-#     m = final_df.groupby(['Time', 'Ecosystem Element'])[['Abundance %']].apply(np.median)
-#     m.name = 'Median'
-#     final_df = final_df.join(m, on=['Time', 'Ecosystem Element'])
-#     # calculate quantiles
-#     perc1 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance %'].quantile(.95)
-#     perc1.name = 'ninetyfivePerc'
-#     final_df = final_df.join(perc1, on=['Time', 'Ecosystem Element'])
-#     perc2 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance %'].quantile(.05)
-#     perc2.name = "fivePerc"
-#     final_df = final_df.join(perc2, on=['Time','Ecosystem Element'])
-
-#     # graph results
-#     colors = ["#6788ee", "#e26952", "#3F9E4D"]
-#     g = sns.FacetGrid(final_df, col="Ecosystem Element", hue = "runType", palette = colors, col_wrap=4, sharey = False)
-#     g.map(sns.lineplot, 'Time', 'Median')
-#     g.map(sns.lineplot, 'Time', 'fivePerc')
-#     g.map(sns.lineplot, 'Time', 'ninetyfivePerc')
-#     for ax in g.axes.flat:
-#         ax.fill_between(ax.lines[3].get_xdata(),ax.lines[3].get_ydata(), ax.lines[6].get_ydata(), color = '#6788ee', alpha =0.2)
-#         ax.fill_between(ax.lines[4].get_xdata(),ax.lines[4].get_ydata(), ax.lines[7].get_ydata(), color = '#e26952', alpha=0.2)
-#         ax.fill_between(ax.lines[5].get_xdata(),ax.lines[5].get_ydata(), ax.lines[8].get_ydata(), color = "#3F9E4D", alpha=0.2)
-#         ax.set_ylabel('Abundance')
-#         # ax.set_xticklabels(ax.get_xticklabels(), rotation=40)
-#     # add subplot titles
-#     axes = g.axes.flatten()
-#     # fill between the quantiles
-#     axes[0].set_title("European bison")
-#     axes[1].set_title("Exmoor ponies")
-#     axes[2].set_title("Fallow deer")
-#     axes[3].set_title("Grassland & parkland")
-#     axes[4].set_title("Longhorn cattle")
-#     axes[5].set_title("Organic carbon")
-#     axes[6].set_title("Red deer")
-#     axes[7].set_title("Roe deer")
-#     axes[8].set_title("Tamworth pigs")
-#     axes[9].set_title("Thorny scrubland")
-#     axes[10].set_title("Woodland")
-#     # add filter lines
-#     g.axes[3].vlines(x=2009,ymin=0.68,ymax=1, color='r')
-#     g.axes[5].vlines(x=2009,ymin=1,ymax=2.1, color='r')
-#     g.axes[7].vlines(x=2009,ymin=1,ymax=3.3, color='r')
-#     g.axes[9].vlines(x=2009,ymin=1,ymax=19, color='r')
-#     g.axes[10].vlines(x=2009,ymin=0.85,ymax=1.6, color='r')
-#     # plot next set of filter lines
-#     g.axes[3].vlines(x=2021,ymin=0.61,ymax=0.86, color='r')
-#     g.axes[5].vlines(x=2021,ymin=1.7,ymax=2.2, color='r')
-#     g.axes[7].vlines(x=2021,ymin=1.7,ymax=3.3, color='r')
-#     g.axes[9].vlines(x=2021,ymin=19,ymax=31.9, color='r')
-#     g.axes[10].vlines(x=2021,ymin=1,ymax=1.7, color='r')
-#     # make sure they all start from 0
-#     g.axes[4].set(ylim =(0,None))
-#     g.axes[6].set(ylim =(0,None))
-#     g.axes[9].set(ylim =(0,None))
-#     # stop the plots from overlapping
-#     plt.tight_layout()
-#     plt.legend(labels=['Reintroductions', 'No reintroductions', 'European bison \n reintroduction'],bbox_to_anchor=(2.2, 0),loc='lower right', fontsize=12)
-#     plt.savefig('reintroNoReintro_ps25.png')
-#     # plt.show()
-
-
-
-# calculate the time it takes to run per node, currently 8.5min for 1k runs
-stop = timeit.default_timer()
-print('Total time: ', (stop - start))
+    return number_simulations, final_results, accepted_parameters
