@@ -3,6 +3,7 @@ from KneppModel_ABM import KneppModel
 import numpy as np
 from scipy.optimize import differential_evolution
 import numpy as np
+import pandas as pd
 
 
 # ------ Optimization of the Knepp ABM model --------
@@ -202,8 +203,9 @@ def objectiveFunction(x):
                          
 
     # if filtered_result < 1000:
-    print(filtered_result)
-    print(results[results['Time'] == 184])
+    print("r:", filtered_result)
+    with pd.option_context('display.max_columns',None):
+        print(results[results['Time'] == 184])
 
     return filtered_result
    

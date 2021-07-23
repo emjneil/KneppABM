@@ -8,6 +8,53 @@ import pandas as pd
 from random_walk import RandomWalker
 from schedule import RandomActivationByBreed
 from mesa.space import MultiGrid 
+from random import choice as rchoice
+
+
+
+# herbivore eating habitat types
+def eat_saplings(habitat_patch, eatenSaps):
+    # count scrub and reduce the number of saplings eaten accordingly
+    count_scrub = habitat_patch.scrub_here
+    # rescale this according to how many shrubs there are 
+    eatenSaps_scaled = eatenSaps - int((eatenSaps*(count_scrub/100)))
+    habitat_patch.saplings_here -= eatenSaps_scaled
+    # don't let number of saplings go negative
+    if habitat_patch.saplings_here < 0:
+        habitat_patch.saplings_here = 0
+
+def eat_trees(habitat_patch, eatenTrees):
+    # roll dice between 0 and my maximum number I'll eat
+    habitat_patch.trees_here -= eatenTrees
+    # don't let it go negative
+    if habitat_patch.trees_here < 0:
+        habitat_patch.trees_here = 0
+
+def eat_scrub(habitat_patch, eatenScrub):
+    # roll dice between 0 and my maximum number I'll eat
+    habitat_patch.scrub_here -= eatenScrub
+    # don't let it go negative
+    if habitat_patch.scrub_here < 0:
+        habitat_patch.scrub_here = 0
+
+def eat_youngscrub(habitat_patch, eatenYoungScrub):
+    # count scrub and reduce the number of young scrubs eaten accordingly
+    count_scrub = habitat_patch.scrub_here
+    # rescale according to number of scrub plants
+    eatenYoungScrub_scaled = eatenYoungScrub - int((eatenYoungScrub*(count_scrub/100)))
+    habitat_patch.youngscrub_here -= eatenYoungScrub_scaled
+    # don't let it go negative
+    if habitat_patch.youngscrub_here < 0:
+        habitat_patch.youngscrub_here = 0
+
+def eat_grass(habitat_patch, eatenGrass):
+    # roll dice between 0 and my maximum number I'll eat
+    habitat_patch.perc_grass_here -= eatenGrass
+    habitat_patch.perc_bareground_here += eatenGrass
+    # don't let it go negative
+    if habitat_patch.perc_grass_here < 0:
+        habitat_patch.perc_grass_here = 0
+        habitat_patch.perc_bareground_here = 100
 
 
                             # # # # ------ Define the agents ------ # # # #
@@ -52,13 +99,10 @@ class habitatAgent (Agent):
                 new_patch_youngscrub = self.random.choice(available_youngscrub_cell) 
                 # and put a young scrub there
                 new_patch_youngscrub.youngscrub_here += 1
-
-
         # chance of bare ground becoming grassland
         if random.random() < self.model.chance_regrowGrass and self.perc_grass_here < 100:
             self.perc_grass_here += 1
             self.perc_bareground_here -= 1
-
         # chance of young scrub becoming mature scrub
         if self.youngscrub_here > 0:
             if random.random() < self.model.chance_youngScrubMatures:
@@ -73,7 +117,6 @@ class habitatAgent (Agent):
                     self.saplings_here -= 1
                 if self.youngscrub_here > 0 and random.random() < self.model.chance_youngScrubOutcompetedByScrub and self.youngscrub_here >0:
                     self.youngscrub_here -= 1
-
         # chance of sapling becoming tree
         if self.saplings_here > 0:
             if random.random() < self.model.chance_saplingBecomingTree:
@@ -85,20 +128,20 @@ class habitatAgent (Agent):
                     self.perc_grass_here -= 1
                 if random.random() < self.model.chance_scrubOutcompetedByTree and self.scrub_here > 0:
                     self.scrub_here -= 1
-                    # or saplings/young scrub
-                    if random.random() < self.model.chance_saplingOutcompetedByTree and self.saplings_here > 0:
-                        self.saplings_here -= 1
-                    if random.random() < self.model.chance_youngScrubOutcompetedByTree and self.youngscrub_here > 0:
-                        self.youngscrub_here -= 1
+                # or saplings/young scrub
+                if random.random() < self.model.chance_saplingOutcompetedByTree and self.saplings_here > 0:
+                    self.saplings_here -= 1
+                if random.random() < self.model.chance_youngScrubOutcompetedByTree and self.youngscrub_here > 0:
+                    self.youngscrub_here -= 1
 
         # reassess dominant condition
-        if self.trees_here < 25 and self.scrub_here < 25 and self.perc_grass_here >= 50:
+        if self.trees_here < 10 and self.scrub_here < 10 and self.perc_grass_here >= 50:
             self.condition = "grassland"
-        if self.trees_here < 25 and self.scrub_here < 25 and self.perc_bareground_here >= 50:
+        if self.trees_here < 10 and self.scrub_here < 10 and self.perc_bareground_here >= 50:
             self.condition = "bare_ground"
-        if self.trees_here < 25 and self.scrub_here >= 25:
+        if self.trees_here < 10 and self.scrub_here >= 10:
             self.condition = "thorny_scrubland"
-        if self.trees_here >= 25:
+        if self.trees_here >= 10:
             self.condition = "woodland"
 
 
@@ -114,81 +157,40 @@ class roeDeer_agent(RandomWalker):
         living = True
         self.energy -= 1
 
-        # Eat what's on my patch
+        # Eat what's on my patch: roe deer are broswers, so randomly choose any habitat to eat
         this_cell = self.model.grid.get_cell_list_contents([self.pos])
         habitat_patch = [obj for obj in this_cell if isinstance(obj, habitatAgent)][0]
-        # are there saplings here? pick how many to eat, gain energy
-        if habitat_patch.saplings_here > 0:
-            # count scrub and reduce the number of saplings eaten accordingly
-            count_scrub = habitat_patch.scrub_here
-            # roll dice between 0 and my maximum number I'll eat
-            eatenSaps = random.randint(0,self.model.roeDeer_saplingsEaten)
-            # rescale this according to how many shrubs there are 
-            eatenSaps_scaled = eatenSaps - int((eatenSaps*(count_scrub/100)))
-            habitat_patch.saplings_here -= eatenSaps_scaled
-            # don't let number of saplings go negative
-            if habitat_patch.saplings_here < 0:
-                habitat_patch.saplings_here = 0
+        for _ in range(5): # eat each habitat type to try to get above 1 energy
             if self.energy < 1:
-                self.energy += self.model.roeDeer_gain_from_Saplings
-                if self.energy > 1:
-                    self.energy = 1
+                habitat_choices = ["saplings", "trees", "scrub", "youngscrub", "grass"]
+                my_choice = rchoice(habitat_choices) # remove what we've chosen and run again
+                habitat_choices.remove(my_choice)
+                if my_choice == "saplings" and habitat_patch.saplings_here > 0:
+                    self.energy += self.model.roeDeer_gain_from_Saplings
+                    eatenSaps = random.randint(0,self.model.roeDeer_saplingsEaten)
+                    eat_saplings(habitat_patch, eatenSaps)
+                if my_choice == "trees" and habitat_patch.trees_here > 0:
+                    self.energy += self.model.roeDeer_gain_from_Trees
+                    eatenTrees = random.randint(0,self.model.roeDeer_treesEaten)
+                    eat_trees(habitat_patch, eatenTrees)
+                if my_choice == "scrub" and habitat_patch.scrub_here > 0:
+                    self.energy += self.model.roeDeer_gain_from_Scrub
+                    eatenScrub = random.randint(0,self.model.roeDeer_scrubEaten)
+                    eat_scrub(habitat_patch, eatenScrub)
+                if my_choice == "youngscrub" and habitat_patch.youngscrub_here > 0:
+                    self.energy += self.model.roeDeer_gain_from_YoungScrub
+                    eatenYoungScrub = random.randint(0,self.model.roeDeer_youngScrubEaten)
+                    eat_youngscrub(habitat_patch, eatenYoungScrub)
+                if my_choice == "grass" and habitat_patch.perc_grass_here > 0:
+                    self.energy += self.model.roeDeer_gain_from_grass
+                    eatenGrass = random.randint(0,self.model.roeDeer_impactGrass)
+                    eat_grass(habitat_patch, eatenGrass)
+  
 
-        # are there trees here?
-        if habitat_patch.trees_here > 0:
-            # roll dice between 0 and my maximum number I'll eat
-            eatenTrees = random.randint(0,self.model.roeDeer_treesEaten)
-            habitat_patch.trees_here -= eatenTrees
-            # don't let it go negative
-            if habitat_patch.trees_here < 0:
-                habitat_patch.trees_here = 0
-            if self.energy < 1:
-                self.energy += self.model.roeDeer_gain_from_Trees
-                if self.energy > 1:
-                    self.energy = 1
-        # are there shrubs here? pick how many to eat, gain energy'            
-        if habitat_patch.scrub_here > 0:
-            # roll dice between 0 and my maximum number I'll eat
-            eatenScrub = random.randint(0,self.model.roeDeer_scrubEaten)
-            habitat_patch.scrub_here -= eatenScrub
-            # don't let it go negative
-            if habitat_patch.scrub_here < 0:
-                habitat_patch.scrub_here = 0
-            if self.energy < 1:
-                self.energy += self.model.roeDeer_gain_from_Scrub
-                if self.energy > 1:
-                    self.energy = 1
-        # what about young shrubs?
-        if habitat_patch.youngscrub_here > 0:
-            # count scrub and reduce the number of young scrubs eaten accordingly
-            count_scrub = habitat_patch.scrub_here
-            # roll dice between 0 and my maximum number I'll eat, and subtract by percentage of scrub (/ total possible # scrub)
-            eatenYoungScrub = random.randint(0,self.model.roeDeer_youngScrubEaten)
-            # rescale according to number of scrub plants
-            eatenYoungScrub_scaled = eatenYoungScrub - int((eatenYoungScrub*(count_scrub/100)))
-            habitat_patch.youngscrub_here -= eatenYoungScrub_scaled
-            # don't let it go negative
-            if habitat_patch.youngscrub_here < 0:
-                habitat_patch.youngscrub_here = 0
-            if self.energy < 1:
-                self.energy += self.model.roeDeer_gain_from_YoungScrub
-                if self.energy > 1:
-                    self.energy = 1
-        # is there grass?
-        if habitat_patch.perc_grass_here > 0:
-            # roll dice between 0 and my maximum number I'll eat
-            eatenGrass = random.randint(0,self.model.roeDeer_impactGrass)
-            habitat_patch.perc_grass_here -= eatenGrass
-            habitat_patch.perc_bareground_here += eatenGrass
-            # don't let it go negative
-            if habitat_patch.perc_grass_here < 0:
-                habitat_patch.perc_grass_here = 0
-                habitat_patch.perc_bareground_here = 100
-            if self.energy < 1:
-                self.energy += self.model.roeDeer_gain_from_grass
-                if self.energy > 1:
-                    self.energy = 1
-    
+        # don't let energy be above 1
+        if self.energy > 1:
+            self.energy = 1
+
         # if roe deer's energy is less than 0, die 
         if self.energy < 0:
             self.model.grid._remove_agent(self.pos, self)
@@ -196,7 +198,7 @@ class roeDeer_agent(RandomWalker):
             living = False
 
         # I can reproduce in May & June (assuming model starts in Jan at beginning of year, May & June = time steps 5&6 out of every 12 months)
-        if living and random.random() < self.model.roeDeer_reproduce and (5 <= self.model.schedule.time < 7 or 17 <= self.model.schedule.time < 19 or 29 <= self.model.schedule.time < 31 or 41 <= self.model.schedule.time < 43 or 53 <= self.model.schedule.time < 55 or 65 <= self.model.schedule.time < 67 or 77 <= self.model.schedule.time < 79 or 89 <= self.model.schedule.time < 91 or 101 <= self.model.schedule.time < 103 or 113 <= self.model.schedule.time < 115 or 125 <= self.model.schedule.time < 127 or 137 <= self.model.schedule.time < 139 or 149 <= self.model.schedule.time < 151 or 161 <= self.model.schedule.time < 163 or 173 <= self.model.schedule.time < 175 or 185 <= self.model.schedule.time < 187 or 197 <= self.model.schedule.time < 199 or 209 <= self.model.schedule.time < 211 or 221 <= self.model.schedule.time < 223 or 233 <= self.model.schedule.time < 235 or 245 <= self.model.schedule.time < 247 or 257 <= self.model.schedule.time < 259 or 269 <= self.model.schedule.time < 271 or 281 <= self.model.schedule.time < 283 or 293 <= self.model.schedule.time < 295):
+        if living and (random.random() < self.model.roeDeer_reproduce) and (5 <= self.model.schedule.time < 7 or 17 <= self.model.schedule.time < 19 or 29 <= self.model.schedule.time < 31 or 41 <= self.model.schedule.time < 43 or 53 <= self.model.schedule.time < 55 or 65 <= self.model.schedule.time < 67 or 77 <= self.model.schedule.time < 79 or 89 <= self.model.schedule.time < 91 or 101 <= self.model.schedule.time < 103 or 113 <= self.model.schedule.time < 115 or 125 <= self.model.schedule.time < 127 or 137 <= self.model.schedule.time < 139 or 149 <= self.model.schedule.time < 151 or 161 <= self.model.schedule.time < 163 or 173 <= self.model.schedule.time < 175 or 185 <= self.model.schedule.time < 187 or 197 <= self.model.schedule.time < 199 or 209 <= self.model.schedule.time < 211 or 221 <= self.model.schedule.time < 223 or 233 <= self.model.schedule.time < 235 or 245 <= self.model.schedule.time < 247 or 257 <= self.model.schedule.time < 259 or 269 <= self.model.schedule.time < 271 or 281 <= self.model.schedule.time < 283 or 293 <= self.model.schedule.time < 295):
             # Create a new roe deer and divide energy:
             self.energy /= 2
             fawn = roeDeer_agent(self.model.next_id(), self.pos, self.model, self.moore, self.energy)
@@ -218,76 +220,32 @@ class exmoorPony(RandomWalker):
         # Eat what's on my patch
         this_cell = self.model.grid.get_cell_list_contents([self.pos])
         habitat_patch = [obj for obj in this_cell if isinstance(obj, habitatAgent)][0]
-        # are there saplings here? pick how many to eat, gain energy
-        if habitat_patch.saplings_here > 0:
-            # count scrub and reduce the number of saplings eaten accordingly
-            count_scrub = habitat_patch.scrub_here
-            # roll dice between 0 and my maximum number I'll eat
-            eatenSaps = random.randint(0,self.model.ponies_saplingsEaten)
-            # rescale this according to how many shrubs there are 
-            eatenSaps_scaled = eatenSaps - int((eatenSaps*(count_scrub/100)))
-            habitat_patch.saplings_here -= eatenSaps_scaled
-            # don't let number of saplings go negative
-            if habitat_patch.saplings_here < 0:
-                habitat_patch.saplings_here = 0
+        for _ in range(5): # eat each habitat type to try to get above 1 energy
             if self.energy < 1:
-                self.energy += self.model.ponies_gain_from_Saplings
-                if self.energy > 1:
-                    self.energy = 1
-        # are there trees here?
-        if habitat_patch.trees_here > 0:
-            # roll dice between 0 and my maximum number I'll eat
-            eatenTrees = random.randint(0,self.model.ponies_treesEaten)
-            habitat_patch.trees_here -= eatenTrees
-            # don't let it go negative
-            if habitat_patch.trees_here < 0:
-                habitat_patch.trees_here = 0
-            if self.energy < 1:
-                self.energy += self.model.ponies_gain_from_Trees
-                if self.energy > 1:
-                    self.energy = 1
-        # are there shrubs here? pick how many to eat, gain energy           
-        if habitat_patch.scrub_here > 0:
-                # roll dice between 0 and my maximum number I'll eat
-            eatenScrub = random.randint(0,self.model.ponies_scrubEaten)
-            habitat_patch.scrub_here -= eatenScrub
-            # don't let it go negative
-            if habitat_patch.scrub_here < 0:
-                habitat_patch.scrub_here = 0
-            if self.energy < 1:
-                self.energy += self.model.ponies_gain_from_Scrub
-                if self.energy > 1:
-                    self.energy = 1
-        # what about young shrubs?
-        if habitat_patch.youngscrub_here > 0:
-            # count scrub and reduce the number of young scrubs eaten accordingly
-            count_scrub = habitat_patch.scrub_here
-            # roll dice between 0 and my maximum number I'll eat, and subtract by percentage of scrub (/ total possible # scrub)
-            eatenYoungScrub = random.randint(0,self.model.ponies_youngScrubEaten)
-            # rescale according to number of scrub plants
-            eatenYoungScrub_scaled = eatenYoungScrub - int((eatenYoungScrub*(count_scrub/100)))
-            habitat_patch.youngscrub_here -= eatenYoungScrub_scaled
-            # don't let it go negative
-            if habitat_patch.youngscrub_here < 0:
-                habitat_patch.youngscrub_here = 0
-            if self.energy < 1:
-                self.energy += self.model.ponies_gain_from_YoungScrub
-                if self.energy > 1:
-                    self.energy = 1
-        # is there grass?
-        if habitat_patch.perc_grass_here > 0:
-            # roll dice between 0 and my maximum number I'll eat
-            eatenGrass = random.randint(0,self.model.ponies_impactGrass)
-            habitat_patch.perc_grass_here -= eatenGrass
-            habitat_patch.perc_bareground_here += eatenGrass
-            # don't let it go negative
-            if habitat_patch.perc_grass_here < 0:
-                habitat_patch.perc_grass_here = 0
-                habitat_patch.perc_bareground_here = 100
-            if self.energy < 1:
-                self.energy += self.model.ponies_gain_from_grass
-                if self.energy > 1:
-                    self.energy = 1
+                my_choice = np.random.choice(["saplings", "trees", "scrub", "youngscrub", "grass"])
+                if my_choice == "saplings" and habitat_patch.saplings_here > 0:
+                    self.energy += self.model.ponies_gain_from_Saplings
+                    eatenSaps = random.randint(0,self.model.ponies_saplingsEaten)
+                    eat_saplings(habitat_patch, eatenSaps)
+                if my_choice == "trees" and habitat_patch.trees_here > 0:
+                    self.energy += self.model.ponies_gain_from_Trees
+                    eatenTrees = random.randint(0,self.model.ponies_treesEaten)
+                    eat_trees(habitat_patch, eatenTrees)
+                if my_choice == "scrub" and habitat_patch.scrub_here > 0:
+                    self.energy += self.model.ponies_gain_from_Scrub
+                    eatenScrub = random.randint(0,self.model.ponies_scrubEaten)
+                    eat_scrub(habitat_patch, eatenScrub)
+                if my_choice == "youngscrub" and habitat_patch.youngscrub_here > 0:
+                    self.energy += self.model.ponies_gain_from_YoungScrub
+                    eatenYoungScrub = random.randint(0,self.model.ponies_youngScrubEaten)
+                    eat_youngscrub(habitat_patch, eatenYoungScrub)
+                if my_choice == "grass" and habitat_patch.perc_grass_here > 0:
+                    self.energy += self.model.ponies_gain_from_grass
+                    eatenGrass = random.randint(0,self.model.ponies_impactGrass)
+                    eat_grass(habitat_patch, eatenGrass)
+
+        if self.energy > 1:
+            self.energy = 1
         # if pony's energy is less than 0, die 
         if self.energy < 0:
             self.model.grid._remove_agent(self.pos, self)
@@ -311,76 +269,32 @@ class longhornCattle(RandomWalker):
         # Eat what's on my patch
         this_cell = self.model.grid.get_cell_list_contents([self.pos])
         habitat_patch = [obj for obj in this_cell if isinstance(obj, habitatAgent)][0]
-        # are there saplings here? pick how many to eat, gain energy
-        if habitat_patch.saplings_here > 0:
-            # count scrub and reduce the number of saplings eaten accordingly
-            count_scrub = habitat_patch.scrub_here
-            # roll dice between 0 and my maximum number I'll eat
-            eatenSaps = random.randint(0,self.model.cows_saplingsEaten)
-            # rescale this according to how many shrubs there are 
-            eatenSaps_scaled = eatenSaps - int((eatenSaps*(count_scrub/100)))
-            habitat_patch.saplings_here -= eatenSaps_scaled
-            # don't let number of saplings go negative
-            if habitat_patch.saplings_here < 0:
-                habitat_patch.saplings_here = 0
+        for _ in range(5): # eat each habitat type to try to get above 1 energy
             if self.energy < 1:
-                self.energy += self.model.cows_gain_from_Saplings
-                if self.energy > 1:
-                    self.energy = 1
-        # are there trees here?
-        if habitat_patch.trees_here > 0:
-            # roll dice between 0 and my maximum number I'll eat
-            eatenTrees = random.randint(0,self.model.cows_treesEaten)
-            habitat_patch.trees_here -= eatenTrees
-            # don't let it go negative
-            if habitat_patch.trees_here < 0:
-                habitat_patch.trees_here = 0
-            if self.energy < 1:
-                self.energy += self.model.cows_gain_from_Trees
-                if self.energy > 1:
-                    self.energy = 1
-        # are there shrubs here? pick how many to eat, gain energy           
-        if habitat_patch.scrub_here > 0:
-                # roll dice between 0 and my maximum number I'll eat
-            eatenScrub = random.randint(0,self.model.cows_scrubEaten)
-            habitat_patch.scrub_here -= eatenScrub
-            # don't let it go negative
-            if habitat_patch.scrub_here < 0:
-                habitat_patch.scrub_here = 0
-            if self.energy < 1:
-                self.energy += self.model.cows_gain_from_Scrub
-                if self.energy > 1:
-                    self.energy = 1
-        # what about young shrubs?
-        if habitat_patch.youngscrub_here > 0:
-            # count scrub and reduce the number of young scrubs eaten accordingly
-            count_scrub = habitat_patch.scrub_here
-            # roll dice between 0 and my maximum number I'll eat, and subtract by percentage of scrub (/ total possible # scrub)
-            eatenYoungScrub = random.randint(0,self.model.cows_youngScrubEaten)
-            # rescale according to number of scrub plants
-            eatenYoungScrub_scaled = eatenYoungScrub - int((eatenYoungScrub*(count_scrub/100)))
-            habitat_patch.youngscrub_here -= eatenYoungScrub_scaled
-            # don't let it go negative
-            if habitat_patch.youngscrub_here < 0:
-                habitat_patch.youngscrub_here = 0
-            if self.energy < 1:
-                self.energy += self.model.cows_gain_from_YoungScrub
-                if self.energy > 1:
-                    self.energy = 1
-        # is there grass?
-        if habitat_patch.perc_grass_here > 0:
-            # roll dice between 0 and my maximum number I'll eat
-            eatenGrass = random.randint(0,self.model.cows_impactGrass)
-            habitat_patch.perc_grass_here -= eatenGrass
-            habitat_patch.perc_bareground_here += eatenGrass
-            # don't let it go negative
-            if habitat_patch.perc_grass_here < 0:
-                habitat_patch.perc_grass_here = 0
-                habitat_patch.perc_bareground_here = 100
-            if self.energy < 1:
-                self.energy += self.model.cows_gain_from_grass
-                if self.energy > 1:
-                    self.energy = 1
+                my_choice = np.random.choice(["saplings", "trees", "scrub", "youngscrub", "grass"])
+                if my_choice == "saplings" and habitat_patch.saplings_here > 0:
+                    self.energy += self.model.cows_gain_from_Saplings
+                    eatenSaps = random.randint(0,self.model.cows_saplingsEaten)
+                    eat_saplings(habitat_patch, eatenSaps)
+                if my_choice == "trees" and habitat_patch.trees_here > 0:
+                    self.energy += self.model.cows_gain_from_Trees
+                    eatenTrees = random.randint(0,self.model.cows_treesEaten)
+                    eat_trees(habitat_patch, eatenTrees)
+                if my_choice == "scrub" and habitat_patch.scrub_here > 0:
+                    self.energy += self.model.cows_gain_from_Scrub
+                    eatenScrub = random.randint(0,self.model.cows_scrubEaten)
+                    eat_scrub(habitat_patch, eatenScrub)
+                if my_choice == "youngscrub" and habitat_patch.youngscrub_here > 0:
+                    self.energy += self.model.cows_gain_from_YoungScrub
+                    eatenYoungScrub = random.randint(0,self.model.cows_youngScrubEaten)
+                    eat_youngscrub(habitat_patch, eatenYoungScrub)
+                if my_choice == "grass" and habitat_patch.perc_grass_here > 0:
+                    self.energy += self.model.cows_gain_from_grass
+                    eatenGrass = random.randint(0,self.model.cows_impactGrass)
+                    eat_grass(habitat_patch, eatenGrass)
+    
+        if self.energy > 1:
+            self.energy = 1
         # if cow's energy is less than 0, die 
         if self.energy < 0:
             self.model.grid._remove_agent(self.pos, self)
@@ -388,7 +302,7 @@ class longhornCattle(RandomWalker):
             living = False
             
         # I reproduce in April, May, and June (assuming model starts in Jan at beginning of year, April, May & June = time steps 4-6 out of every 12 months)
-        if living and random.random() < self.model.cows_reproduce and (4 <= self.model.schedule.time < 7 or 16 <= self.model.schedule.time < 19 or 28 <= self.model.schedule.time < 31 or 40 <= self.model.schedule.time < 43 or 52 <= self.model.schedule.time < 55 or 64 <= self.model.schedule.time < 67 or 76 <= self.model.schedule.time < 79 or 88 <= self.model.schedule.time < 91 or 100 <= self.model.schedule.time < 103 or 112 <= self.model.schedule.time < 115 or 124 <= self.model.schedule.time < 127 or 136 <= self.model.schedule.time < 139 or 148 <= self.model.schedule.time < 151 or 160 <= self.model.schedule.time < 163 or 172 <= self.model.schedule.time < 175 or 184 <= self.model.schedule.time < 187 or 196 <= self.model.schedule.time < 199 or 208 <= self.model.schedule.time < 211 or 220 <= self.model.schedule.time < 223 or 232 <= self.model.schedule.time < 235 or 244 <= self.model.schedule.time < 247 or 256 <= self.model.schedule.time < 259 or 268 <= self.model.schedule.time < 271 or 280 <= self.model.schedule.time < 283 or 292 <= self.model.schedule.time < 295):
+        if living and (random.random() < self.model.cows_reproduce) and (4 <= self.model.schedule.time < 7 or 16 <= self.model.schedule.time < 19 or 28 <= self.model.schedule.time < 31 or 40 <= self.model.schedule.time < 43 or 52 <= self.model.schedule.time < 55 or 64 <= self.model.schedule.time < 67 or 76 <= self.model.schedule.time < 79 or 88 <= self.model.schedule.time < 91 or 100 <= self.model.schedule.time < 103 or 112 <= self.model.schedule.time < 115 or 124 <= self.model.schedule.time < 127 or 136 <= self.model.schedule.time < 139 or 148 <= self.model.schedule.time < 151 or 160 <= self.model.schedule.time < 163 or 172 <= self.model.schedule.time < 175 or 184 <= self.model.schedule.time < 187 or 196 <= self.model.schedule.time < 199 or 208 <= self.model.schedule.time < 211 or 220 <= self.model.schedule.time < 223 or 232 <= self.model.schedule.time < 235 or 244 <= self.model.schedule.time < 247 or 256 <= self.model.schedule.time < 259 or 268 <= self.model.schedule.time < 271 or 280 <= self.model.schedule.time < 283 or 292 <= self.model.schedule.time < 295):
             # Create a new cow and divide energy:
             self.energy /= 2
             calf = longhornCattle(self.model.next_id(), self.pos, self.model, self.moore, self.energy)
@@ -412,76 +326,32 @@ class fallowDeer(RandomWalker):
         # Eat what's on my patch
         this_cell = self.model.grid.get_cell_list_contents([self.pos])
         habitat_patch = [obj for obj in this_cell if isinstance(obj, habitatAgent)][0]
-        # are there saplings here? pick how many to eat, gain energy
-        if habitat_patch.saplings_here > 0:
-            # count scrub and reduce the number of saplings eaten accordingly
-            count_scrub = habitat_patch.scrub_here
-            # roll dice between 0 and my maximum number I'll eat
-            eatenSaps = random.randint(0,self.model.fallowDeer_saplingsEaten)
-            # rescale this according to how many shrubs there are 
-            eatenSaps_scaled = eatenSaps - int((eatenSaps*(count_scrub/100)))
-            habitat_patch.saplings_here -= eatenSaps_scaled
-            # don't let number of saplings go negative
-            if habitat_patch.saplings_here < 0:
-                habitat_patch.saplings_here = 0
+        for _ in range(5): # eat each habitat type to try to get above 1 energy
             if self.energy < 1:
-                self.energy += self.model.fallowDeer_gain_from_Saplings
-                if self.energy > 1:
-                    self.energy = 1
-        # are there trees here?
-        if habitat_patch.trees_here > 0:
-            # roll dice between 0 and my maximum number I'll eat
-            eatenTrees = random.randint(0,self.model.fallowDeer_treesEaten)
-            habitat_patch.trees_here -= eatenTrees
-            # don't let it go negative
-            if habitat_patch.trees_here < 0:
-                habitat_patch.trees_here = 0
-            if self.energy < 1:
-                self.energy += self.model.fallowDeer_gain_from_Trees
-                if self.energy > 1:
-                    self.energy = 1
-        # are there shrubs here? pick how many to eat, gain energy'            
-        if habitat_patch.scrub_here > 0:
-                # roll dice between 0 and my maximum number I'll eat
-            eatenScrub = random.randint(0,self.model.fallowDeer_scrubEaten)
-            habitat_patch.scrub_here -= eatenScrub
-            # don't let it go negative
-            if habitat_patch.scrub_here < 0:
-                habitat_patch.scrub_here = 0
-            if self.energy < 1:
-                self.energy += self.model.fallowDeer_gain_from_Scrub
-                if self.energy > 1:
-                    self.energy = 1
-        # what about young shrubs?
-        if habitat_patch.youngscrub_here > 0:
-            # count scrub and reduce the number of young scrubs eaten accordingly
-            count_scrub = habitat_patch.scrub_here
-            # roll dice between 0 and my maximum number I'll eat, and subtract by percentage of scrub (/ total possible # scrub)
-            eatenYoungScrub = random.randint(0,self.model.fallowDeer_youngScrubEaten)
-            # rescale according to number of scrub plants
-            eatenYoungScrub_scaled = eatenYoungScrub - int((eatenYoungScrub*(count_scrub/100)))
-            habitat_patch.youngscrub_here -= eatenYoungScrub_scaled
-            # don't let it go negative
-            if habitat_patch.youngscrub_here < 0:
-                habitat_patch.youngscrub_here = 0
-            if self.energy < 1:
-                self.energy += self.model.fallowDeer_gain_from_YoungScrub
-                if self.energy > 1:
-                    self.energy = 1
-        # is there grass?
-        if habitat_patch.perc_grass_here > 0:
-            # roll dice between 0 and my maximum number I'll eat
-            eatenGrass = random.randint(0,self.model.fallowDeer_impactGrass)
-            habitat_patch.perc_grass_here -= eatenGrass
-            habitat_patch.perc_bareground_here += eatenGrass
-            # don't let it go negative
-            if habitat_patch.perc_grass_here < 0:
-                habitat_patch.perc_grass_here = 0
-                habitat_patch.perc_bareground_here = 100
-            if self.energy < 1:
-                self.energy += self.model.fallowDeer_gain_from_grass
-                if self.energy > 1:
-                    self.energy = 1
+                my_choice = np.random.choice(["saplings", "trees", "scrub", "youngscrub", "grass"])
+                if my_choice == "saplings" and habitat_patch.saplings_here > 0:
+                    self.energy += self.model.fallowDeer_gain_from_Saplings
+                    eatenSaps = random.randint(0,self.model.fallowDeer_saplingsEaten)
+                    eat_saplings(habitat_patch, eatenSaps)
+                if my_choice == "trees" and habitat_patch.trees_here > 0:
+                    self.energy += self.model.fallowDeer_gain_from_Trees
+                    eatenTrees = random.randint(0,self.model.fallowDeer_treesEaten)
+                    eat_trees(habitat_patch, eatenTrees)
+                if my_choice == "scrub" and habitat_patch.scrub_here > 0:
+                    self.energy += self.model.cows_gain_from_Scrub
+                    eatenScrub = random.randint(0,self.model.cows_scrubEaten)
+                    eat_scrub(habitat_patch, eatenScrub)
+                if my_choice == "youngscrub" and habitat_patch.youngscrub_here > 0:
+                    self.energy += self.model.fallowDeer_gain_from_YoungScrub
+                    eatenYoungScrub = random.randint(0,self.model.fallowDeer_youngScrubEaten)
+                    eat_youngscrub(habitat_patch, eatenYoungScrub)
+                if my_choice == "grass" and habitat_patch.perc_grass_here > 0:
+                    self.energy += self.model.fallowDeer_gain_from_grass
+                    eatenGrass = random.randint(0,self.model.fallowDeer_impactGrass)
+                    eat_grass(habitat_patch, eatenGrass)
+ 
+        if self.energy > 1:
+            self.energy = 1
     
         # if fallow deer's energy is less than 0, die 
         if self.energy < 0:
@@ -490,7 +360,7 @@ class fallowDeer(RandomWalker):
             living = False
             
         # I reproduce in May & June (assuming model starts in Jan at beginning of year, May & June = time steps 5&6 out of every 12 months)
-        if living and random.random() < self.model.fallowDeer_reproduce and (5 <= self.model.schedule.time < 7 or 17 <= self.model.schedule.time < 19 or 29 <= self.model.schedule.time < 31 or 41 <= self.model.schedule.time < 43 or 53 <= self.model.schedule.time < 55 or 65 <= self.model.schedule.time < 67 or 77 <= self.model.schedule.time < 79 or 89 <= self.model.schedule.time < 91 or 101 <= self.model.schedule.time < 103 or 113 <= self.model.schedule.time < 115 or 125 <= self.model.schedule.time < 127 or 137 <= self.model.schedule.time < 139 or 149 <= self.model.schedule.time < 151 or 161 <= self.model.schedule.time < 163 or 173 <= self.model.schedule.time < 175 or 185 <= self.model.schedule.time < 187 or 197 <= self.model.schedule.time < 199 or 209 <= self.model.schedule.time < 211 or 221 <= self.model.schedule.time < 223 or 233 <= self.model.schedule.time < 235 or 245 <= self.model.schedule.time < 247 or 257 <= self.model.schedule.time < 259 or 269 <= self.model.schedule.time < 271 or 281 <= self.model.schedule.time < 283 or 293 <= self.model.schedule.time < 295):
+        if living and (random.random() < self.model.fallowDeer_reproduce) and (5 <= self.model.schedule.time < 7 or 17 <= self.model.schedule.time < 19 or 29 <= self.model.schedule.time < 31 or 41 <= self.model.schedule.time < 43 or 53 <= self.model.schedule.time < 55 or 65 <= self.model.schedule.time < 67 or 77 <= self.model.schedule.time < 79 or 89 <= self.model.schedule.time < 91 or 101 <= self.model.schedule.time < 103 or 113 <= self.model.schedule.time < 115 or 125 <= self.model.schedule.time < 127 or 137 <= self.model.schedule.time < 139 or 149 <= self.model.schedule.time < 151 or 161 <= self.model.schedule.time < 163 or 173 <= self.model.schedule.time < 175 or 185 <= self.model.schedule.time < 187 or 197 <= self.model.schedule.time < 199 or 209 <= self.model.schedule.time < 211 or 221 <= self.model.schedule.time < 223 or 233 <= self.model.schedule.time < 235 or 245 <= self.model.schedule.time < 247 or 257 <= self.model.schedule.time < 259 or 269 <= self.model.schedule.time < 271 or 281 <= self.model.schedule.time < 283 or 293 <= self.model.schedule.time < 295):
             # Create a new fallow deer and divide energy:
             self.energy /= 2
             fawn = fallowDeer(self.model.next_id(), self.pos, self.model, self.moore, self.energy)
@@ -512,78 +382,32 @@ class redDeer(RandomWalker):
         # Eat what's on my patch
         this_cell = self.model.grid.get_cell_list_contents([self.pos])
         habitat_patch = [obj for obj in this_cell if isinstance(obj, habitatAgent)][0]
-        # are there saplings here? pick how many to eat, gain energy
-        if habitat_patch.saplings_here > 0:
-            # count scrub and reduce the number of saplings eaten accordingly
-            count_scrub = habitat_patch.scrub_here
-            # roll dice between 0 and my maximum number I'll eat
-            eatenSaps = random.randint(0,self.model.redDeer_saplingsEaten)
-            # rescale this according to how many shrubs there are 
-            eatenSaps_scaled = eatenSaps - int((eatenSaps*(count_scrub/100)))
-            habitat_patch.saplings_here -= eatenSaps_scaled
-            # don't let number of saplings go negative
-            if habitat_patch.saplings_here < 0:
-                habitat_patch.saplings_here = 0
-            # gain energy up to  1
+        for _ in range(5): # eat each habitat type to try to get above 1 energy
             if self.energy < 1:
-                self.energy += self.model.redDeer_gain_from_Saplings
-                if self.energy > 1:
-                    self.energy = 1
-        # are there trees here?
-        if habitat_patch.trees_here > 0:
-            # roll dice between 0 and my maximum number I'll eat
-            eatenTrees = random.randint(0,self.model.redDeer_treesEaten)
-            habitat_patch.trees_here -= eatenTrees
-            # don't let it go negative
-            if habitat_patch.trees_here < 0:
-                habitat_patch.trees_here = 0
-            if self.energy < 1:
-                self.energy += self.model.redDeer_gain_from_Trees
-                if self.energy > 1:
-                    self.energy = 1
-                
-        # are there shrubs here? pick how many to eat, gain energy'            
-        if habitat_patch.scrub_here > 0:
-                # roll dice between 0 and my maximum number I'll eat
-            eatenScrub = random.randint(0,self.model.redDeer_scrubEaten)
-            habitat_patch.scrub_here -= eatenScrub
-            # don't let it go negative
-            if habitat_patch.scrub_here < 0:
-                habitat_patch.scrub_here = 0
-            if self.energy < 1:
-                self.energy += self.model.redDeer_gain_from_Scrub
-                if self.energy > 1:
-                    self.energy = 1
-        # what about young shrubs?
-        if habitat_patch.youngscrub_here > 0:
-            # count scrub and reduce the number of young scrubs eaten accordingly
-            count_scrub = habitat_patch.scrub_here
-            # roll dice between 0 and my maximum number I'll eat, and subtract by percentage of scrub (/ total possible # scrub)
-            eatenYoungScrub = random.randint(0,self.model.redDeer_youngScrubEaten)
-            # rescale according to number of scrub plants
-            eatenYoungScrub_scaled = eatenYoungScrub - int((eatenYoungScrub*(count_scrub/100)))
-            habitat_patch.youngscrub_here -= eatenYoungScrub_scaled
-            # don't let it go negative
-            if habitat_patch.youngscrub_here < 0:
-                habitat_patch.youngscrub_here = 0
-            if self.energy < 1:
-                self.energy += self.model.redDeer_gain_from_YoungScrub
-                if self.energy > 1:
-                    self.energy = 1
-        # is there grass?
-        if habitat_patch.perc_grass_here > 0:
-            # roll dice between 0 and my maximum number I'll eat
-            eatenGrass = random.randint(0,self.model.redDeer_impactGrass)
-            habitat_patch.perc_grass_here -= eatenGrass
-            habitat_patch.perc_bareground_here += eatenGrass
-            # don't let it go negative
-            if habitat_patch.perc_grass_here < 0:
-                habitat_patch.perc_grass_here = 0
-                habitat_patch.perc_bareground_here = 100
-            if self.energy < 1:
-                self.energy += self.model.redDeer_gain_from_grass
-                if self.energy > 1:
-                    self.energy = 1
+                my_choice = np.random.choice(["saplings", "trees", "scrub", "youngscrub", "grass"])
+                if my_choice == "saplings" and habitat_patch.saplings_here > 0: 
+                    self.energy += self.model.redDeer_gain_from_Saplings
+                    eatenSaps = random.randint(0,self.model.redDeer_saplingsEaten)
+                    eat_saplings(habitat_patch, eatenSaps)
+                if my_choice == "trees" and habitat_patch.trees_here > 0:
+                    self.energy += self.model.redDeer_gain_from_Trees
+                    eatenTrees = random.randint(0,self.model.redDeer_treesEaten)
+                    eat_trees(habitat_patch, eatenTrees)
+                if my_choice == "scrub" and habitat_patch.scrub_here > 0:
+                    self.energy += self.model.redDeer_gain_from_Scrub
+                    eatenScrub = random.randint(0,self.model.redDeer_scrubEaten)
+                    eat_scrub(habitat_patch, eatenScrub)
+                if my_choice == "youngscrub" and habitat_patch.youngscrub_here > 0:
+                    self.energy += self.model.redDeer_gain_from_YoungScrub
+                    eatenYoungScrub = random.randint(0,self.model.redDeer_youngScrubEaten)
+                    eat_youngscrub(habitat_patch, eatenYoungScrub)
+                if my_choice == "grass" and habitat_patch.perc_grass_here > 0:
+                    self.energy += self.model.redDeer_gain_from_grass
+                    eatenGrass = random.randint(0,self.model.redDeer_impactGrass)
+                    eat_grass(habitat_patch, eatenGrass)
+ 
+        if self.energy > 1:
+            self.energy = 1
 
         # if red deer's energy is less than 0, die 
         if self.energy < 0:
@@ -591,7 +415,7 @@ class redDeer(RandomWalker):
             self.model.schedule.remove(self)
             living = False
         # I reproduce in May & June (assuming model starts in Jan at beginning of year, May & June = time steps 5&6 out of every 12 months)
-        if living and random.random() < self.model.redDeer_reproduce and (5 <= self.model.schedule.time < 7 or 17 <= self.model.schedule.time < 19 or 29 <= self.model.schedule.time < 31 or 41 <= self.model.schedule.time < 43 or 53 <= self.model.schedule.time < 55 or 65 <= self.model.schedule.time < 67 or 77 <= self.model.schedule.time < 79 or 89 <= self.model.schedule.time < 91 or 101 <= self.model.schedule.time < 103 or 113 <= self.model.schedule.time < 115 or 125 <= self.model.schedule.time < 127 or 137 <= self.model.schedule.time < 139 or 149 <= self.model.schedule.time < 151 or 161 <= self.model.schedule.time < 163 or 173 <= self.model.schedule.time < 175 or 185 <= self.model.schedule.time < 187 or 197 <= self.model.schedule.time < 199 or 209 <= self.model.schedule.time < 211 or 221 <= self.model.schedule.time < 223 or 233 <= self.model.schedule.time < 235 or 245 <= self.model.schedule.time < 247 or 257 <= self.model.schedule.time < 259 or 269 <= self.model.schedule.time < 271 or 281 <= self.model.schedule.time < 283 or 293 <= self.model.schedule.time < 295):
+        if living and (random.random() < self.model.redDeer_reproduce) and (5 <= self.model.schedule.time < 7 or 17 <= self.model.schedule.time < 19 or 29 <= self.model.schedule.time < 31 or 41 <= self.model.schedule.time < 43 or 53 <= self.model.schedule.time < 55 or 65 <= self.model.schedule.time < 67 or 77 <= self.model.schedule.time < 79 or 89 <= self.model.schedule.time < 91 or 101 <= self.model.schedule.time < 103 or 113 <= self.model.schedule.time < 115 or 125 <= self.model.schedule.time < 127 or 137 <= self.model.schedule.time < 139 or 149 <= self.model.schedule.time < 151 or 161 <= self.model.schedule.time < 163 or 173 <= self.model.schedule.time < 175 or 185 <= self.model.schedule.time < 187 or 197 <= self.model.schedule.time < 199 or 209 <= self.model.schedule.time < 211 or 221 <= self.model.schedule.time < 223 or 233 <= self.model.schedule.time < 235 or 245 <= self.model.schedule.time < 247 or 257 <= self.model.schedule.time < 259 or 269 <= self.model.schedule.time < 271 or 281 <= self.model.schedule.time < 283 or 293 <= self.model.schedule.time < 295):
             # Create a new roe deer and divide energy:
             self.energy /= 2
             fawn = redDeer(self.model.next_id(), self.pos, self.model, self.moore, self.energy)
@@ -614,54 +438,23 @@ class tamworthPigs(RandomWalker):
         # Eat what's on my patch
         this_cell = self.model.grid.get_cell_list_contents([self.pos])
         habitat_patch = [obj for obj in this_cell if isinstance(obj, habitatAgent)][0]
-        # are there saplings here? pick how many to eat, gain energy
-        if habitat_patch.saplings_here > 0:
-            # count scrub and reduce the number of saplings eaten accordingly
-            count_scrub = habitat_patch.scrub_here
-            # roll dice between 0 and my maximum number I'll eat
-            eatenSaps = random.randint(0,self.model.pigs_saplingsEaten)
-            # rescale this according to how many shrubs there are 
-            eatenSaps_scaled = eatenSaps - int((eatenSaps*(count_scrub/100)))
-            habitat_patch.saplings_here -= eatenSaps_scaled
-            # don't let number of saplings go negative
-            if habitat_patch.saplings_here < 0:
-                habitat_patch.saplings_here = 0
+        for _ in range(5): # eat each habitat type to try to get above 1 energy
             if self.energy < 1:
-                self.energy += self.model.pigs_gain_from_Saplings
-                if self.energy > 1:
-                    self.energy = 1
-        # what about young shrubs?
-        if habitat_patch.youngscrub_here > 0:
-            self.energy += self.model.pigs_gain_from_YoungScrub
-            # count scrub and reduce the number of young scrubs eaten accordingly
-            count_scrub = habitat_patch.scrub_here
-            # roll dice between 0 and my maximum number I'll eat, and subtract by percentage of scrub (/ total possible # scrub)
-            eatenYoungScrub = random.randint(0,self.model.pigs_youngScrubEaten)
-            # rescale according to number of scrub plants
-            eatenYoungScrub_scaled = eatenYoungScrub - int((eatenYoungScrub*(count_scrub/100)))
-            habitat_patch.youngscrub_here -= eatenYoungScrub_scaled
-            # don't let it go negative
-            if habitat_patch.youngscrub_here < 0:
-                habitat_patch.youngscrub_here = 0
-            if self.energy < 1:
-                self.energy += self.model.pigs_gain_from_YoungScrub
-                if self.energy > 1:
-                    self.energy = 1
-        # is there grass?
-        if habitat_patch.perc_grass_here > 0:
-            self.energy += self.model.pigs_gain_from_grass
-            # roll dice between 0 and my maximum number I'll eat
-            eatenGrass = random.randint(0,self.model.pigs_impactGrass)
-            habitat_patch.perc_grass_here -= eatenGrass
-            habitat_patch.perc_bareground_here += eatenGrass
-            # don't let it go negative
-            if habitat_patch.perc_grass_here < 0:
-                habitat_patch.perc_grass_here = 0
-                habitat_patch.perc_bareground_here = 100
-            if self.energy < 1:
-                self.energy += self.model.pigs_gain_from_grass
-                if self.energy > 1:
-                    self.energy = 1
+                my_choice = np.random.choice(["saplings", "youngscrub", "grass"])
+                if my_choice == "saplings" and habitat_patch.saplings_here > 0:
+                    self.energy += self.model.pigs_gain_from_Saplings
+                    eatenSaps = random.randint(0,self.model.pigs_saplingsEaten)
+                    eat_saplings(habitat_patch, eatenSaps)
+                if my_choice == "youngscrub" and habitat_patch.scrub_here > 0:
+                    self.energy += self.model.pigs_gain_from_YoungScrub
+                    eatenYoungScrub = random.randint(0,self.model.pigs_youngScrubEaten)
+                    eat_youngscrub(habitat_patch, eatenYoungScrub)
+                if my_choice == "grass" and habitat_patch.perc_grass_here > 0:
+                    self.energy += self.model.pigs_gain_from_grass
+                    eatenGrass = random.randint(0,self.model.pigs_impactGrass)
+                    eat_grass(habitat_patch, eatenGrass)
+        if self.energy > 1:
+            self.energy = 1
     
         # if pig's energy is less than 0, die 
         if self.energy < 0:
@@ -670,7 +463,7 @@ class tamworthPigs(RandomWalker):
             living = False
             
         # pigs reproduce Jan - July (1 - 7, < 8)
-        if living and random.random() < self.model.pigs_reproduce and (1 <= self.model.schedule.time < 8 or 13 <= self.model.schedule.time < 20 or 25 <= self.model.schedule.time < 32 or 37 <= self.model.schedule.time < 44 or 49 <= self.model.schedule.time < 56 or 61 <= self.model.schedule.time < 68 or 73 <= self.model.schedule.time < 80 or 85 <= self.model.schedule.time < 92 or 97 <= self.model.schedule.time < 104 or 109 <= self.model.schedule.time < 116 or 121 <= self.model.schedule.time < 128 or 133 <= self.model.schedule.time < 140 or 145 <= self.model.schedule.time < 152 or 157 <= self.model.schedule.time < 164 or 169 <= self.model.schedule.time < 176 or 181 <= self.model.schedule.time < 188 or 193 <= self.model.schedule.time < 200 or 205 <= self.model.schedule.time < 212 or 217 <= self.model.schedule.time < 224 or 229 <= self.model.schedule.time < 236 or 241 <= self.model.schedule.time < 248 or 253 <= self.model.schedule.time < 260 or 265 <= self.model.schedule.time < 272 or 277 <= self.model.schedule.time < 284 or 289 <= self.model.schedule.time < 296):
+        if living and (random.random() < self.model.pigs_reproduce) and (1 <= self.model.schedule.time < 8 or 13 <= self.model.schedule.time < 20 or 25 <= self.model.schedule.time < 32 or 37 <= self.model.schedule.time < 44 or 49 <= self.model.schedule.time < 56 or 61 <= self.model.schedule.time < 68 or 73 <= self.model.schedule.time < 80 or 85 <= self.model.schedule.time < 92 or 97 <= self.model.schedule.time < 104 or 109 <= self.model.schedule.time < 116 or 121 <= self.model.schedule.time < 128 or 133 <= self.model.schedule.time < 140 or 145 <= self.model.schedule.time < 152 or 157 <= self.model.schedule.time < 164 or 169 <= self.model.schedule.time < 176 or 181 <= self.model.schedule.time < 188 or 193 <= self.model.schedule.time < 200 or 205 <= self.model.schedule.time < 212 or 217 <= self.model.schedule.time < 224 or 229 <= self.model.schedule.time < 236 or 241 <= self.model.schedule.time < 248 or 253 <= self.model.schedule.time < 260 or 265 <= self.model.schedule.time < 272 or 277 <= self.model.schedule.time < 284 or 289 <= self.model.schedule.time < 296):
             # Pick a number of piglets to have
             for _ in range(random.randint(1,10)):
             # Create a new piglet and divide energy:
