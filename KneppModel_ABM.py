@@ -14,10 +14,8 @@ from random import choice as rchoice
 
 # herbivore eating habitat types
 def eat_saplings(habitat_patch, eatenSaps):
-    # count scrub and reduce the number of saplings eaten accordingly
-    count_scrub = habitat_patch.scrub_here
     # rescale this according to how many shrubs there are 
-    eatenSaps_scaled = eatenSaps - int((eatenSaps*(count_scrub/100)))
+    eatenSaps_scaled = eatenSaps - int((eatenSaps*(habitat_patch.scrub_here/100)))
     habitat_patch.saplings_here -= eatenSaps_scaled
     # don't let number of saplings go negative
     if habitat_patch.saplings_here < 0:
@@ -38,10 +36,8 @@ def eat_scrub(habitat_patch, eatenScrub):
         habitat_patch.scrub_here = 0
 
 def eat_youngscrub(habitat_patch, eatenYoungScrub):
-    # count scrub and reduce the number of young scrubs eaten accordingly
-    count_scrub = habitat_patch.scrub_here
     # rescale according to number of scrub plants
-    eatenYoungScrub_scaled = eatenYoungScrub - int((eatenYoungScrub*(count_scrub/100)))
+    eatenYoungScrub_scaled = eatenYoungScrub - int((eatenYoungScrub*(habitat_patch.scrub_here/100)))
     habitat_patch.youngscrub_here -= eatenYoungScrub_scaled
     # don't let it go negative
     if habitat_patch.youngscrub_here < 0:
@@ -72,78 +68,85 @@ class habitatAgent (Agent):
         self.perc_bareground_here = perc_bareground_here
 
     def step(self):
-        # chance of reproducing a sapling to neighboring cell or to my cell
-        if self.trees_here > 0 and random.random() < self.model.chance_reproduceSapling:
-            # find my neighboring cells, including the one I'm in
-            neighborhood_list = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=True)
-            items_in_neighborhood = list(map(self.model.grid.get_cell_list_contents, neighborhood_list)) 
-            # pick one that has less than 1000 saplings
-            only_habitat_cells = [obj for obj in items_in_neighborhood if (isinstance(x, habitatAgent) for x in obj)]
-            no_herbivores = [item[0] for item in only_habitat_cells]
-            available_sapling_cell = [i for i in no_herbivores if i.saplings_here < 1000]
-            if len(available_sapling_cell) > 0:
-                new_patch_sapling = self.random.choice(available_sapling_cell)
-                # and put a sapling there
-                new_patch_sapling.saplings_here += 1
+        # chance of reproducing saplings to neighboring cell or to my cell
+        neighborhood_list = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=True)
+        items_in_neighborhood = list(map(self.model.grid.get_cell_list_contents, neighborhood_list)) 
+        # pick one that has less than 1000 saplings
+        only_habitat_cells = [obj for obj in items_in_neighborhood if (isinstance(x, habitatAgent) for x in obj)]
+        no_herbivores = [item[0] for item in only_habitat_cells]
+        available_sapling_cell = [i for i in no_herbivores if i.saplings_here < 1000 and i.trees_here < 100]
+        if len(available_sapling_cell) > 0:
+            new_patch_sapling = self.random.choice(available_sapling_cell)
+            # and put a sapling there
+            # newSapling = (int(self.model.chance_reproduceSapling * self.trees_here))
+            # it has less chance of surviving if there are lots of trees there
+            # new_patch_sapling.saplings_here += (newSapling - int((newSapling*(new_patch_sapling.trees_here/100))))
+            new_patch_sapling.saplings_here += int(self.model.chance_reproduceSapling * self.trees_here) # if there are no trees, this'll be zero
 
         # chance of reproducing young scrub
-        if self.scrub_here > 0 and random.random() < self.model.chance_reproduceYoungScrub:
-            # find my neighboring cells, including the one I'm in
-            neighborhood_list = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=True)
-            items_in_neighborhood = list(map(self.model.grid.get_cell_list_contents, neighborhood_list)) 
-            # pick one that has less than 1000 young scrubs
-            only_habitat_cells = [obj for obj in items_in_neighborhood if (isinstance(x, habitatAgent) for x in obj)]
-            no_herbivores = [item[0] for item in only_habitat_cells]
-            available_youngscrub_cell = [i for i in no_herbivores if i.youngscrub_here < 1000]
-            if len(available_youngscrub_cell) > 0:
-                new_patch_youngscrub = self.random.choice(available_youngscrub_cell) 
-                # and put a young scrub there
-                new_patch_youngscrub.youngscrub_here += 1
-        # chance of bare ground becoming grassland
-        if random.random() < self.model.chance_regrowGrass and self.perc_grass_here < 100:
-            self.perc_grass_here += 1
-            self.perc_bareground_here -= 1
-        # chance of young scrub becoming mature scrub
-        if self.youngscrub_here > 0:
-            if random.random() < self.model.chance_youngScrubMatures:
-                self.scrub_here += 1
-                self.youngscrub_here -= 1
-            # if a mature scrub is added, chance of grassland being outcompeted
-                if self.perc_grass_here > 0 and random.random() < self.model.chance_grassOutcompetedByTreeScrub:
-                    self.perc_bareground_here += 1
-                    self.perc_grass_here -= 1
-                # or of scrub/saplings outcompeted
-                if self.saplings_here > 0 and random.random() < self.model.chance_saplingOutcompetedByScrub and self.saplings_here >0:
-                    self.saplings_here -= 1
-                if self.youngscrub_here > 0 and random.random() < self.model.chance_youngScrubOutcompetedByScrub and self.youngscrub_here >0:
-                    self.youngscrub_here -= 1
-        # chance of sapling becoming tree
-        if self.saplings_here > 0:
-            if random.random() < self.model.chance_saplingBecomingTree:
-                self.trees_here += 1
-                self.saplings_here -= 1
-                # if a mature tree is added, chance of grassland and scrubland being outcompeted
-                if random.random() < self.model.chance_grassOutcompetedByTreeScrub and self.perc_grass_here > 0:
-                    self.perc_bareground_here += 1
-                    self.perc_grass_here -= 1
-                if random.random() < self.model.chance_scrubOutcompetedByTree and self.scrub_here > 0:
-                    self.scrub_here -= 1
-                # or saplings/young scrub
-                if random.random() < self.model.chance_saplingOutcompetedByTree and self.saplings_here > 0:
-                    self.saplings_here -= 1
-                if random.random() < self.model.chance_youngScrubOutcompetedByTree and self.youngscrub_here > 0:
-                    self.youngscrub_here -= 1
+        neighborhood_list = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=True)
+        items_in_neighborhood = list(map(self.model.grid.get_cell_list_contents, neighborhood_list)) 
+        # pick one that has less than 1000 young scrubs
+        only_habitat_cells = [obj for obj in items_in_neighborhood if (isinstance(x, habitatAgent) for x in obj)]
+        no_herbivores = [item[0] for item in only_habitat_cells]
+        available_youngscrub_cell = [i for i in no_herbivores if i.youngscrub_here < 1000 and i.scrub_here < 100]
+        if len(available_youngscrub_cell) > 0:
+            new_patch_youngscrub = self.random.choice(available_youngscrub_cell) 
+            # and put a young scrub there
+            new_patch_youngscrub.youngscrub_here += int(self.model.chance_reproduceYoungScrub * self.scrub_here) # if there are no trees, this'll be zero
 
+        # chance of bare ground becoming grassland
+        amount_regrown = self.model.chance_regrowGrass * self.perc_bareground_here
+        self.perc_grass_here += int(amount_regrown)
+        self.perc_bareground_here -= int(amount_regrown)
+
+        # chance of young scrub becoming mature scrub
+        scrub_maturing = self.model.chance_youngScrubMatures * self.youngscrub_here
+        if self.scrub_here + scrub_maturing > 100: 
+            scrub_maturing = 100 - self.scrub_here
+        self.scrub_here += int(scrub_maturing)
+        self.youngscrub_here -= int(scrub_maturing)
+
+        # chance of sapling becoming tree
+        tree_maturing = self.model.chance_saplingBecomingTree * self.saplings_here
+        if self.trees_here + tree_maturing > 100: 
+            tree_maturing = 100 - self.trees_here
+        self.trees_here += int(tree_maturing)
+        self.saplings_here -= int(tree_maturing)
+   
+        # outcompeted by tree - scales depending on number of trees
+        outcompeted_grass = self.model.chance_grassOutcompetedByTree * self.perc_grass_here
+        self.perc_bareground_here += (int(outcompeted_grass) - int((outcompeted_grass*(self.trees_here/100))))
+        self.perc_grass_here -= (int(outcompeted_grass) - int((outcompeted_grass*(self.trees_here/100))))
+        outcompeted_scrub = self.model.chance_scrubOutcompetedByTree * self.scrub_here
+        self.scrub_here -= (int(outcompeted_scrub) - int((outcompeted_scrub*(self.trees_here/100))))
+        outcompeted_saplings = self.model.chance_saplingOutcompetedByTree * self.saplings_here
+        self.saplings_here -= (int(outcompeted_saplings) - int((outcompeted_saplings*(self.trees_here/100))))
+        outcompeted_youngscrub = self.model.chance_youngScrubOutcompetedByTree * self.youngscrub_here
+        self.youngscrub_here -= (int(outcompeted_youngscrub) - int((outcompeted_youngscrub*(self.trees_here/100))))
+
+        # outcompeted by mature scrub
+        outcompeted_grass_byScrub = self.model.chance_grassOutcompetedByScrub * self.perc_grass_here
+        self.perc_bareground_here += (int(outcompeted_grass_byScrub) - int((outcompeted_grass_byScrub*(self.scrub_here/100))))
+        self.perc_grass_here -= (int(outcompeted_grass_byScrub) - int((outcompeted_grass_byScrub*(self.scrub_here/100))))
+        outcompeted_saplings_byScrub = self.model.chance_saplingOutcompetedByScrub * self.saplings_here
+        self.saplings_here -= (int(outcompeted_saplings_byScrub) - int((outcompeted_saplings_byScrub*(self.scrub_here/100))))
+        outcompeted_youngscrub = self.model.chance_youngScrubOutcompetedByScrub * self.youngscrub_here
+        self.youngscrub_here -= (int(outcompeted_youngscrub) - int((outcompeted_youngscrub*(self.scrub_here/100))))
+
+
+
+        # print(self.unique_id, "trees", self.trees_here, "scrub", self.scrub_here, "saplings", self.saplings_here, "youngScrub", self.youngscrub_here, "grass", self.perc_grass_here, "Bare", self.perc_bareground_here)
+        
         # reassess dominant condition
         if self.trees_here < 10 and self.scrub_here < 10 and self.perc_grass_here >= 50:
             self.condition = "grassland"
-        if self.trees_here < 10 and self.scrub_here < 10 and self.perc_bareground_here >= 50:
+        if self.trees_here < 10 and self.scrub_here < 10 and self.perc_bareground_here > 50:
             self.condition = "bare_ground"
         if self.trees_here < 10 and self.scrub_here >= 10:
             self.condition = "thorny_scrubland"
         if self.trees_here >= 10:
             self.condition = "woodland"
-
 
 
 class roeDeer_agent(RandomWalker):
@@ -160,39 +163,40 @@ class roeDeer_agent(RandomWalker):
         # Eat what's on my patch: roe deer are broswers, so randomly choose any habitat to eat
         this_cell = self.model.grid.get_cell_list_contents([self.pos])
         habitat_patch = [obj for obj in this_cell if isinstance(obj, habitatAgent)][0]
-        for _ in range(5): # eat each habitat type to try to get above 1 energy
-            if self.energy < 1:
-                habitat_choices = ["saplings", "trees", "scrub", "youngscrub", "grass"]
-                my_choice = rchoice(habitat_choices) # remove what we've chosen and run again
-                habitat_choices.remove(my_choice)
-                if my_choice == "saplings" and habitat_patch.saplings_here > 0:
-                    self.energy += self.model.roeDeer_gain_from_Saplings
-                    eatenSaps = random.randint(0,self.model.roeDeer_saplingsEaten)
-                    eat_saplings(habitat_patch, eatenSaps)
-                if my_choice == "trees" and habitat_patch.trees_here > 0:
-                    self.energy += self.model.roeDeer_gain_from_Trees
-                    eatenTrees = random.randint(0,self.model.roeDeer_treesEaten)
-                    eat_trees(habitat_patch, eatenTrees)
-                if my_choice == "scrub" and habitat_patch.scrub_here > 0:
-                    self.energy += self.model.roeDeer_gain_from_Scrub
-                    eatenScrub = random.randint(0,self.model.roeDeer_scrubEaten)
-                    eat_scrub(habitat_patch, eatenScrub)
-                if my_choice == "youngscrub" and habitat_patch.youngscrub_here > 0:
-                    self.energy += self.model.roeDeer_gain_from_YoungScrub
-                    eatenYoungScrub = random.randint(0,self.model.roeDeer_youngScrubEaten)
-                    eat_youngscrub(habitat_patch, eatenYoungScrub)
-                if my_choice == "grass" and habitat_patch.perc_grass_here > 0:
-                    self.energy += self.model.roeDeer_gain_from_grass
-                    eatenGrass = random.randint(0,self.model.roeDeer_impactGrass)
-                    eat_grass(habitat_patch, eatenGrass)
-  
+        habitat_choices = ["saplings", "trees", "scrub", "youngScrub", "grass"]
+        # pick a habitat type and eat it 
+        for habitat_types in habitat_choices:
+            # pick a habitat type
+            my_choice = rchoice(habitat_choices)
+            habitat_choices.remove(my_choice)
+            # if my energy is low enough, eat it 
+            if self.energy < 1 and my_choice == "saplings" and habitat_patch.saplings_here > 0:
+                eatenSaps = random.randint(0,self.model.roeDeer_saplingsEaten)
+                eat_saplings(habitat_patch, eatenSaps)
+                self.energy += (self.model.roeDeer_gain_from_Saplings * eatenSaps)
+            elif self.energy < 1 and my_choice== "trees" and habitat_patch.trees_here > 0:
+                eatenTrees = random.randint(0,self.model.roeDeer_treesEaten)
+                eat_trees(habitat_patch, eatenTrees)
+                self.energy += (self.model.roeDeer_gain_from_Trees * eatenTrees)
+            elif self.energy < 1 and my_choice == "scrub" and habitat_patch.scrub_here > 0:
+                eatenScrub = random.randint(0,self.model.roeDeer_scrubEaten)
+                eat_scrub(habitat_patch, eatenScrub)
+                self.energy += (self.model.roeDeer_gain_from_Scrub * eatenScrub)
+            elif self.energy < 1 and my_choice == "youngscrub" and habitat_patch.youngscrub_here > 0:
+                eatenYoungScrub = random.randint(0,self.model.roeDeer_youngScrubEaten)
+                eat_youngscrub(habitat_patch, eatenYoungScrub)
+                self.energy += (self.model.roeDeer_gain_from_YoungScrub * eatenYoungScrub)
 
+            elif self.energy < 1 and my_choice == "grass" and habitat_patch.perc_grass_here > 0:
+                eatenGrass = random.randint(0,self.model.roeDeer_impactGrass)
+                eat_grass(habitat_patch, eatenGrass)
+                self.energy += (self.model.roeDeer_gain_from_grass * eatenGrass)
         # don't let energy be above 1
         if self.energy > 1:
             self.energy = 1
-
+        
         # if roe deer's energy is less than 0, die 
-        if self.energy < 0:
+        if self.energy <= 0:
             self.model.grid._remove_agent(self.pos, self)
             self.model.schedule.remove(self)
             living = False
@@ -200,7 +204,7 @@ class roeDeer_agent(RandomWalker):
         # I can reproduce in May & June (assuming model starts in Jan at beginning of year, May & June = time steps 5&6 out of every 12 months)
         if living and (random.random() < self.model.roeDeer_reproduce) and (5 <= self.model.schedule.time < 7 or 17 <= self.model.schedule.time < 19 or 29 <= self.model.schedule.time < 31 or 41 <= self.model.schedule.time < 43 or 53 <= self.model.schedule.time < 55 or 65 <= self.model.schedule.time < 67 or 77 <= self.model.schedule.time < 79 or 89 <= self.model.schedule.time < 91 or 101 <= self.model.schedule.time < 103 or 113 <= self.model.schedule.time < 115 or 125 <= self.model.schedule.time < 127 or 137 <= self.model.schedule.time < 139 or 149 <= self.model.schedule.time < 151 or 161 <= self.model.schedule.time < 163 or 173 <= self.model.schedule.time < 175 or 185 <= self.model.schedule.time < 187 or 197 <= self.model.schedule.time < 199 or 209 <= self.model.schedule.time < 211 or 221 <= self.model.schedule.time < 223 or 233 <= self.model.schedule.time < 235 or 245 <= self.model.schedule.time < 247 or 257 <= self.model.schedule.time < 259 or 269 <= self.model.schedule.time < 271 or 281 <= self.model.schedule.time < 283 or 293 <= self.model.schedule.time < 295):
             # Create a new roe deer and divide energy:
-            self.energy /= 2
+            self.energy = np.random.uniform(0, self.energy)
             fawn = roeDeer_agent(self.model.next_id(), self.pos, self.model, self.moore, self.energy)
             self.model.grid.place_agent(fawn, self.pos)
             self.model.schedule.add(fawn)
@@ -220,34 +224,39 @@ class exmoorPony(RandomWalker):
         # Eat what's on my patch
         this_cell = self.model.grid.get_cell_list_contents([self.pos])
         habitat_patch = [obj for obj in this_cell if isinstance(obj, habitatAgent)][0]
-        for _ in range(5): # eat each habitat type to try to get above 1 energy
-            if self.energy < 1:
-                my_choice = np.random.choice(["saplings", "trees", "scrub", "youngscrub", "grass"])
-                if my_choice == "saplings" and habitat_patch.saplings_here > 0:
-                    self.energy += self.model.ponies_gain_from_Saplings
-                    eatenSaps = random.randint(0,self.model.ponies_saplingsEaten)
-                    eat_saplings(habitat_patch, eatenSaps)
-                if my_choice == "trees" and habitat_patch.trees_here > 0:
-                    self.energy += self.model.ponies_gain_from_Trees
-                    eatenTrees = random.randint(0,self.model.ponies_treesEaten)
-                    eat_trees(habitat_patch, eatenTrees)
-                if my_choice == "scrub" and habitat_patch.scrub_here > 0:
-                    self.energy += self.model.ponies_gain_from_Scrub
-                    eatenScrub = random.randint(0,self.model.ponies_scrubEaten)
-                    eat_scrub(habitat_patch, eatenScrub)
-                if my_choice == "youngscrub" and habitat_patch.youngscrub_here > 0:
-                    self.energy += self.model.ponies_gain_from_YoungScrub
-                    eatenYoungScrub = random.randint(0,self.model.ponies_youngScrubEaten)
-                    eat_youngscrub(habitat_patch, eatenYoungScrub)
-                if my_choice == "grass" and habitat_patch.perc_grass_here > 0:
-                    self.energy += self.model.ponies_gain_from_grass
-                    eatenGrass = random.randint(0,self.model.ponies_impactGrass)
-                    eat_grass(habitat_patch, eatenGrass)
+        habitat_choices = ["saplings", "trees", "scrub", "youngScrub", "grass"]
+        # pick a habitat type and eat it 
+        for habitat_types in habitat_choices:
+            # pick a habitat type
+            my_choice = rchoice(habitat_choices)
+            habitat_choices.remove(my_choice)
+            # if my energy is low enough, eat it 
+            if self.energy < 1 and my_choice == "saplings" and habitat_patch.saplings_here > 0:
+                eatenSaps = random.randint(0,self.model.ponies_saplingsEaten)
+                eat_saplings(habitat_patch, eatenSaps)
+                self.energy += (self.model.ponies_gain_from_Saplings * eatenSaps)
+            elif self.energy < 1 and my_choice== "trees" and habitat_patch.trees_here > 0:
+                eatenTrees = random.randint(0,self.model.ponies_treesEaten)
+                eat_trees(habitat_patch, eatenTrees)
+                self.energy += (self.model.ponies_gain_from_Trees * eatenTrees)
+            elif self.energy < 1 and my_choice == "scrub" and habitat_patch.scrub_here > 0:
+                eatenScrub = random.randint(0,self.model.ponies_scrubEaten)
+                eat_scrub(habitat_patch, eatenScrub)
+                self.energy += (self.model.ponies_gain_from_Scrub*eatenScrub)
+            elif self.energy < 1 and my_choice == "youngscrub" and habitat_patch.youngscrub_here > 0:
+                eatenYoungScrub = random.randint(0,self.model.ponies_youngScrubEaten)
+                eat_youngscrub(habitat_patch, eatenYoungScrub)
+                self.energy += (self.model.ponies_gain_from_YoungScrub*eatenYoungScrub)
+            elif self.energy < 1 and my_choice == "grass" and habitat_patch.perc_grass_here > 0:
+                eatenGrass = random.randint(0,self.model.ponies_impactGrass)
+                eat_grass(habitat_patch, eatenGrass)
+                self.energy += (self.model.ponies_gain_from_grass*eatenGrass)
 
         if self.energy > 1:
             self.energy = 1
+            
         # if pony's energy is less than 0, die 
-        if self.energy < 0:
+        if self.energy <= 0:
             self.model.grid._remove_agent(self.pos, self)
             self.model.schedule.remove(self)
             
@@ -269,45 +278,51 @@ class longhornCattle(RandomWalker):
         # Eat what's on my patch
         this_cell = self.model.grid.get_cell_list_contents([self.pos])
         habitat_patch = [obj for obj in this_cell if isinstance(obj, habitatAgent)][0]
-        for _ in range(5): # eat each habitat type to try to get above 1 energy
-            if self.energy < 1:
-                my_choice = np.random.choice(["saplings", "trees", "scrub", "youngscrub", "grass"])
-                if my_choice == "saplings" and habitat_patch.saplings_here > 0:
-                    self.energy += self.model.cows_gain_from_Saplings
-                    eatenSaps = random.randint(0,self.model.cows_saplingsEaten)
-                    eat_saplings(habitat_patch, eatenSaps)
-                if my_choice == "trees" and habitat_patch.trees_here > 0:
-                    self.energy += self.model.cows_gain_from_Trees
-                    eatenTrees = random.randint(0,self.model.cows_treesEaten)
-                    eat_trees(habitat_patch, eatenTrees)
-                if my_choice == "scrub" and habitat_patch.scrub_here > 0:
-                    self.energy += self.model.cows_gain_from_Scrub
-                    eatenScrub = random.randint(0,self.model.cows_scrubEaten)
-                    eat_scrub(habitat_patch, eatenScrub)
-                if my_choice == "youngscrub" and habitat_patch.youngscrub_here > 0:
-                    self.energy += self.model.cows_gain_from_YoungScrub
-                    eatenYoungScrub = random.randint(0,self.model.cows_youngScrubEaten)
-                    eat_youngscrub(habitat_patch, eatenYoungScrub)
-                if my_choice == "grass" and habitat_patch.perc_grass_here > 0:
-                    self.energy += self.model.cows_gain_from_grass
-                    eatenGrass = random.randint(0,self.model.cows_impactGrass)
-                    eat_grass(habitat_patch, eatenGrass)
-    
+        habitat_choices = ["saplings", "trees", "scrub", "youngscrub", "grass"]
+
+        # pick a habitat type and eat it 
+        for habitat_types in habitat_choices:
+            # pick a habitat type
+            my_choice = rchoice(habitat_choices)
+            habitat_choices.remove(my_choice)
+            # if my energy is low enough, eat it 
+            if self.energy < 1 and my_choice == "saplings" and habitat_patch.saplings_here > 0:
+                eatenSaps = random.randint(0,self.model.cows_saplingsEaten)
+                eat_saplings(habitat_patch, eatenSaps)
+                self.energy += (self.model.cows_gain_from_Saplings*eatenSaps)
+            elif self.energy < 1 and my_choice== "trees" and habitat_patch.trees_here > 0:
+                eatenTrees = random.randint(0,self.model.cows_treesEaten)
+                eat_trees(habitat_patch, eatenTrees)
+                self.energy += (self.model.cows_gain_from_Trees*eatenTrees)
+            elif self.energy < 1 and my_choice == "scrub" and habitat_patch.scrub_here > 0:
+                eatenScrub = random.randint(0,self.model.cows_scrubEaten)
+                eat_scrub(habitat_patch, eatenScrub)
+                self.energy += (self.model.cows_gain_from_Scrub*eatenScrub)
+            elif self.energy < 1 and my_choice == "youngscrub" and habitat_patch.youngscrub_here > 0:
+                eatenYoungScrub = random.randint(0,self.model.cows_youngScrubEaten)
+                eat_youngscrub(habitat_patch, eatenYoungScrub)
+                self.energy += (self.model.cows_gain_from_YoungScrub*eatenYoungScrub)
+            elif self.energy < 1 and my_choice == "grass" and habitat_patch.perc_grass_here > 0:
+                eatenGrass = random.randint(0,self.model.cows_impactGrass)
+                eat_grass(habitat_patch, eatenGrass)
+                self.energy += (self.model.cows_gain_from_grass*eatenGrass)
         if self.energy > 1:
             self.energy = 1
+
         # if cow's energy is less than 0, die 
-        if self.energy < 0:
+        if self.energy <= 0:
             self.model.grid._remove_agent(self.pos, self)
             self.model.schedule.remove(self)
             living = False
-            
+
         # I reproduce in April, May, and June (assuming model starts in Jan at beginning of year, April, May & June = time steps 4-6 out of every 12 months)
         if living and (random.random() < self.model.cows_reproduce) and (4 <= self.model.schedule.time < 7 or 16 <= self.model.schedule.time < 19 or 28 <= self.model.schedule.time < 31 or 40 <= self.model.schedule.time < 43 or 52 <= self.model.schedule.time < 55 or 64 <= self.model.schedule.time < 67 or 76 <= self.model.schedule.time < 79 or 88 <= self.model.schedule.time < 91 or 100 <= self.model.schedule.time < 103 or 112 <= self.model.schedule.time < 115 or 124 <= self.model.schedule.time < 127 or 136 <= self.model.schedule.time < 139 or 148 <= self.model.schedule.time < 151 or 160 <= self.model.schedule.time < 163 or 172 <= self.model.schedule.time < 175 or 184 <= self.model.schedule.time < 187 or 196 <= self.model.schedule.time < 199 or 208 <= self.model.schedule.time < 211 or 220 <= self.model.schedule.time < 223 or 232 <= self.model.schedule.time < 235 or 244 <= self.model.schedule.time < 247 or 256 <= self.model.schedule.time < 259 or 268 <= self.model.schedule.time < 271 or 280 <= self.model.schedule.time < 283 or 292 <= self.model.schedule.time < 295):
             # Create a new cow and divide energy:
-            self.energy /= 2
+            self.energy = np.random.uniform(0, self.energy)
             calf = longhornCattle(self.model.next_id(), self.pos, self.model, self.moore, self.energy)
             self.model.grid.place_agent(calf, self.pos)
             self.model.schedule.add(calf)
+        
 
 
 
@@ -326,35 +341,39 @@ class fallowDeer(RandomWalker):
         # Eat what's on my patch
         this_cell = self.model.grid.get_cell_list_contents([self.pos])
         habitat_patch = [obj for obj in this_cell if isinstance(obj, habitatAgent)][0]
-        for _ in range(5): # eat each habitat type to try to get above 1 energy
-            if self.energy < 1:
-                my_choice = np.random.choice(["saplings", "trees", "scrub", "youngscrub", "grass"])
-                if my_choice == "saplings" and habitat_patch.saplings_here > 0:
-                    self.energy += self.model.fallowDeer_gain_from_Saplings
-                    eatenSaps = random.randint(0,self.model.fallowDeer_saplingsEaten)
-                    eat_saplings(habitat_patch, eatenSaps)
-                if my_choice == "trees" and habitat_patch.trees_here > 0:
-                    self.energy += self.model.fallowDeer_gain_from_Trees
-                    eatenTrees = random.randint(0,self.model.fallowDeer_treesEaten)
-                    eat_trees(habitat_patch, eatenTrees)
-                if my_choice == "scrub" and habitat_patch.scrub_here > 0:
-                    self.energy += self.model.cows_gain_from_Scrub
-                    eatenScrub = random.randint(0,self.model.cows_scrubEaten)
-                    eat_scrub(habitat_patch, eatenScrub)
-                if my_choice == "youngscrub" and habitat_patch.youngscrub_here > 0:
-                    self.energy += self.model.fallowDeer_gain_from_YoungScrub
-                    eatenYoungScrub = random.randint(0,self.model.fallowDeer_youngScrubEaten)
-                    eat_youngscrub(habitat_patch, eatenYoungScrub)
-                if my_choice == "grass" and habitat_patch.perc_grass_here > 0:
-                    self.energy += self.model.fallowDeer_gain_from_grass
-                    eatenGrass = random.randint(0,self.model.fallowDeer_impactGrass)
-                    eat_grass(habitat_patch, eatenGrass)
- 
+        habitat_choices = ["saplings", "trees", "scrub", "youngscrub", "grass"]
+
+        # pick a habitat type and eat it 
+        for habitat_types in habitat_choices:
+            # pick a habitat type
+            my_choice = rchoice(habitat_choices)
+            habitat_choices.remove(my_choice)
+            # if my energy is low enough, eat it 
+            if self.energy < 1 and my_choice == "saplings" and habitat_patch.saplings_here > 0:
+                eatenSaps = random.randint(0,self.model.fallowDeer_saplingsEaten)
+                eat_saplings(habitat_patch, eatenSaps)
+                self.energy += (self.model.fallowDeer_gain_from_Saplings*eatenSaps)
+            elif self.energy < 1 and my_choice== "trees" and habitat_patch.trees_here > 0:
+                eatenTrees = random.randint(0,self.model.fallowDeer_treesEaten)
+                eat_trees(habitat_patch, eatenTrees)
+                self.energy += (self.model.fallowDeer_gain_from_Trees*eatenTrees)
+            elif self.energy < 1 and my_choice == "scrub" and habitat_patch.scrub_here > 0:
+                eatenScrub = random.randint(0,self.model.fallowDeer_scrubEaten)
+                eat_scrub(habitat_patch, eatenScrub)
+                self.energy += (self.model.fallowDeer_gain_from_Scrub*eatenScrub)
+            elif self.energy < 1 and my_choice == "youngscrub" and habitat_patch.youngscrub_here > 0:
+                eatenYoungScrub = random.randint(0,self.model.fallowDeer_youngScrubEaten)
+                eat_youngscrub(habitat_patch, eatenYoungScrub)
+                self.energy += (self.model.fallowDeer_gain_from_YoungScrub *eatenYoungScrub)
+            elif self.energy < 1 and my_choice == "grass" and habitat_patch.perc_grass_here > 0:
+                eatenGrass = random.randint(0,self.model.fallowDeer_impactGrass)
+                eat_grass(habitat_patch, eatenGrass)
+                self.energy += (self.model.fallowDeer_gain_from_grass*eatenGrass)
         if self.energy > 1:
             self.energy = 1
     
         # if fallow deer's energy is less than 0, die 
-        if self.energy < 0:
+        if self.energy <= 0:
             self.model.grid._remove_agent(self.pos, self)
             self.model.schedule.remove(self)
             living = False
@@ -362,7 +381,7 @@ class fallowDeer(RandomWalker):
         # I reproduce in May & June (assuming model starts in Jan at beginning of year, May & June = time steps 5&6 out of every 12 months)
         if living and (random.random() < self.model.fallowDeer_reproduce) and (5 <= self.model.schedule.time < 7 or 17 <= self.model.schedule.time < 19 or 29 <= self.model.schedule.time < 31 or 41 <= self.model.schedule.time < 43 or 53 <= self.model.schedule.time < 55 or 65 <= self.model.schedule.time < 67 or 77 <= self.model.schedule.time < 79 or 89 <= self.model.schedule.time < 91 or 101 <= self.model.schedule.time < 103 or 113 <= self.model.schedule.time < 115 or 125 <= self.model.schedule.time < 127 or 137 <= self.model.schedule.time < 139 or 149 <= self.model.schedule.time < 151 or 161 <= self.model.schedule.time < 163 or 173 <= self.model.schedule.time < 175 or 185 <= self.model.schedule.time < 187 or 197 <= self.model.schedule.time < 199 or 209 <= self.model.schedule.time < 211 or 221 <= self.model.schedule.time < 223 or 233 <= self.model.schedule.time < 235 or 245 <= self.model.schedule.time < 247 or 257 <= self.model.schedule.time < 259 or 269 <= self.model.schedule.time < 271 or 281 <= self.model.schedule.time < 283 or 293 <= self.model.schedule.time < 295):
             # Create a new fallow deer and divide energy:
-            self.energy /= 2
+            self.energy = np.random.uniform(0, self.energy)
             fawn = fallowDeer(self.model.next_id(), self.pos, self.model, self.moore, self.energy)
             self.model.grid.place_agent(fawn, self.pos)
             self.model.schedule.add(fawn)
@@ -382,42 +401,46 @@ class redDeer(RandomWalker):
         # Eat what's on my patch
         this_cell = self.model.grid.get_cell_list_contents([self.pos])
         habitat_patch = [obj for obj in this_cell if isinstance(obj, habitatAgent)][0]
-        for _ in range(5): # eat each habitat type to try to get above 1 energy
-            if self.energy < 1:
-                my_choice = np.random.choice(["saplings", "trees", "scrub", "youngscrub", "grass"])
-                if my_choice == "saplings" and habitat_patch.saplings_here > 0: 
-                    self.energy += self.model.redDeer_gain_from_Saplings
-                    eatenSaps = random.randint(0,self.model.redDeer_saplingsEaten)
-                    eat_saplings(habitat_patch, eatenSaps)
-                if my_choice == "trees" and habitat_patch.trees_here > 0:
-                    self.energy += self.model.redDeer_gain_from_Trees
-                    eatenTrees = random.randint(0,self.model.redDeer_treesEaten)
-                    eat_trees(habitat_patch, eatenTrees)
-                if my_choice == "scrub" and habitat_patch.scrub_here > 0:
-                    self.energy += self.model.redDeer_gain_from_Scrub
-                    eatenScrub = random.randint(0,self.model.redDeer_scrubEaten)
-                    eat_scrub(habitat_patch, eatenScrub)
-                if my_choice == "youngscrub" and habitat_patch.youngscrub_here > 0:
-                    self.energy += self.model.redDeer_gain_from_YoungScrub
-                    eatenYoungScrub = random.randint(0,self.model.redDeer_youngScrubEaten)
-                    eat_youngscrub(habitat_patch, eatenYoungScrub)
-                if my_choice == "grass" and habitat_patch.perc_grass_here > 0:
-                    self.energy += self.model.redDeer_gain_from_grass
-                    eatenGrass = random.randint(0,self.model.redDeer_impactGrass)
-                    eat_grass(habitat_patch, eatenGrass)
- 
+        habitat_choices = ["saplings", "trees", "scrub", "youngscrub", "grass"]
+        # pick a habitat type and eat it 
+        for habitat_types in habitat_choices:
+            # pick a habitat type
+            my_choice = rchoice(habitat_choices)
+            habitat_choices.remove(my_choice)
+            # if my energy is low enough, eat it 
+            if self.energy < 1 and my_choice == "saplings" and habitat_patch.saplings_here > 0:
+                eatenSaps = random.randint(0,self.model.redDeer_saplingsEaten)
+                eat_saplings(habitat_patch, eatenSaps)
+                self.energy += (self.model.redDeer_gain_from_Saplings*eatenSaps)
+            elif self.energy < 1 and my_choice== "trees" and habitat_patch.trees_here > 0:
+                eatenTrees = random.randint(0,self.model.redDeer_treesEaten)
+                eat_trees(habitat_patch, eatenTrees)
+                self.energy += (self.model.redDeer_gain_from_Trees*eatenTrees)
+            elif self.energy < 1 and my_choice == "scrub" and habitat_patch.scrub_here > 0:
+                eatenScrub = random.randint(0,self.model.redDeer_scrubEaten)
+                eat_scrub(habitat_patch, eatenScrub)
+                self.energy += (self.model.redDeer_gain_from_Scrub*eatenScrub)
+            elif self.energy < 1 and my_choice == "youngscrub" and habitat_patch.youngscrub_here > 0:
+                eatenYoungScrub = random.randint(0,self.model.redDeer_youngScrubEaten)
+                eat_youngscrub(habitat_patch, eatenYoungScrub)
+                self.energy += (self.model.redDeer_gain_from_YoungScrub*eatenYoungScrub)
+            elif self.energy < 1 and my_choice == "grass" and habitat_patch.perc_grass_here > 0:
+                eatenGrass = random.randint(0,self.model.redDeer_impactGrass)
+                eat_grass(habitat_patch, eatenGrass)
+                self.energy += (self.model.redDeer_gain_from_grass*eatenGrass)
         if self.energy > 1:
             self.energy = 1
 
         # if red deer's energy is less than 0, die 
-        if self.energy < 0:
+        if self.energy <= 0:
             self.model.grid._remove_agent(self.pos, self)
             self.model.schedule.remove(self)
             living = False
+
         # I reproduce in May & June (assuming model starts in Jan at beginning of year, May & June = time steps 5&6 out of every 12 months)
         if living and (random.random() < self.model.redDeer_reproduce) and (5 <= self.model.schedule.time < 7 or 17 <= self.model.schedule.time < 19 or 29 <= self.model.schedule.time < 31 or 41 <= self.model.schedule.time < 43 or 53 <= self.model.schedule.time < 55 or 65 <= self.model.schedule.time < 67 or 77 <= self.model.schedule.time < 79 or 89 <= self.model.schedule.time < 91 or 101 <= self.model.schedule.time < 103 or 113 <= self.model.schedule.time < 115 or 125 <= self.model.schedule.time < 127 or 137 <= self.model.schedule.time < 139 or 149 <= self.model.schedule.time < 151 or 161 <= self.model.schedule.time < 163 or 173 <= self.model.schedule.time < 175 or 185 <= self.model.schedule.time < 187 or 197 <= self.model.schedule.time < 199 or 209 <= self.model.schedule.time < 211 or 221 <= self.model.schedule.time < 223 or 233 <= self.model.schedule.time < 235 or 245 <= self.model.schedule.time < 247 or 257 <= self.model.schedule.time < 259 or 269 <= self.model.schedule.time < 271 or 281 <= self.model.schedule.time < 283 or 293 <= self.model.schedule.time < 295):
             # Create a new roe deer and divide energy:
-            self.energy /= 2
+            self.energy = np.random.uniform(0, self.energy)
             fawn = redDeer(self.model.next_id(), self.pos, self.model, self.moore, self.energy)
             self.model.grid.place_agent(fawn, self.pos)
             self.model.schedule.add(fawn)
@@ -434,47 +457,47 @@ class tamworthPigs(RandomWalker):
         self.random_move()
         living = True
         self.energy -= 1
-
         # Eat what's on my patch
         this_cell = self.model.grid.get_cell_list_contents([self.pos])
         habitat_patch = [obj for obj in this_cell if isinstance(obj, habitatAgent)][0]
-        for _ in range(5): # eat each habitat type to try to get above 1 energy
-            if self.energy < 1:
-                my_choice = np.random.choice(["saplings", "youngscrub", "grass"])
-                if my_choice == "saplings" and habitat_patch.saplings_here > 0:
-                    self.energy += self.model.pigs_gain_from_Saplings
-                    eatenSaps = random.randint(0,self.model.pigs_saplingsEaten)
-                    eat_saplings(habitat_patch, eatenSaps)
-                if my_choice == "youngscrub" and habitat_patch.scrub_here > 0:
-                    self.energy += self.model.pigs_gain_from_YoungScrub
-                    eatenYoungScrub = random.randint(0,self.model.pigs_youngScrubEaten)
-                    eat_youngscrub(habitat_patch, eatenYoungScrub)
-                if my_choice == "grass" and habitat_patch.perc_grass_here > 0:
-                    self.energy += self.model.pigs_gain_from_grass
-                    eatenGrass = random.randint(0,self.model.pigs_impactGrass)
-                    eat_grass(habitat_patch, eatenGrass)
+        habitat_choices = ["saplings", "youngscrub", "grass"]
+        # pick a habitat type and eat it 
+        for habitat_types in habitat_choices:
+            # pick a habitat type
+            my_choice = rchoice(habitat_choices)
+            habitat_choices.remove(my_choice)
+            # if my energy is low enough, eat it 
+            if self.energy < 1 and my_choice == "saplings" and habitat_patch.saplings_here > 0:
+                eatenSaps = random.randint(0,self.model.pigs_saplingsEaten)
+                eat_saplings(habitat_patch, eatenSaps)
+                self.energy += (self.model.pigs_gain_from_Saplings*eatenSaps)
+            elif self.energy < 1 and my_choice == "youngscrub" and habitat_patch.youngscrub_here > 0:
+                eatenYoungScrub = random.randint(0,self.model.pigs_youngScrubEaten)
+                eat_youngscrub(habitat_patch, eatenYoungScrub)
+                self.energy += (self.model.pigs_gain_from_YoungScrub*eatenYoungScrub)
+            elif self.energy < 1 and my_choice == "grass" and habitat_patch.perc_grass_here > 0:
+                eatenGrass = random.randint(0,self.model.pigs_impactGrass)
+                eat_grass(habitat_patch, eatenGrass)
+                self.energy += (self.model.pigs_gain_from_grass*eatenGrass)
+ 
         if self.energy > 1:
             self.energy = 1
     
         # if pig's energy is less than 0, die 
-        if self.energy < 0:
+        if self.energy <= 0:
             self.model.grid._remove_agent(self.pos, self)
             self.model.schedule.remove(self)
             living = False
             
         # pigs reproduce Jan - July (1 - 7, < 8)
         if living and (random.random() < self.model.pigs_reproduce) and (1 <= self.model.schedule.time < 8 or 13 <= self.model.schedule.time < 20 or 25 <= self.model.schedule.time < 32 or 37 <= self.model.schedule.time < 44 or 49 <= self.model.schedule.time < 56 or 61 <= self.model.schedule.time < 68 or 73 <= self.model.schedule.time < 80 or 85 <= self.model.schedule.time < 92 or 97 <= self.model.schedule.time < 104 or 109 <= self.model.schedule.time < 116 or 121 <= self.model.schedule.time < 128 or 133 <= self.model.schedule.time < 140 or 145 <= self.model.schedule.time < 152 or 157 <= self.model.schedule.time < 164 or 169 <= self.model.schedule.time < 176 or 181 <= self.model.schedule.time < 188 or 193 <= self.model.schedule.time < 200 or 205 <= self.model.schedule.time < 212 or 217 <= self.model.schedule.time < 224 or 229 <= self.model.schedule.time < 236 or 241 <= self.model.schedule.time < 248 or 253 <= self.model.schedule.time < 260 or 265 <= self.model.schedule.time < 272 or 277 <= self.model.schedule.time < 284 or 289 <= self.model.schedule.time < 296):
+            # divide my energy
+            self.energy = np.random.uniform(0, self.energy)
             # Pick a number of piglets to have
             for _ in range(random.randint(1,10)):
-            # Create a new piglet and divide energy:
-                self.energy /= 2
                 piglet = tamworthPigs(self.model.next_id(), self.pos, self.model, self.moore, self.energy)
                 self.model.grid.place_agent(piglet, self.pos)
                 self.model.schedule.add(piglet)
-
-
-
-
 
 
 
@@ -488,7 +511,7 @@ class KneppModel(Model):
     
     def __init__(self,             
             chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
-            chance_scrubOutcompetedByTree, chance_grassOutcompetedByTreeScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
+            chance_scrubOutcompetedByTree, chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
             initial_roeDeer, initial_grassland, initial_woodland, initial_scrubland,
             roeDeer_reproduce, roeDeer_gain_from_grass, roeDeer_gain_from_Trees, roeDeer_gain_from_Scrub, roeDeer_gain_from_Saplings, roeDeer_gain_from_YoungScrub,
             roeDeer_impactGrass, roeDeer_saplingsEaten, roeDeer_youngScrubEaten, roeDeer_treesEaten, roeDeer_scrubEaten,
@@ -516,7 +539,8 @@ class KneppModel(Model):
         self.chance_youngScrubMatures = chance_youngScrubMatures
         self.chance_scrubOutcompetedByTree = chance_scrubOutcompetedByTree
         self.chance_saplingOutcompetedByScrub = chance_saplingOutcompetedByScrub
-        self.chance_grassOutcompetedByTreeScrub = chance_grassOutcompetedByTreeScrub
+        self.chance_grassOutcompetedByTree = chance_grassOutcompetedByTree
+        self.chance_grassOutcompetedByScrub = chance_grassOutcompetedByScrub
         self.chance_saplingOutcompetedByTree = chance_saplingOutcompetedByTree
         self.chance_youngScrubOutcompetedByScrub = chance_youngScrubOutcompetedByScrub
         self.chance_youngScrubOutcompetedByTree = chance_youngScrubOutcompetedByTree
@@ -716,12 +740,12 @@ class KneppModel(Model):
         self.schedule.step()
         # count how many there are, then step
         self.datacollector.collect(self)
-        # 2005-2009
+        # Jan 2005 - March 2009
         if self.schedule.time == 50:
             self.add_herbivores(exmoorPony, 23)
             self.add_herbivores(longhornCattle, 53)
             self.add_herbivores(tamworthPigs, 20)
-        # 2010
+        # March 2010
         if self.schedule.time == 62: 
             results_2 = self.datacollector.get_model_vars_dataframe()
             exmoorValue = results_2.iloc[62]['Exmoor pony']
@@ -890,10 +914,11 @@ class KneppModel(Model):
             else:
                 number_to_add = 13 - redDeerValue
                 self.add_herbivores(redDeer, number_to_add)
+        
         # March 2015
         if self.schedule.time == 122:
             results_7 = self.datacollector.get_model_vars_dataframe()
-            # Exmoor ponies: 10
+            #  Exmoor ponies: 10
             exmoorValue = results_7.iloc[122]['Exmoor pony']
             if exmoorValue >= 10:
                 number_to_subtract = -10 + exmoorValue
@@ -1148,7 +1173,7 @@ class KneppModel(Model):
         
         # stop running it in May 2021
         if self.schedule.time == 184:
-            self.running = False
+            self.running = False 
 
 
 
@@ -1157,8 +1182,11 @@ class KneppModel(Model):
         # run it for 184 steps
         for i in range(184):
             self.step()
+            # print(i)
+            # results_step = self.datacollector.get_model_vars_dataframe()
+            # with pd.option_context('display.max_columns',None):
+            #     print(results_step)
         results = self.datacollector.get_model_vars_dataframe()
         # with pd.option_context('display.max_columns',None, 'display.max_rows',None):
         #     print(results)
-        # print(results)
         return results

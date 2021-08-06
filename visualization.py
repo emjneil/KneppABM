@@ -86,7 +86,7 @@ chart_element = ChartModule([{"Label": "Roe deer", "Color": "#666666"},
 
 server = ModularServer(KneppModel, [canvas_element, chart_element],
                        "KneppModel", {"chance_reproduceSapling":0.5, "chance_reproduceYoungScrub":0.5, "chance_regrowGrass":0.5, "chance_saplingBecomingTree":0.5, "chance_youngScrubMatures":0.5,
-                        "chance_scrubOutcompetedByTree":0.5, "chance_grassOutcompetedByTreeScrub":0.5, "chance_saplingOutcompetedByTree":0.5, "chance_saplingOutcompetedByScrub":0.5, "chance_youngScrubOutcompetedByScrub":0.5, "chance_youngScrubOutcompetedByTree":0.5,
+                        "chance_scrubOutcompetedByTree":0.5, "chance_grassOutcompetedByTree":0.5, "chance_grassOutcompetedByScrub":0.5, "chance_saplingOutcompetedByTree":0.5, "chance_saplingOutcompetedByScrub":0.5, "chance_youngScrubOutcompetedByScrub":0.5, "chance_youngScrubOutcompetedByTree":0.5,
                         "initial_roeDeer":12, "initial_grassland":71, "initial_woodland":12, "initial_scrubland":1, 
                         "roeDeer_reproduce":0.05, "roeDeer_gain_from_grass":0.5, "roeDeer_gain_from_Trees":0.25, "roeDeer_gain_from_Scrub":0.25, "roeDeer_gain_from_Saplings":0.15, "roeDeer_gain_from_YoungScrub":0.15, 
                         "roeDeer_impactGrass": 5, "roeDeer_saplingsEaten":100, "roeDeer_youngScrubEaten":100, "roeDeer_treesEaten":10, "roeDeer_scrubEaten":10,

@@ -16,7 +16,7 @@ from mesa.space import MultiGrid
 class KneppModel_counterfactual(Model):
     def __init__(self,             
             chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
-            chance_scrubOutcompetedByTree, chance_grassOutcompetedByTreeScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
+            chance_scrubOutcompetedByTree, chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
             initial_roeDeer, initial_grassland, initial_woodland, initial_scrubland,
             roeDeer_reproduce, roeDeer_gain_from_grass, roeDeer_gain_from_Trees, roeDeer_gain_from_Scrub, roeDeer_gain_from_Saplings, roeDeer_gain_from_YoungScrub,
             roeDeer_impactGrass, roeDeer_saplingsEaten, roeDeer_youngScrubEaten, roeDeer_treesEaten, roeDeer_scrubEaten,
@@ -44,7 +44,8 @@ class KneppModel_counterfactual(Model):
         self.chance_youngScrubMatures = chance_youngScrubMatures
         self.chance_scrubOutcompetedByTree = chance_scrubOutcompetedByTree
         self.chance_saplingOutcompetedByScrub = chance_saplingOutcompetedByScrub
-        self.chance_grassOutcompetedByTreeScrub = chance_grassOutcompetedByTreeScrub
+        self.chance_grassOutcompetedByTree = chance_grassOutcompetedByTree
+        self.chance_grassOutcompetedByScrub = chance_grassOutcompetedByScrub
         self.chance_saplingOutcompetedByTree = chance_saplingOutcompetedByTree
         self.chance_youngScrubOutcompetedByScrub = chance_youngScrubOutcompetedByScrub
         self.chance_youngScrubOutcompetedByTree = chance_youngScrubOutcompetedByTree
@@ -250,81 +251,82 @@ def run_counterfactual():
         chance_saplingBecomingTree =  row[4]
         chance_youngScrubMatures =  row[5]
         chance_scrubOutcompetedByTree =  row[6]
-        chance_grassOutcompetedByTreeScrub =  row[7]
-        chance_saplingOutcompetedByTree =  row[8]
-        chance_saplingOutcompetedByScrub =  row[9]
-        chance_youngScrubOutcompetedByScrub =  row[10]
-        chance_youngScrubOutcompetedByTree =  row[11]
-        initial_roeDeer =  int(row[12])
-        initial_grassland =  int(row[13])
-        initial_woodland =  int(row[14])
-        initial_scrubland =  int(row[15])
-        roeDeer_reproduce =  int(row[16])
-        roeDeer_gain_from_grass =  row[17]
-        roeDeer_gain_from_Trees =  row[18]
-        roeDeer_gain_from_Scrub =  row[19]
-        roeDeer_gain_from_Saplings =  row[20]
-        roeDeer_gain_from_YoungScrub =  row[21]
-        roeDeer_impactGrass =  int(row[22])
-        roeDeer_saplingsEaten =  int(row[23])
-        roeDeer_youngScrubEaten =  int(row[24])
-        roeDeer_treesEaten =  int(row[25])
-        roeDeer_scrubEaten =  int(row[26])
-        ponies_gain_from_grass =  row[27]
-        ponies_gain_from_Trees =  row[28]
-        ponies_gain_from_Scrub =  row[29]
-        ponies_gain_from_Saplings =  row[30]
-        ponies_gain_from_YoungScrub =  row[31]
-        ponies_impactGrass =  row[32]
-        ponies_saplingsEaten =  row[33]
-        ponies_youngScrubEaten =  row[34]
-        ponies_treesEaten =  row[35]
-        ponies_scrubEaten =  row[36]
-        cows_reproduce =  row[37]
-        cows_gain_from_grass =  row[38]
-        cows_gain_from_Trees =  row[39]
-        cows_gain_from_Scrub =  row[40]
-        cows_gain_from_Saplings =  row[41]
-        cows_gain_from_YoungScrub =  row[42]
-        cows_impactGrass =  row[43]
-        cows_saplingsEaten =  row[44]
-        cows_youngScrubEaten =  row[45]
-        cows_treesEaten =  row[46]
-        cows_scrubEaten =  row[47]
-        fallowDeer_reproduce =  row[48]
-        fallowDeer_gain_from_grass =  row[49]
-        fallowDeer_gain_from_Trees =  row[50]
-        fallowDeer_gain_from_Scrub =  row[51]
-        fallowDeer_gain_from_Saplings =  row[52]
-        fallowDeer_gain_from_YoungScrub =  row[53]
-        fallowDeer_impactGrass =  row[54]
-        fallowDeer_saplingsEaten =  row[55]
-        fallowDeer_youngScrubEaten =  row[56]
-        fallowDeer_treesEaten =  row[57]
-        fallowDeer_scrubEaten =  row[58]
-        redDeer_reproduce =  row[59]
-        redDeer_gain_from_grass =  row[60]
-        redDeer_gain_from_Trees =  row[61]
-        redDeer_gain_from_Scrub =  row[62]
-        redDeer_gain_from_Saplings =  row[63]
-        redDeer_gain_from_YoungScrub =  row[64]
-        redDeer_impactGrass =  row[65]
-        redDeer_saplingsEaten =  row[66]
-        redDeer_youngScrubEaten =  row[67]
-        redDeer_treesEaten =  row[68]
-        redDeer_scrubEaten =  row[69]
-        pigs_reproduce =  row[70]
-        pigs_gain_from_grass =  row[71]
-        pigs_gain_from_Saplings =  row[72]
-        pigs_gain_from_YoungScrub =  row[73]
-        pigs_impactGrass =  row[74]
-        pigs_saplingsEaten =  row[75]
+        chance_grassOutcompetedByTree =  row[7]
+        chance_grassOutcompetedByScrub = row[8]
+        chance_saplingOutcompetedByTree =  row[9]
+        chance_saplingOutcompetedByScrub =  row[10]
+        chance_youngScrubOutcompetedByScrub =  row[11]
+        chance_youngScrubOutcompetedByTree =  row[12]
+        initial_roeDeer =  int(row[13])
+        initial_grassland =  int(row[14])
+        initial_woodland =  int(row[15])
+        initial_scrubland =  int(row[16])
+        roeDeer_reproduce =  int(row[17])
+        roeDeer_gain_from_grass =  row[18]
+        roeDeer_gain_from_Trees =  row[19]
+        roeDeer_gain_from_Scrub =  row[20]
+        roeDeer_gain_from_Saplings =  row[21]
+        roeDeer_gain_from_YoungScrub =  row[22]
+        roeDeer_impactGrass =  int(row[23])
+        roeDeer_saplingsEaten =  int(row[24])
+        roeDeer_youngScrubEaten =  int(row[25])
+        roeDeer_treesEaten =  int(row[26])
+        roeDeer_scrubEaten =  int(row[27])
+        ponies_gain_from_grass =  row[28]
+        ponies_gain_from_Trees =  row[29]
+        ponies_gain_from_Scrub =  row[30]
+        ponies_gain_from_Saplings =  row[31]
+        ponies_gain_from_YoungScrub =  row[32]
+        ponies_impactGrass =  row[33]
+        ponies_saplingsEaten =  row[34]
+        ponies_youngScrubEaten =  row[35]
+        ponies_treesEaten =  row[36]
+        ponies_scrubEaten =  row[37]
+        cows_reproduce =  row[38]
+        cows_gain_from_grass =  row[39]
+        cows_gain_from_Trees =  row[40]
+        cows_gain_from_Scrub =  row[41]
+        cows_gain_from_Saplings =  row[42]
+        cows_gain_from_YoungScrub =  row[43]
+        cows_impactGrass =  row[44]
+        cows_saplingsEaten =  row[45]
+        cows_youngScrubEaten =  row[46]
+        cows_treesEaten =  row[47]
+        cows_scrubEaten =  row[48]
+        fallowDeer_reproduce =  row[49]
+        fallowDeer_gain_from_grass =  row[50]
+        fallowDeer_gain_from_Trees =  row[51]
+        fallowDeer_gain_from_Scrub =  row[52]
+        fallowDeer_gain_from_Saplings =  row[53]
+        fallowDeer_gain_from_YoungScrub =  row[54]
+        fallowDeer_impactGrass =  row[55]
+        fallowDeer_saplingsEaten =  row[56]
+        fallowDeer_youngScrubEaten =  row[57]
+        fallowDeer_treesEaten =  row[58]
+        fallowDeer_scrubEaten =  row[59]
+        redDeer_reproduce =  row[60]
+        redDeer_gain_from_grass =  row[61]
+        redDeer_gain_from_Trees =  row[62]
+        redDeer_gain_from_Scrub =  row[63]
+        redDeer_gain_from_Saplings =  row[64]
+        redDeer_gain_from_YoungScrub =  row[65]
+        redDeer_impactGrass =  row[66]
+        redDeer_saplingsEaten =  row[67]
+        redDeer_youngScrubEaten =  row[68]
+        redDeer_treesEaten =  row[69]
+        redDeer_scrubEaten =  row[70]
+        pigs_reproduce =  row[71]
+        pigs_gain_from_grass =  row[72]
+        pigs_gain_from_Saplings =  row[73]
+        pigs_gain_from_YoungScrub =  row[74]
+        pigs_impactGrass =  row[75]
+        pigs_saplingsEaten =  row[76]
         pigs_youngScrubEaten =  row[76]
 
 
         model = KneppModel_counterfactual(
             chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
-            chance_scrubOutcompetedByTree, chance_grassOutcompetedByTreeScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
+            chance_scrubOutcompetedByTree, chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
             initial_roeDeer, initial_grassland, initial_woodland, initial_scrubland, 
             roeDeer_reproduce, roeDeer_gain_from_grass, roeDeer_gain_from_Trees, roeDeer_gain_from_Scrub, roeDeer_gain_from_Saplings, roeDeer_gain_from_YoungScrub,
             roeDeer_impactGrass, roeDeer_saplingsEaten, roeDeer_youngScrubEaten, roeDeer_treesEaten, roeDeer_scrubEaten,
@@ -355,3 +357,5 @@ def run_counterfactual():
 
     # return the number of simulations, final results, forecasting, and counterfactual 
     return number_simulations, final_results, counterfactual, accepted_parameters
+
+run_counterfactual()

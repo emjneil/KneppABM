@@ -1,10 +1,9 @@
 # ------ Optimization of the Knepp ABM model --------
 from KneppModel_ABM import KneppModel 
 import numpy as np
-from scipy.optimize import differential_evolution
 import numpy as np
 import pandas as pd
-
+from geneticalgorithm import geneticalgorithm as ga
 
 # ------ Optimization of the Knepp ABM model --------
 
@@ -59,7 +58,6 @@ def objectiveFunction(x):
     pigs_gain_from_grass = x[46]
     pigs_gain_from_Saplings = x[47]
     pigs_gain_from_YoungScrub = x[48]
-
 
     # put large herbivore impacts in order 
     grass_impact_bds = list(x[49:55])
@@ -213,33 +211,46 @@ def objectiveFunction(x):
 
 
 # Define bounds
-param_bds = (
+bds = np.array([
     # initial values
-    (6,18), (70,90), (4,24), (0,11), 
+    [6,18],[70,90],[4,24],[0,11],
     # habitat parameters
-    (0,1), (0,1), (0,1), (0,1), (0,1), (0,1), (0,1), (0,1), (0,1), (0,1), (0,1), (0,1),
+    [0,1], [0,1],[0,1], [0,0.01],[0,0.01], [0,1], [0,1], [0,1], [0,1], [0,1], [0,1], [0,1],
     # roe deer parameters
-    (0,1), (0,1),(0,1),(0,1),(0,1),(0,1),
+    [0,0.1],[0,0.1],[0,0.1],[0,0.1],[0,0.1],[0,0.1],
     # fallow deer parameters
-    (0,1), (0,1),(0,1),(0,1),(0,1),(0,1),
+    [0,0.1], [0,0.1],[0,0.1],[0,0.1],[0,0.1],[0,0.1],
     # red deer parameters
-    (0,1), (0,1),(0,1),(0,1),(0,1),(0,1),
+    [0,0.1],[0,0.1],[0,0.1],[0,0.1],[0,0.1],[0,0.1],
     # exmoor pony parameters
-    (0,1),(0,1),(0,1),(0,1),(0,1),
+    [0,0.1],[0,0.1],[0,0.1],[0,0.1],[0,0.1],
     # cattle parameters
-    (0,1), (0,1),(0,1),(0,1),(0,1),(0,1),
+    [0,0.1], [0,0.1],[0,0.1],[0,0.1],[0,0.1],[0,0.1],
     # pig parameters
-    (0,1), (0,1),(0,1),(0,1))
+    [0,0.1], [0,0.1],[0,0.1],[0,0.1],
+    # grass impact
+    [0,100],[0,100],[0,100],[0,100],[0,100],[0,100],
+    # sapling impact
+    [0,1000],[0,1000],[0,1000],[0,1000],[0,1000],[0,1000],
+    # young scrub impact
+    [0,1000],[0,1000],[0,1000],[0,1000],[0,1000],[0,1000],
+    # scrub impact
+    [0,100],[0,100],[0,100],[0,100],[0,100],
+    # tree impact
+    [0,100],[0,100],[0,100],[0,100],[0,100]
+
+])
+
+algorithm_param = {'max_num_iteration': 500,\
+                   'population_size':100,\
+                   'mutation_probability':0.1,\
+                   'elit_ratio': 0.01,\
+                   'crossover_probability': 0.5,\
+                   'parents_portion': 0.3,\
+                   'crossover_type':'uniform',\
+                   'max_iteration_without_improv':None}
 
 
-grass_impact_bds = ((0,100), (0,100), (0,100), (0,100), (0,100), (0,100))
-saplings_impact_bds = ((0,1000), (0,1000), (0,1000), (0,1000), (0,1000), (0,1000))
-youngScrub_impact_bds = ((0,1000), (0,1000), (0,1000), (0,1000), (0,1000), (0,1000))
-scrub_impact_bds = ((0,100), (0,100), (0,100), (0,100), (0,100))
-tree_impact_bds = ((0,100), (0,100), (0,100), (0,100), (0,100))
-
-bds = param_bds + grass_impact_bds + saplings_impact_bds + youngScrub_impact_bds + scrub_impact_bds + tree_impact_bds
-
-optimization = differential_evolution(objectiveFunction, bounds = bds, maxiter =  1000)
+optimization =  ga(function = objectiveFunction, dimension = 77, variable_type = 'real',variable_boundaries= bds, algorithm_parameters = algorithm_param, function_timeout=6000)
+optimization.run()
 print(optimization)
-

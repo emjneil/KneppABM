@@ -15,7 +15,7 @@ def run_all_models():
     start = timeit.default_timer()
 
     # define number of simulations
-    number_simulations =  10
+    number_simulations =  1
     # make list of variables
     final_results_list = []
     final_parameters = []
@@ -35,7 +35,8 @@ def run_all_models():
         chance_saplingBecomingTree = np.random.uniform(0,1)
         chance_youngScrubMatures = np.random.uniform(0,1)
         chance_scrubOutcompetedByTree = np.random.uniform(0,1) 
-        chance_grassOutcompetedByTreeScrub = np.random.uniform(0,1)
+        chance_grassOutcompetedByTree = np.random.uniform(0,1)
+        chance_grassOutcompetedByScrub = np.random.uniform(0,1)
         chance_saplingOutcompetedByTree = np.random.uniform(0,1)
         chance_saplingOutcompetedByScrub = np.random.uniform(0,1)
         chance_youngScrubOutcompetedByScrub = np.random.uniform(0,1)
@@ -48,10 +49,10 @@ def run_all_models():
         roeDeer_gain_from_Saplings = np.random.uniform(0,1)
         roeDeer_gain_from_YoungScrub = np.random.uniform(0,1)
         roeDeer_impactGrass = random.randint(0,100)
-        roeDeer_saplingsEaten = random.randint(0,100)
-        roeDeer_youngScrubEaten = random.randint(0,100)
-        roeDeer_treesEaten = random.randint(0,10)
-        roeDeer_scrubEaten = random.randint(0,10)
+        roeDeer_saplingsEaten = random.randint(0,1000)
+        roeDeer_youngScrubEaten = random.randint(0,1000)
+        roeDeer_treesEaten = random.randint(0,100)
+        roeDeer_scrubEaten = random.randint(0,100)
         # Fallow deer
         fallowDeer_reproduce = np.random.uniform(0,1)
         fallowDeer_gain_from_grass = np.random.uniform(0,1)
@@ -60,10 +61,10 @@ def run_all_models():
         fallowDeer_gain_from_Saplings = np.random.uniform(0,1)
         fallowDeer_gain_from_YoungScrub = np.random.uniform(0,1)
         fallowDeer_impactGrass = random.randint(roeDeer_impactGrass,100)
-        fallowDeer_saplingsEaten = random.randint(roeDeer_saplingsEaten,100)
-        fallowDeer_youngScrubEaten = random.randint(roeDeer_youngScrubEaten,100)
-        fallowDeer_treesEaten = random.randint(roeDeer_treesEaten,10)
-        fallowDeer_scrubEaten = random.randint(roeDeer_scrubEaten,10)
+        fallowDeer_saplingsEaten = random.randint(roeDeer_saplingsEaten,1000)
+        fallowDeer_youngScrubEaten = random.randint(roeDeer_youngScrubEaten,1000)
+        fallowDeer_treesEaten = random.randint(roeDeer_treesEaten,100)
+        fallowDeer_scrubEaten = random.randint(roeDeer_scrubEaten,100)
         # Red deer
         redDeer_reproduce = np.random.uniform(0,1)
         redDeer_gain_from_grass = np.random.uniform(0,1)
@@ -72,10 +73,10 @@ def run_all_models():
         redDeer_gain_from_Saplings = np.random.uniform(0,1)
         redDeer_gain_from_YoungScrub = np.random.uniform(0,1)
         redDeer_impactGrass = random.randint(fallowDeer_impactGrass,100)
-        redDeer_saplingsEaten = random.randint(fallowDeer_saplingsEaten,100)
-        redDeer_youngScrubEaten = random.randint(fallowDeer_youngScrubEaten,100)
-        redDeer_treesEaten = random.randint(fallowDeer_treesEaten,10)
-        redDeer_scrubEaten = random.randint(fallowDeer_scrubEaten,10)
+        redDeer_saplingsEaten = random.randint(fallowDeer_saplingsEaten,1000)
+        redDeer_youngScrubEaten = random.randint(fallowDeer_youngScrubEaten,1000)
+        redDeer_treesEaten = random.randint(fallowDeer_treesEaten,100)
+        redDeer_scrubEaten = random.randint(fallowDeer_scrubEaten,100)
         # Exmoor ponies
         ponies_gain_from_grass = np.random.uniform(0,1)
         ponies_gain_from_Trees = np.random.uniform(0,1)
@@ -83,10 +84,10 @@ def run_all_models():
         ponies_gain_from_Saplings = np.random.uniform(0,1)
         ponies_gain_from_YoungScrub = np.random.uniform(0,1)
         ponies_impactGrass = random.randint(redDeer_impactGrass,100)
-        ponies_saplingsEaten = random.randint(redDeer_saplingsEaten,100)
-        ponies_youngScrubEaten = random.randint(redDeer_youngScrubEaten,100)
-        ponies_treesEaten = random.randint(redDeer_treesEaten,10)
-        ponies_scrubEaten = random.randint(redDeer_scrubEaten,10)
+        ponies_saplingsEaten = random.randint(redDeer_saplingsEaten,1000)
+        ponies_youngScrubEaten = random.randint(redDeer_youngScrubEaten,1000)
+        ponies_treesEaten = random.randint(redDeer_treesEaten,100)
+        ponies_scrubEaten = random.randint(redDeer_scrubEaten,100)
         # Longhorn cattle
         cows_reproduce = np.random.uniform(0,1)
         cows_gain_from_grass = np.random.uniform(0,1)
@@ -95,24 +96,24 @@ def run_all_models():
         cows_gain_from_Saplings = np.random.uniform(0,1)
         cows_gain_from_YoungScrub = np.random.uniform(0,1)
         cows_impactGrass = random.randint(ponies_impactGrass,100)
-        cows_saplingsEaten = random.randint(ponies_saplingsEaten,100)
-        cows_youngScrubEaten = random.randint(ponies_youngScrubEaten,100)
-        cows_treesEaten = random.randint(ponies_treesEaten,10)
-        cows_scrubEaten = random.randint(ponies_scrubEaten,10)
+        cows_saplingsEaten = random.randint(ponies_saplingsEaten,1000)
+        cows_youngScrubEaten = random.randint(ponies_youngScrubEaten,1000)
+        cows_treesEaten = random.randint(ponies_treesEaten,100)
+        cows_scrubEaten = random.randint(ponies_scrubEaten,100)
         # Tamworth pigs
         pigs_reproduce = np.random.uniform(0,1)
         pigs_gain_from_grass = np.random.uniform(0,1)
         pigs_gain_from_Saplings = np.random.uniform(0,1)
         pigs_gain_from_YoungScrub = np.random.uniform(0,1)
         pigs_impactGrass = random.randint(cows_impactGrass,100)
-        pigs_saplingsEaten = random.randint(cows_saplingsEaten,100)
-        pigs_youngScrubEaten = random.randint(cows_youngScrubEaten,100)
+        pigs_saplingsEaten = random.randint(cows_saplingsEaten,1000)
+        pigs_youngScrubEaten = random.randint(cows_youngScrubEaten,1000)
 
         # keep track of my parameters
         parameters_used = [
             run_number,
             chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
-            chance_scrubOutcompetedByTree, chance_grassOutcompetedByTreeScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
+            chance_scrubOutcompetedByTree, chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
             initial_roeDeer, initial_grassland, initial_woodland, initial_scrubland, 
             roeDeer_reproduce, roeDeer_gain_from_grass, roeDeer_gain_from_Trees, roeDeer_gain_from_Scrub, roeDeer_gain_from_Saplings, roeDeer_gain_from_YoungScrub,
             roeDeer_impactGrass, roeDeer_saplingsEaten, roeDeer_youngScrubEaten, roeDeer_treesEaten, roeDeer_scrubEaten,
@@ -135,7 +136,7 @@ def run_all_models():
         print(run_number)
         model = KneppModel(
             chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
-            chance_scrubOutcompetedByTree, chance_grassOutcompetedByTreeScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
+            chance_scrubOutcompetedByTree, chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
             initial_roeDeer, initial_grassland, initial_woodland, initial_scrubland, 
             roeDeer_reproduce, roeDeer_gain_from_grass, roeDeer_gain_from_Trees, roeDeer_gain_from_Scrub, roeDeer_gain_from_Saplings, roeDeer_gain_from_YoungScrub,
             roeDeer_impactGrass, roeDeer_saplingsEaten, roeDeer_youngScrubEaten, roeDeer_treesEaten, roeDeer_scrubEaten,
@@ -170,7 +171,8 @@ def run_all_models():
         "chance_saplingBecomingTree",
         "chance_youngScrubMatures",
         "chance_scrubOutcompetedByTree", # if tree matures, chance of scrub decreasing
-        "chance_grassOutcompetedByTreeScrub",
+        "chance_grassOutcompetedByTree",
+        "chance_grassOutcompetedByScrub",
         "chance_saplingOutcompetedByTree",
         "chance_saplingOutcompetedByScrub",
         "chance_youngScrubOutcompetedByScrub",
@@ -386,8 +388,8 @@ def run_all_models():
     # tag the accepted simulations
     final_results['accepted?'] = np.where(final_results['run_number'].isin(accepted_parameters['run_number']), 'Accepted', 'Rejected')
 
-    # with pd.option_context('display.max_columns',None):
-    #     print("final results unfiltered", final_results[(final_results["Time"] == 184)])
+    with pd.option_context('display.max_columns',None):
+        print(final_results[(final_results["Time"] == 184)])
     
     with pd.option_context('display.max_rows',None, 'display.max_columns',None):
         print("accepted_years: \n", all_accepted_runs)
@@ -398,3 +400,4 @@ def run_all_models():
     print('Total time: ', (stop - start)) 
 
     return number_simulations, final_results, accepted_parameters
+
