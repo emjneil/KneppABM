@@ -125,7 +125,7 @@ class KneppModel_counterfactual(Model):
         self.running = True
         self.current_id = 0
 
-        
+     
         # Create habitat patches
         if (initial_woodland + initial_grassland + initial_scrubland) >= 100:
             # rescale it to 100
@@ -176,7 +176,6 @@ class KneppModel_counterfactual(Model):
             self.grid.place_agent(patch, (x, y))
             self.schedule.add(patch)
 
-
         # Create roe deer
         for i in range(self.initial_roeDeer):
             x = random.randrange(self.width)
@@ -205,9 +204,9 @@ class KneppModel_counterfactual(Model):
                             }
                             )
 
-
         self.running = True
         self.datacollector.collect(self)
+
 
     def count_condition(self, model, habitat_condition):
         # want to count grass, wood, scrub, bare ground in each patch
@@ -218,22 +217,24 @@ class KneppModel_counterfactual(Model):
         # return percentage of entire area
         return int((count/1800)*100)
 
+
     def step(self):
         self.schedule.step()
         # count how many there are, then step
         self.datacollector.collect(self)
         # run till 2021 with no large herbivore reintroductions
-        if self.schedule.time == 184:
+        if self.schedule.time == 50:
             self.running = False
+
+
 
     def run_model(self): 
         # run it for 184 steps
-        for i in range(184):
+        for i in range(50):
             self.step()
         results = self.datacollector.get_model_vars_dataframe()
         return results
-
-
+  
 
 
 
@@ -244,7 +245,7 @@ def run_counterfactual():
     run_number = 0
 
     # take the accepted parameters, and go row by row, running the model
-    for index, row in accepted_parameters.iterrows():
+    for _, row in accepted_parameters.iterrows():
         chance_reproduceSapling = row[1]
         chance_reproduceYoungScrub =  row[2]
         chance_regrowGrass =  row[3]
@@ -257,21 +258,21 @@ def run_counterfactual():
         chance_saplingOutcompetedByScrub =  row[10]
         chance_youngScrubOutcompetedByScrub =  row[11]
         chance_youngScrubOutcompetedByTree =  row[12]
-        initial_roeDeer =  int(row[13])
+        initial_roeDeer = int(row[13])
         initial_grassland =  int(row[14])
         initial_woodland =  int(row[15])
         initial_scrubland =  int(row[16])
-        roeDeer_reproduce =  int(row[17])
+        roeDeer_reproduce =  row[17]
         roeDeer_gain_from_grass =  row[18]
         roeDeer_gain_from_Trees =  row[19]
         roeDeer_gain_from_Scrub =  row[20]
         roeDeer_gain_from_Saplings =  row[21]
         roeDeer_gain_from_YoungScrub =  row[22]
-        roeDeer_impactGrass =  int(row[23])
-        roeDeer_saplingsEaten =  int(row[24])
-        roeDeer_youngScrubEaten =  int(row[25])
-        roeDeer_treesEaten =  int(row[26])
-        roeDeer_scrubEaten =  int(row[27])
+        roeDeer_impactGrass =  row[23]
+        roeDeer_saplingsEaten =  row[24]
+        roeDeer_youngScrubEaten =  row[25]
+        roeDeer_treesEaten =  row[26]
+        roeDeer_scrubEaten =  row[27]
         ponies_gain_from_grass =  row[28]
         ponies_gain_from_Trees =  row[29]
         ponies_gain_from_Scrub =  row[30]
@@ -321,7 +322,7 @@ def run_counterfactual():
         pigs_gain_from_YoungScrub =  row[74]
         pigs_impactGrass =  row[75]
         pigs_saplingsEaten =  row[76]
-        pigs_youngScrubEaten =  row[76]
+        pigs_youngScrubEaten =  row[77]
 
 
         model = KneppModel_counterfactual(
@@ -354,8 +355,7 @@ def run_counterfactual():
     counterfactual = pd.concat(final_results_list)
     counterfactual['accepted?'] = "noReintro"
 
+    counterfactual.to_excel("noReintro.xlsx")
 
     # return the number of simulations, final results, forecasting, and counterfactual 
     return number_simulations, final_results, counterfactual, accepted_parameters
-
-run_counterfactual()

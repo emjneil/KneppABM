@@ -60,48 +60,49 @@ def objectiveFunction(x):
     pigs_gain_from_YoungScrub = x[48]
 
     # put large herbivore impacts in order 
-    grass_impact_bds = list(x[49:55])
-    organized_grass = np.sort(grass_impact_bds)
-    roeDeer_impactGrass = int(organized_grass[0])
-    fallowDeer_impactGrass = int(organized_grass[1])
-    redDeer_impactGrass = int(organized_grass[2])
-    ponies_impactGrass = int(organized_grass[3])
-    cows_impactGrass = int(organized_grass[4])
-    pigs_impactGrass = int(organized_grass[5])
+    # grass_impact_bds = list(x[49:55])
+    # organized_grass = np.sort(grass_impact_bds)
+    # roeDeer_impactGrass = int(organized_grass[0])
+    roeDeer_impactGrass = int(x[49])
+    fallowDeer_impactGrass = int(x[50])
+    redDeer_impactGrass = int(x[51])
+    ponies_impactGrass = int(x[52])
+    cows_impactGrass = int(x[53])
+    pigs_impactGrass = int(x[54])
     # saplings 
-    saplings_impact_bds = list(x[55:61])
-    organized_saplings = np.sort(saplings_impact_bds)
-    roeDeer_saplingsEaten = int(organized_saplings[0])
-    fallowDeer_saplingsEaten = int(organized_saplings[1])
-    redDeer_saplingsEaten = int(organized_saplings[2])
-    ponies_saplingsEaten = int(organized_saplings[3])
-    cows_saplingsEaten = int(organized_saplings[4])
-    pigs_saplingsEaten = int(organized_saplings[5])
+    # saplings_impact_bds = list(x[55:61])
+    # organized_saplings = np.sort(saplings_impact_bds)
+    roeDeer_saplingsEaten = int(x[55])
+    fallowDeer_saplingsEaten = int(x[56])
+    redDeer_saplingsEaten = int(x[57])
+    ponies_saplingsEaten = int(x[58])
+    cows_saplingsEaten = int(x[59])
+    pigs_saplingsEaten = int(x[60])
     # young scrub 
-    youngScrub_impact_bds = list(x[61:67])
-    organized_youngScrub = np.sort(youngScrub_impact_bds)
-    roeDeer_youngScrubEaten = int(organized_youngScrub[0])
-    fallowDeer_youngScrubEaten = int(organized_youngScrub[1])
-    redDeer_youngScrubEaten = int(organized_youngScrub[2])
-    ponies_youngScrubEaten = int(organized_youngScrub[3])
-    cows_youngScrubEaten = int(organized_youngScrub[4])
-    pigs_youngScrubEaten = int(organized_youngScrub[5])
+    # youngScrub_impact_bds = list(x[61:67])
+    # organized_youngScrub = np.sort(youngScrub_impact_bds)
+    roeDeer_youngScrubEaten = int(x[61])
+    fallowDeer_youngScrubEaten = int(x[62])
+    redDeer_youngScrubEaten = int(x[63])
+    ponies_youngScrubEaten = int(x[64])
+    cows_youngScrubEaten = int(x[65])
+    pigs_youngScrubEaten = int(x[66])
     # scrub eaten
-    scrub_impact_bds = list(x[67:72])
-    organizedScrub = np.sort(scrub_impact_bds)
-    roeDeer_scrubEaten = int(organizedScrub[0])
-    fallowDeer_scrubEaten = int(organizedScrub[1])
-    redDeer_scrubEaten = int(organizedScrub[2])
-    ponies_scrubEaten = int(organizedScrub[3])
-    cows_scrubEaten = int(organizedScrub[4])
+    # scrub_impact_bds = list(x[67:72])
+    # organizedScrub = np.sort(scrub_impact_bds)
+    roeDeer_scrubEaten = int(x[67])
+    fallowDeer_scrubEaten = int(x[68])
+    redDeer_scrubEaten = int(x[69])
+    ponies_scrubEaten = int(x[70])
+    cows_scrubEaten = int(x[71])
     # trees eaten
-    trees_impact_bds = list(x[72:77])
-    organized_trees = np.sort(trees_impact_bds)
-    roeDeer_treesEaten = int(organized_trees[0])
-    fallowDeer_treesEaten = int(organized_trees[1])
-    redDeer_treesEaten = int(organized_trees[2])
-    ponies_treesEaten = int(organized_trees[3])
-    cows_treesEaten = int(organized_trees[4])
+    # trees_impact_bds = list(x[72:77])
+    # organized_trees = np.sort(trees_impact_bds)
+    roeDeer_treesEaten = int(x[72])
+    fallowDeer_treesEaten = int(x[73])
+    redDeer_treesEaten = int(x[74])
+    ponies_treesEaten = int(x[75])
+    cows_treesEaten = int(x[76])
 
     model = KneppModel(
         chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
@@ -124,133 +125,135 @@ def objectiveFunction(x):
 
     # remember the results of the model (dominant conditions, # of agents)
     results = model.datacollector.get_model_vars_dataframe()
-
+    
     # find the middle of each filter
     filtered_result = (
         # pre-reintro model
-        ((((list(results.loc[results['Time'] == 50, 'Roe deer'])[0])-23)**2)/23) +
-        ((((list(results.loc[results['Time'] == 50, 'Grassland'])[0])-70)**2)/70) +
-        ((((list(results.loc[results['Time'] == 50, 'Thorny Scrub'])[0])-11)**2)/11) +
-        ((((list(results.loc[results['Time'] == 50, 'Woodland'])[0])-17)**2)/17) +
-        # post-reintro model: April 2015
-        ((((list(results.loc[results['Time'] == 123, 'Longhorn cattle'])[0])-115)**2)/115) +
-        ((((list(results.loc[results['Time'] == 123, 'Tamworth pigs'])[0])-22)**2)/22) +
-        # May 2015
-        ((((list(results.loc[results['Time'] == 124, 'Longhorn cattle'])[0])-129)**2)/129) +
-        # June 2015
-        ((((list(results.loc[results['Time'] == 125, 'Longhorn cattle'])[0])-129)**2)/129) +
-        # Feb 2016
-        ((((list(results.loc[results['Time'] == 133, 'Exmoor pony'])[0])-10)**2)/10) +
-        # March 2016
-        ((((list(results.loc[results['Time'] == 134, 'Fallow deer'])[0])-140)**2)/140) +
-        ((((list(results.loc[results['Time'] == 134, 'Red deer'])[0])-26)**2)/26) +
-        ((((list(results.loc[results['Time'] == 134, 'Tamworth pigs'])[0])-9)**2)/9) +
-        # April 2016
-        ((((list(results.loc[results['Time'] == 135, 'Longhorn cattle'])[0])-103)**2)/103) +
-        # May 2016
-        ((((list(results.loc[results['Time'] == 136, 'Longhorn cattle'])[0])-108)**2)/108) +
-        ((((list(results.loc[results['Time'] == 136, 'Tamworth pigs'])[0])-17)**2)/17) +
-        # June 2016
-        ((((list(results.loc[results['Time'] == 137, 'Longhorn cattle'])[0])-129)**2)/129) +
-        # Feb 2017
-        ((((list(results.loc[results['Time'] == 145, 'Exmoor pony'])[0])-11)**2)/11) +
-        # March 2017
-        ((((list(results.loc[results['Time'] == 146, 'Fallow deer'])[0])-165)**2)/165) +
-        # April 2017
-        ((((list(results.loc[results['Time'] == 147, 'Longhorn cattle'])[0])-100)**2)/100) +
-        ((((list(results.loc[results['Time'] == 147, 'Tamworth pigs'])[0])-22)**2)/22) +
-        # May 2017
-        ((((list(results.loc[results['Time'] == 148, 'Longhorn cattle'])[0])-109)**2)/109) +
-        # June 2017
-        ((((list(results.loc[results['Time'] == 149, 'Longhorn cattle'])[0])-94)**2)/94) +
-        # Jan 2018
-        ((((list(results.loc[results['Time'] == 156, 'Tamworth pigs'])[0])-12)**2)/12) +
-        # Feb 2018
-        ((((list(results.loc[results['Time'] == 157, 'Exmoor pony'])[0])-10)**2)/10) +
-        ((((list(results.loc[results['Time'] == 157, 'Tamworth pigs'])[0])-16)**2)/16) +
-        # March 2018
-        ((((list(results.loc[results['Time'] == 158, 'Fallow deer'])[0])-251)**2)/251) +
-        ((((list(results.loc[results['Time'] == 158, 'Red deer'])[0])-24)**2)/24) +
-        # April 2018
-        ((((list(results.loc[results['Time'] == 159, 'Longhorn cattle'])[0])-101)**2)/101) +
-        # May 2018
-        ((((list(results.loc[results['Time'] == 160, 'Longhorn cattle'])[0])-117)**2)/117) +
-        ((((list(results.loc[results['Time'] == 160, 'Tamworth pigs'])[0])-23)**2)/23) +
-        # June 2018
-        ((((list(results.loc[results['Time'] == 161, 'Longhorn cattle'])[0])-103)**2)/103) +
-        # March 2019
-        ((((list(results.loc[results['Time'] == 170, 'Fallow deer'])[0])-278)**2)/278) +
-        ((((list(results.loc[results['Time'] == 170, 'Red deer'])[0])-37)**2)/37) +
-        # April 2019
-        ((((list(results.loc[results['Time'] == 171, 'Longhorn cattle'])[0])-101)**2)/101) +
-        # May 2019
-        ((((list(results.loc[results['Time'] == 172, 'Longhorn cattle'])[0])-110)**2)/110) +
-        # June 2019
-        ((((list(results.loc[results['Time'] == 173, 'Longhorn cattle'])[0])-89)**2)/89) +
-        # July 2019        
-        ((((list(results.loc[results['Time'] == 174, 'Tamworth pigs'])[0])-9)**2)/9) +
-        # March 2021 
-        ((((list(results.loc[results['Time'] == 182, 'Fallow deer'])[0])-247)**2)/247) +
-        ((((list(results.loc[results['Time'] == 182, 'Red deer'])[0])-35)**2)/35) +
-        # May 2021
-        ((((list(results.loc[results['Time'] == 184, 'Exmoor pony'])[0])-15)**2)/15) +
-        ((((list(results.loc[results['Time'] == 184, 'Tamworth pigs'])[0])-19)**2)/19) +
-        ((((list(results.loc[results['Time'] == 184, 'Roe deer'])[0])-30)**2)/30) +
-        ((((list(results.loc[results['Time'] == 184, 'Grassland'])[0])-59)**2)/59) +
-        ((((list(results.loc[results['Time'] == 184, 'Thorny Scrub'])[0])-28)**2)/28) +
-        ((((list(results.loc[results['Time'] == 184, 'Woodland'])[0])-19)**2)/19))
+        (((list(results.loc[results['Time'] == 49, 'Roe deer'])[0])-23)**2) +
+        (((list(results.loc[results['Time'] == 49, 'Grassland'])[0])-70)**2) +
+        (((list(results.loc[results['Time'] == 49, 'Thorny Scrub'])[0])-11)**2) +
+        (((list(results.loc[results['Time'] == 49, 'Woodland'])[0])-17)**2))
+        # # post-reintro model: April 2015
+        # ((((list(results.loc[results['Time'] == 123, 'Longhorn cattle'])[0])-115)**2)/115) +
+        # ((((list(results.loc[results['Time'] == 123, 'Tamworth pigs'])[0])-23)**2)/23) +
+        # # May 2015
+        # ((((list(results.loc[results['Time'] == 124, 'Longhorn cattle'])[0])-129)**2)/129) +
+        # # June 2015
+        # ((((list(results.loc[results['Time'] == 125, 'Longhorn cattle'])[0])-134)**2)/134) +
+        # # Feb 2016
+        # ((((list(results.loc[results['Time'] == 133, 'Exmoor pony'])[0])-10)**2)/10) +
+        # # March 2016
+        # ((((list(results.loc[results['Time'] == 134, 'Fallow deer'])[0])-140)**2)/140) +
+        # ((((list(results.loc[results['Time'] == 134, 'Red deer'])[0])-26)**2)/26) +
+        # ((((list(results.loc[results['Time'] == 134, 'Tamworth pigs'])[0])-10)**2)/10) +
+        # # April 2016
+        # ((((list(results.loc[results['Time'] == 135, 'Longhorn cattle'])[0])-102)**2)/102) +
+        # # May 2016
+        # ((((list(results.loc[results['Time'] == 136, 'Longhorn cattle'])[0])-110)**2)/110) +
+        # ((((list(results.loc[results['Time'] == 136, 'Tamworth pigs'])[0])-17)**2)/17) +
+        # # June 2016
+        # ((((list(results.loc[results['Time'] == 137, 'Longhorn cattle'])[0])-113)**2)/113) +
+        # # Feb 2017
+        # ((((list(results.loc[results['Time'] == 145, 'Exmoor pony'])[0])-11)**2)/11) +
+        # # March 2017
+        # ((((list(results.loc[results['Time'] == 146, 'Fallow deer'])[0])-165)**2)/165) +
+        # # April 2017
+        # ((((list(results.loc[results['Time'] == 147, 'Longhorn cattle'])[0])-103)**2)/103) +
+        # ((((list(results.loc[results['Time'] == 147, 'Tamworth pigs'])[0])-22)**2)/22) +
+        # # May 2017
+        # ((((list(results.loc[results['Time'] == 148, 'Longhorn cattle'])[0])-109)**2)/109) +
+        # # June 2017
+        # ((((list(results.loc[results['Time'] == 149, 'Longhorn cattle'])[0])-115)**2)/115) +
+        # # Jan 2018
+        # ((((list(results.loc[results['Time'] == 156, 'Tamworth pigs'])[0])-20)**2)/20) +
+        # # Feb 2018
+        # ((((list(results.loc[results['Time'] == 157, 'Exmoor pony'])[0])-10)**2)/10) +
+        # ((((list(results.loc[results['Time'] == 157, 'Tamworth pigs'])[0])-17)**2)/17) +
+        # # March 2018
+        # ((((list(results.loc[results['Time'] == 158, 'Fallow deer'])[0])-251)**2)/251) +
+        # ((((list(results.loc[results['Time'] == 158, 'Red deer'])[0])-24)**2)/24) +
+        # # April 2018
+        # ((((list(results.loc[results['Time'] == 159, 'Longhorn cattle'])[0])-100)**2)/100) +
+        # # May 2018
+        # ((((list(results.loc[results['Time'] == 160, 'Longhorn cattle'])[0])-117)**2)/117) +
+        # ((((list(results.loc[results['Time'] == 160, 'Tamworth pigs'])[0])-23)**2)/23) +
+        # # June 2018
+        # ((((list(results.loc[results['Time'] == 161, 'Longhorn cattle'])[0])-123)**2)/123) +
+        # # March 2019
+        # ((((list(results.loc[results['Time'] == 170, 'Fallow deer'])[0])-278)**2)/278) +
+        # ((((list(results.loc[results['Time'] == 170, 'Red deer'])[0])-37)**2)/37) +
+        # # April 2019
+        # ((((list(results.loc[results['Time'] == 171, 'Longhorn cattle'])[0])-101)**2)/101) +
+        # # May 2019
+        # ((((list(results.loc[results['Time'] == 172, 'Longhorn cattle'])[0])-110)**2)/110) +
+        # # June 2019
+        # ((((list(results.loc[results['Time'] == 173, 'Longhorn cattle'])[0])-117)**2)/117) +
+        # # July 2019        
+        # ((((list(results.loc[results['Time'] == 174, 'Tamworth pigs'])[0])-36)**2)/36) +
+        # # March 2021 
+        # ((((list(results.loc[results['Time'] == 182, 'Fallow deer'])[0])-247)**2)/247) +
+        # ((((list(results.loc[results['Time'] == 182, 'Red deer'])[0])-35)**2)/35) +
+        # # May 2021
+        # ((((list(results.loc[results['Time'] == 184, 'Exmoor pony'])[0])-15)**2)/15) +
+        # ((((list(results.loc[results['Time'] == 184, 'Tamworth pigs'])[0])-19)**2)/19) +
+        # ((((list(results.loc[results['Time'] == 184, 'Roe deer'])[0])-30)**2)/30) +
+        # ((((list(results.loc[results['Time'] == 184, 'Grassland'])[0])-59)**2)/59) +
+        # ((((list(results.loc[results['Time'] == 184, 'Thorny Scrub'])[0])-28)**2)/28) +
+        # ((((list(results.loc[results['Time'] == 184, 'Woodland'])[0])-19)**2)/19))
                          
 
-    # if filtered_result < 1000:
-    print("r:", filtered_result)
-    with pd.option_context('display.max_columns',None):
-        print(results[results['Time'] == 184])
+    if filtered_result < 10000:
+        print("r:", filtered_result)
+        with pd.option_context('display.max_columns',None):
+            print(results[results['Time'] == 50])
 
     return filtered_result
    
 
-
-# Define bounds
-bds = np.array([
-    # initial values
-    [6,18],[70,90],[4,24],[0,11],
-    # habitat parameters
-    [0,1], [0,1],[0,1], [0,0.01],[0,0.01], [0,1], [0,1], [0,1], [0,1], [0,1], [0,1], [0,1],
-    # roe deer parameters
-    [0,0.1],[0,0.1],[0,0.1],[0,0.1],[0,0.1],[0,0.1],
-    # fallow deer parameters
-    [0,0.1], [0,0.1],[0,0.1],[0,0.1],[0,0.1],[0,0.1],
-    # red deer parameters
-    [0,0.1],[0,0.1],[0,0.1],[0,0.1],[0,0.1],[0,0.1],
-    # exmoor pony parameters
-    [0,0.1],[0,0.1],[0,0.1],[0,0.1],[0,0.1],
-    # cattle parameters
-    [0,0.1], [0,0.1],[0,0.1],[0,0.1],[0,0.1],[0,0.1],
-    # pig parameters
-    [0,0.1], [0,0.1],[0,0.1],[0,0.1],
-    # grass impact
-    [0,100],[0,100],[0,100],[0,100],[0,100],[0,100],
-    # sapling impact
-    [0,1000],[0,1000],[0,1000],[0,1000],[0,1000],[0,1000],
-    # young scrub impact
-    [0,1000],[0,1000],[0,1000],[0,1000],[0,1000],[0,1000],
-    # scrub impact
-    [0,100],[0,100],[0,100],[0,100],[0,100],
-    # tree impact
-    [0,100],[0,100],[0,100],[0,100],[0,100]
-
-])
-
-algorithm_param = {'max_num_iteration': 500,\
-                   'population_size':100,\
-                   'mutation_probability':0.1,\
-                   'elit_ratio': 0.01,\
-                   'crossover_probability': 0.5,\
-                   'parents_portion': 0.3,\
-                   'crossover_type':'uniform',\
-                   'max_iteration_without_improv':None}
+def run_optimizer():
+    # Define bounds
+    bds = np.array([
+        # initial values
+        [6,18],[70,90],[4,24],[0,11],
+        # habitat parameters
+        [0,0.01],[0,0.01],[0,0.1],[0,0.001],[0,0.001],[0,0.1],[0,0.1],[0,0.1],[0,0.1],[0,0.1],[0,0.1],[0,0.1],
+        # roe deer parameters
+        [0,1],[0,1],[0,1],[0,1],[0,1],[0,1],
+        # fallow deer parameters
+        [0,1],[0,1],[0,1],[0,1],[0,1],[0,1],
+        # red deer parameters
+        [0,1],[0,1],[0,1],[0,1],[0,1],[0,1],
+        # exmoor pony parameters
+        [0,1],[0,1],[0,1],[0,1],[0,1],
+        # cattle parameters
+        [0,1],[0,1],[0,1],[0,1],[0,1],[0,1],
+        # pig parameters
+        [0,1],[0,1],[0,1],[0,1],
+        # grass impact
+        [0,100],[0,1],[0,1],[0,1],[0,1],[0,1],
+        # sapling impact
+        [0,1000],[0,1],[0,1],[0,1],[0,1],[0,1],
+        # young scrub impact
+        [0,1000],[0,1],[0,1],[0,1],[0,1],[0,1],
+        # scrub impact
+        [0,100],[0,1],[0,1],[0,1],[0,1],
+        # tree impact
+        [0,100],[0,1],[0,1],[0,1],[0,1]
+    ])
 
 
-optimization =  ga(function = objectiveFunction, dimension = 77, variable_type = 'real',variable_boundaries= bds, algorithm_parameters = algorithm_param, function_timeout=6000)
-optimization.run()
-print(optimization)
+
+    algorithm_param = {'max_num_iteration': 100,\
+                    'population_size':10,\
+                    'mutation_probability':0.1,\
+                    'elit_ratio': 0.01,\
+                    'crossover_probability': 0.5,\
+                    'parents_portion': 0.3,\
+                    'crossover_type':'uniform',\
+                    'max_iteration_without_improv':None}
+
+
+    optimization =  ga(function = objectiveFunction, dimension = 77, variable_type = 'real',variable_boundaries= bds, algorithm_parameters = algorithm_param, function_timeout=6000)
+    optimization.run()
+    print(optimization)
+    return optimization.output_dict

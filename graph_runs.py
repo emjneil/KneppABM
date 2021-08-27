@@ -20,20 +20,19 @@ def graph_runs():
     # y values
     y_values_finaldf = final_results.drop(['run_number', 'accepted?', 'Time'], axis=1).values.flatten()
     y_values_counterfactual = counterfactual.drop(['run_number', 'accepted?', 'Time'], axis=1).values.flatten()
-    print(y_values_finaldf, y_values_counterfactual)
     y_values = np.concatenate((y_values_finaldf, y_values_counterfactual), axis=0)
-    # species list
-    species_list_finaldf = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"], 185*number_simulations)
-    species_list_counterfactual = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"], 185*len(accepted_parameters))
+    # species list. this should be +1 the number of simulations
+    species_list_finaldf = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"], 51*number_simulations) 
+    species_list_counterfactual = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"], 51*len(accepted_parameters))
     species_list = np.concatenate((species_list_finaldf, species_list_counterfactual), axis=0)
     # indices
     indices_finaldf = np.repeat(final_results['Time'], 10)
     indices_counterfactual = np.repeat(counterfactual['Time'], 10)
     indices = pd.concat([indices_finaldf, indices_counterfactual], axis=0)
+
     final_df = pd.DataFrame(
     {'Abundance %': y_values, 'runNumber': grouping_variable, 'Ecosystem Element': species_list, 'Time': indices, 'runType': accepted_shape})
     
-
 
     # calculate median 
     m = final_df.groupby(['Time', 'runType', 'Ecosystem Element'])[['Abundance %']].apply(np.median)
@@ -47,8 +46,6 @@ def graph_runs():
     perc2.name = "fivePerc"
     final_df = final_df.join(perc2, on=['Time','runType', 'Ecosystem Element'])
     colors = ["#6788ee", "#e26952", "#3F9E4D"]
-
-
 
 
     # first graph: counterfactual & forecasting
@@ -77,14 +74,14 @@ def graph_runs():
     # add filter lines
     g.axes[0].vlines(x=50,ymin=6,ymax=40, color='r')
     g.axes[6].vlines(x=50,ymin=49,ymax=90, color='r')
-    g.axes[7].vlines(x=50,ymin=1,ymax=21, color='r')
-    g.axes[8].vlines(x=50,ymin=7,ymax=27, color='r')
+    g.axes[7].vlines(x=50,ymin=7,ymax=27, color='r')
+    g.axes[8].vlines(x=50,ymin=1,ymax=21, color='r')
     # plot next set of filter lines
-    g.axes[0].vlines(x=184,ymin=20,ymax=40, color='r')
-    g.axes[6].vlines(x=184,ymin=49,ymax=69, color='r')
-    g.axes[7].vlines(x=184,ymin=21,ymax=35, color='r')
-    g.axes[8].vlines(x=184,ymin=9,ymax=29, color='r')
-    # stop the plots from overlapping
+    # g.axes[0].vlines(x=184,ymin=20,ymax=40, color='r')
+    # g.axes[6].vlines(x=184,ymin=49,ymax=69, color='r')
+    # g.axes[7].vlines(x=184,ymin=21,ymax=35, color='r')
+    # g.axes[8].vlines(x=184,ymin=9,ymax=29, color='r')
+    # # stop the plots from overlapping
     plt.tight_layout()
     plt.legend(labels=['Reintroductions', 'No reintroductions'],bbox_to_anchor=(2.2, 0),loc='lower right', fontsize=12)
     plt.show()
@@ -120,10 +117,10 @@ def graph_runs():
     r.axes[7].vlines(x=50,ymin=1,ymax=21, color='r')
     r.axes[8].vlines(x=50,ymin=7,ymax=27, color='r')
     # plot next set of filter lines
-    r.axes[0].vlines(x=184,ymin=20,ymax=40, color='r')
-    r.axes[6].vlines(x=184,ymin=49,ymax=69, color='r')
-    r.axes[7].vlines(x=184,ymin=21,ymax=35, color='r')
-    r.axes[8].vlines(x=184,ymin=9,ymax=29, color='r')
+    # r.axes[0].vlines(x=184,ymin=20,ymax=40, color='r')
+    # r.axes[6].vlines(x=184,ymin=49,ymax=69, color='r')
+    # r.axes[7].vlines(x=184,ymin=21,ymax=35, color='r')
+    # r.axes[8].vlines(x=184,ymin=9,ymax=29, color='r')
     # stop the plots from overlapping
     plt.tight_layout()
     plt.legend(labels=['Rejected Runs', 'Accepted Runs'],bbox_to_anchor=(2.2, 0), loc='lower right', fontsize=12)

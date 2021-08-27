@@ -14,7 +14,7 @@ from random import choice as rchoice
 
 # herbivore eating habitat types
 def eat_saplings(habitat_patch, eatenSaps):
-    # rescale this according to how many shrubs there are 
+    # rescale this according to how many shrubs there are (they protect the saplings)
     eatenSaps_scaled = eatenSaps - int((eatenSaps*(habitat_patch.scrub_here/100)))
     habitat_patch.saplings_here -= eatenSaps_scaled
     # don't let number of saplings go negative
@@ -68,32 +68,40 @@ class habitatAgent (Agent):
         self.perc_bareground_here = perc_bareground_here
 
     def step(self):
-        # chance of reproducing saplings to neighboring cell or to my cell
-        neighborhood_list = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=True)
-        items_in_neighborhood = list(map(self.model.grid.get_cell_list_contents, neighborhood_list)) 
-        # pick one that has less than 1000 saplings
-        only_habitat_cells = [obj for obj in items_in_neighborhood if (isinstance(x, habitatAgent) for x in obj)]
-        no_herbivores = [item[0] for item in only_habitat_cells]
-        available_sapling_cell = [i for i in no_herbivores if i.saplings_here < 1000 and i.trees_here < 100]
-        if len(available_sapling_cell) > 0:
-            new_patch_sapling = self.random.choice(available_sapling_cell)
-            # and put a sapling there
-            # newSapling = (int(self.model.chance_reproduceSapling * self.trees_here))
-            # it has less chance of surviving if there are lots of trees there
-            # new_patch_sapling.saplings_here += (newSapling - int((newSapling*(new_patch_sapling.trees_here/100))))
-            new_patch_sapling.saplings_here += int(self.model.chance_reproduceSapling * self.trees_here) # if there are no trees, this'll be zero
 
-        # chance of reproducing young scrub
-        neighborhood_list = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=True)
-        items_in_neighborhood = list(map(self.model.grid.get_cell_list_contents, neighborhood_list)) 
-        # pick one that has less than 1000 young scrubs
-        only_habitat_cells = [obj for obj in items_in_neighborhood if (isinstance(x, habitatAgent) for x in obj)]
-        no_herbivores = [item[0] for item in only_habitat_cells]
-        available_youngscrub_cell = [i for i in no_herbivores if i.youngscrub_here < 1000 and i.scrub_here < 100]
-        if len(available_youngscrub_cell) > 0:
-            new_patch_youngscrub = self.random.choice(available_youngscrub_cell) 
-            # and put a young scrub there
-            new_patch_youngscrub.youngscrub_here += int(self.model.chance_reproduceYoungScrub * self.scrub_here) # if there are no trees, this'll be zero
+        # are there trees here?
+        if self.trees_here > 0 and random.random() < ((self.model.chance_reproduceSapling * self.trees_here)/100):
+            # if so, each tree looks at my cell and my neighboring cells and has a chance of reproducing
+            neighborhood_list = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=True)
+            items_in_neighborhood = list(map(self.model.grid.get_cell_list_contents, neighborhood_list)) 
+            only_habitat_cells = [obj for obj in items_in_neighborhood if (isinstance(x, habitatAgent) for x in obj)]
+            no_herbivores = [item[0] for item in only_habitat_cells]
+            # are there any that aren't full of other saplings/trees?
+            available_sapling_cell = [i for i in no_herbivores if i.saplings_here < 1000 and i.trees_here < 100]
+            # if yes, put a sapling there
+            if len(available_sapling_cell) > 0:
+            # there's a chance that each tree reproduces some saplings to one of the cells
+                new_patch_sapling = self.random.choice(available_sapling_cell)
+                new_patch_sapling.saplings_here += random.randint(0,1000)
+                if new_patch_sapling.saplings_here > 1000:
+                    new_patch_sapling.saplings_here = 1000  
+
+        # are there are scrub here?
+        if self.scrub_here > 0 and random.random() < ((self.model.chance_reproduceYoungScrub*self.scrub_here)/100):
+            # look at my cell and my neighboring cells
+            neighborhood_list = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=True)
+            items_in_neighborhood = list(map(self.model.grid.get_cell_list_contents, neighborhood_list)) 
+            only_habitat_cells = [obj for obj in items_in_neighborhood if (isinstance(x, habitatAgent) for x in obj)]
+            no_herbivores = [item[0] for item in only_habitat_cells]
+            # are there any that aren't full of other scrub/young scrub?
+            available_youngscrub_cell = [i for i in no_herbivores if i.youngscrub_here < 1000 and i.scrub_here < 100]
+            # if yes, put a scrub there
+            if len(available_youngscrub_cell) > 0:
+                new_patch_youngscrub = self.random.choice(available_youngscrub_cell)
+                new_patch_youngscrub.youngscrub_here += random.randint(0,1000)
+                if new_patch_youngscrub.youngscrub_here > 1000:
+                    new_patch_youngscrub.youngscrub_here = 1000  
+
 
         # chance of bare ground becoming grassland
         amount_regrown = self.model.chance_regrowGrass * self.perc_bareground_here
@@ -102,38 +110,37 @@ class habitatAgent (Agent):
 
         # chance of young scrub becoming mature scrub
         scrub_maturing = self.model.chance_youngScrubMatures * self.youngscrub_here
-        if self.scrub_here + scrub_maturing > 100: 
+        if (self.scrub_here + scrub_maturing) > 100: 
             scrub_maturing = 100 - self.scrub_here
         self.scrub_here += int(scrub_maturing)
         self.youngscrub_here -= int(scrub_maturing)
 
         # chance of sapling becoming tree
         tree_maturing = self.model.chance_saplingBecomingTree * self.saplings_here
-        if self.trees_here + tree_maturing > 100: 
+        if (self.trees_here + tree_maturing) > 100: 
             tree_maturing = 100 - self.trees_here
         self.trees_here += int(tree_maturing)
         self.saplings_here -= int(tree_maturing)
    
-        # outcompeted by tree - scales depending on number of trees
+        # chance that 1% grass is outcompeted by 1 tree
         outcompeted_grass = self.model.chance_grassOutcompetedByTree * self.perc_grass_here
-        self.perc_bareground_here += (int(outcompeted_grass) - int((outcompeted_grass*(self.trees_here/100))))
-        self.perc_grass_here -= (int(outcompeted_grass) - int((outcompeted_grass*(self.trees_here/100))))
+        self.perc_bareground_here += int(outcompeted_grass - (outcompeted_grass*(self.trees_here/100)))
+        self.perc_grass_here -= int(outcompeted_grass - (outcompeted_grass*(self.trees_here/100)))
         outcompeted_scrub = self.model.chance_scrubOutcompetedByTree * self.scrub_here
-        self.scrub_here -= (int(outcompeted_scrub) - int((outcompeted_scrub*(self.trees_here/100))))
+        self.scrub_here -= int(outcompeted_scrub - (outcompeted_scrub*(self.trees_here/100)))
         outcompeted_saplings = self.model.chance_saplingOutcompetedByTree * self.saplings_here
-        self.saplings_here -= (int(outcompeted_saplings) - int((outcompeted_saplings*(self.trees_here/100))))
+        self.saplings_here -= int(outcompeted_saplings - (outcompeted_saplings*(self.trees_here/100)))
         outcompeted_youngscrub = self.model.chance_youngScrubOutcompetedByTree * self.youngscrub_here
-        self.youngscrub_here -= (int(outcompeted_youngscrub) - int((outcompeted_youngscrub*(self.trees_here/100))))
-
+        self.youngscrub_here -= int(outcompeted_youngscrub - (outcompeted_youngscrub*(self.trees_here/100)))
+        
         # outcompeted by mature scrub
         outcompeted_grass_byScrub = self.model.chance_grassOutcompetedByScrub * self.perc_grass_here
-        self.perc_bareground_here += (int(outcompeted_grass_byScrub) - int((outcompeted_grass_byScrub*(self.scrub_here/100))))
-        self.perc_grass_here -= (int(outcompeted_grass_byScrub) - int((outcompeted_grass_byScrub*(self.scrub_here/100))))
+        self.perc_bareground_here += int(outcompeted_grass_byScrub - (outcompeted_grass_byScrub*(self.scrub_here/100)))
+        self.perc_grass_here -= int(outcompeted_grass_byScrub - (outcompeted_grass_byScrub*(self.scrub_here/100)))
         outcompeted_saplings_byScrub = self.model.chance_saplingOutcompetedByScrub * self.saplings_here
-        self.saplings_here -= (int(outcompeted_saplings_byScrub) - int((outcompeted_saplings_byScrub*(self.scrub_here/100))))
+        self.saplings_here -= int(outcompeted_saplings_byScrub - (outcompeted_saplings_byScrub*(self.scrub_here/100)))
         outcompeted_youngscrub = self.model.chance_youngScrubOutcompetedByScrub * self.youngscrub_here
-        self.youngscrub_here -= (int(outcompeted_youngscrub) - int((outcompeted_youngscrub*(self.scrub_here/100))))
-
+        self.youngscrub_here -= int(outcompeted_youngscrub - (outcompeted_youngscrub*(self.scrub_here/100)))
 
 
         # print(self.unique_id, "trees", self.trees_here, "scrub", self.scrub_here, "saplings", self.saplings_here, "youngScrub", self.youngscrub_here, "grass", self.perc_grass_here, "Bare", self.perc_bareground_here)
@@ -146,7 +153,7 @@ class habitatAgent (Agent):
         if self.trees_here < 10 and self.scrub_here >= 10:
             self.condition = "thorny_scrubland"
         if self.trees_here >= 10:
-            self.condition = "woodland"
+            self.condition = "woodland"        
 
 
 class roeDeer_agent(RandomWalker):
@@ -639,7 +646,6 @@ class KneppModel(Model):
             condition = np.random.choice(["grassland", "thorny_scrubland", "woodland", "bare_ground"], p=[prob_grassland, prob_scrubland, prob_woodland, prob_bare_ground])            
             # put a random number of trees, shrubs, etc., depending on dominant condition
             if condition == "grassland": # more than 50% grassland, no more than 10 mature trees/shrubs
-                count +=1
                 trees_here = random.randint(0, 10)
                 saplings_here = random.randint(0, 1000)
                 scrub_here = random.randint(0, 10)
@@ -667,10 +673,10 @@ class KneppModel(Model):
                 youngscrub_here = random.randint(0, 1000)
                 perc_grass_here = random.randint(0, 100)
                 perc_bareground_here = 100 - perc_grass_here
+                count += 1
             patch = habitatAgent(self.next_id(), (x, y), self, condition, trees_here, saplings_here, scrub_here, youngscrub_here, perc_grass_here, perc_bareground_here)
             self.grid.place_agent(patch, (x, y))
             self.schedule.add(patch)
-
 
         # Create roe deer
         for i in range(self.initial_roeDeer):
@@ -705,6 +711,15 @@ class KneppModel(Model):
         self.datacollector.collect(self)
 
 
+    def count_condition(self, model, habitat_condition):
+        # want to count grass, wood, scrub, bare ground in each patch
+        count = 0
+        for key, value in model.schedule.agents_by_breed[habitatAgent].items():
+            if value.condition == habitat_condition:
+                count += 1
+        # return percentage of entire area
+        return int((count/1800)*100)
+
 
     def add_herbivores(self, herbivore, count):
         x = random.randrange(self.width)
@@ -724,455 +739,444 @@ class KneppModel(Model):
                 self.grid._remove_agent(my_choice.pos, my_choice)
                 self.schedule.remove(my_choice)
 
-
-
-    def count_condition(self, model, habitat_condition):
-        # want to count grass, wood, scrub, bare ground in each patch
-        count = 0
-        for key, value in model.schedule.agents_by_breed[habitatAgent].items():
-            if value.condition == habitat_condition:
-                count += 1
-        # return percentage of entire area
-        return int((count/1800)*100)
-
-
     def step(self):
         self.schedule.step()
         # count how many there are, then step
         self.datacollector.collect(self)
         # Jan 2005 - March 2009
-        if self.schedule.time == 50:
+        if self.schedule.time == 49:
             self.add_herbivores(exmoorPony, 23)
             self.add_herbivores(longhornCattle, 53)
             self.add_herbivores(tamworthPigs, 20)
-        # March 2010
-        if self.schedule.time == 62: 
-            results_2 = self.datacollector.get_model_vars_dataframe()
-            exmoorValue = results_2.iloc[62]['Exmoor pony']
-            if exmoorValue >= 13: # randomly choose that many exmoor ponies and delete them
-                number_to_subtract = -13 + exmoorValue
-                self.remove_herbivores(exmoorPony, number_to_subtract)
-            else: # add them
-                number_to_add = 13 - exmoorValue
-                self.add_herbivores(exmoorPony, number_to_add)
-            cowValue = results_2.iloc[62]['Longhorn cattle']
-            if cowValue >= 77:
-                number_to_subtract = -77 + cowValue
-                self.remove_herbivores(longhornCattle, number_to_subtract)
-            else:
-                number_to_add = 77 - cowValue
-                self.add_herbivores(longhornCattle, number_to_add)
-            fallowValue = results_2.iloc[62]['Fallow deer']
-            if fallowValue >= 42:
-                number_to_subtract = -42 + fallowValue
-                self.remove_herbivores(fallowDeer, number_to_subtract)
-            else:
-                number_to_add = 42 - fallowValue
-                self.add_herbivores(fallowDeer, number_to_add)
-            pigsValue = results_2.iloc[62]['Tamworth pigs']
-            if pigsValue >= 17:
-                number_to_subtract = -17 + pigsValue
-                self.remove_herbivores(tamworthPigs, number_to_subtract)
-            else:
-                number_to_add = 17 - pigsValue
-                self.add_herbivores(tamworthPigs, number_to_add)
-        # 2011
-        if self.schedule.time == 74:
-            results_3 = self.datacollector.get_model_vars_dataframe()
-            exmoorValue = results_3.iloc[74]['Exmoor pony']
-            if exmoorValue >= 15:
-                number_to_subtract = -15 + exmoorValue
-                self.remove_herbivores(exmoorPony, number_to_subtract)
-            else:
-                number_to_add = 15 - exmoorValue
-                self.add_herbivores(exmoorPony, number_to_add)
-            cowValue = results_3.iloc[74]['Longhorn cattle']
-            if cowValue >= 92:
-                number_to_subtract = -92 + cowValue
-                self.remove_herbivores(longhornCattle, number_to_subtract)
-            else:
-                number_to_add = 92 - cowValue
-                self.add_herbivores(longhornCattle, number_to_add)
-            fallowValue = results_3.iloc[74]['Fallow deer']
-            if fallowValue >= 81:
-                number_to_subtract = -81 + fallowValue
-                self.remove_herbivores(fallowDeer, number_to_subtract)
-            else:
-                number_to_add = 81 - fallowValue
-                self.add_herbivores(fallowDeer, number_to_add)
-            pigsValue = results_3.iloc[74]['Tamworth pigs']
-            if pigsValue >= 22:
-                number_to_subtract = -22 + pigsValue
-                self.remove_herbivores(tamworthPigs, number_to_subtract)
-            else:
-                number_to_add = 22 - pigsValue
-                self.add_herbivores(tamworthPigs, number_to_add)
-        # 2012
-        if self.schedule.time == 86:
-            results_4 = self.datacollector.get_model_vars_dataframe()
-            exmoorValue = results_4.iloc[86]['Exmoor pony']
-            if exmoorValue >= 17:
-                number_to_subtract = -17 + exmoorValue
-                self.remove_herbivores(exmoorPony, number_to_subtract)
-            else:
-                number_to_add = 17 - exmoorValue
-                self.add_herbivores(exmoorPony, number_to_add)
-            cowValue = results_4.iloc[86]['Longhorn cattle']
-            if cowValue >= 116:
-                number_to_subtract = -116 + cowValue
-                self.remove_herbivores(longhornCattle, number_to_subtract)
-            else:
-                number_to_add = 116 - cowValue
-                self.add_herbivores(longhornCattle, number_to_add)
-            fallowValue = results_4.iloc[86]['Fallow deer']
-            if fallowValue >= 100:
-                number_to_subtract = -100 + fallowValue
-                self.remove_herbivores(fallowDeer, number_to_subtract)
-            else:
-                number_to_add = 100 - fallowValue
-                self.add_herbivores(fallowDeer, number_to_add)
-            pigsValue = results_4.iloc[86]['Tamworth pigs']
-            if pigsValue >= 33:
-                number_to_subtract = -33 + pigsValue
-                self.remove_herbivores(tamworthPigs, number_to_subtract)
-            else:
-                number_to_add = 33 - pigsValue
-                self.add_herbivores(tamworthPigs, number_to_add)
-        # 2013
-        if self.schedule.time == 98:
-            results_5 = self.datacollector.get_model_vars_dataframe()
-            # Exmoor ponies: 10
-            exmoorValue = results_5.iloc[98]['Exmoor pony']
-            if exmoorValue >= 10:
-                number_to_subtract = -10 + exmoorValue
-                self.remove_herbivores(exmoorPony, number_to_subtract)
-            else:
-                number_to_add = 10 - exmoorValue
-                self.add_herbivores(exmoorPony, number_to_add)
-            # Longhorn cattle: 129
-            cowValue = results_5.iloc[98]['Longhorn cattle']
-            if cowValue >= 129:
-                number_to_subtract = -129 + cowValue
-                self.remove_herbivores(longhornCattle, number_to_subtract)
-            else:
-                number_to_add = 129 - cowValue
-                self.add_herbivores(longhornCattle, number_to_add)
-            # Fallow deer: 100
-            fallowValue = results_5.iloc[98]['Fallow deer']
-            if fallowValue >= 100:
-                number_to_subtract = -100 + fallowValue
-                self.remove_herbivores(fallowDeer, number_to_subtract)
-            else:
-                number_to_add = 100 - fallowValue
-                self.add_herbivores(fallowDeer, number_to_add)
-            # Pigs: 6
-            pigsValue = results_5.iloc[98]['Tamworth pigs']
-            if pigsValue >= 6:
-                number_to_subtract = -6 + pigsValue
-                self.remove_herbivores(tamworthPigs, number_to_subtract)
-            else:
-                number_to_add = 6 - pigsValue
-                self.add_herbivores(tamworthPigs, number_to_add)
-            # Red deer: add 13
-            self.add_herbivores(redDeer, 13)
-        # 2014
-        if self.schedule.time == 110:
-            results_6 = self.datacollector.get_model_vars_dataframe()
-            exmoorValue = results_6.iloc[110]['Exmoor pony']
-            if exmoorValue >= 10:
-                number_to_subtract = -10 + exmoorValue
-                self.remove_herbivores(exmoorPony, number_to_subtract)
-            else:
-                number_to_add = 10 - exmoorValue
-                self.add_herbivores(exmoorPony, number_to_add)
-            cowValue = results_6.iloc[110]['Longhorn cattle']
-            if cowValue >= 264:
-                number_to_subtract = -264 + cowValue
-                self.remove_herbivores(longhornCattle, number_to_subtract)
-            else:
-                number_to_add = 264 - cowValue
-                self.add_herbivores(longhornCattle, number_to_add)
-            fallowValue = results_6.iloc[110]['Fallow deer']
-            if fallowValue >= 100:
-                number_to_subtract = -100 + fallowValue
-                self.remove_herbivores(fallowDeer, number_to_subtract)
-            else:
-                number_to_add = 100 - fallowValue
-                self.add_herbivores(fallowDeer, number_to_add)
-            # Pigs: 18
-            pigsValue = results_6.iloc[110]['Tamworth pigs']
-            if pigsValue >= 18:
-                number_to_subtract = -18 + pigsValue
-                self.remove_herbivores(tamworthPigs, number_to_subtract)
-            else:
-                number_to_add = 18 - pigsValue
-                self.add_herbivores(tamworthPigs, number_to_add)
-            redDeerValue = results_6.iloc[110]['Red deer']
-            if redDeerValue >= 13:
-                number_to_subtract = -13 + redDeerValue
-                self.remove_herbivores(redDeer, number_to_subtract)
-            else:
-                number_to_add = 13 - redDeerValue
-                self.add_herbivores(redDeer, number_to_add)
+        # # # March 2010
+        # if self.schedule.time == 61: 
+        #     results_2 = self.datacollector.get_model_vars_dataframe()
+        #     exmoorValue = results_2.iloc[61]['Exmoor pony']
+        #     if exmoorValue >= 13: # randomly choose that many exmoor ponies and delete them
+        #         number_to_subtract = -13 + exmoorValue
+        #         self.remove_herbivores(exmoorPony, number_to_subtract)
+        #     else:
+        #         number_to_add = 13 - exmoorValue
+        #         self.add_herbivores(exmoorPony, number_to_add)
+        #     cowValue = results_2.iloc[61]['Longhorn cattle']
+        #     if cowValue >= 77:
+        #         number_to_subtract = -77 + cowValue
+        #         self.remove_herbivores(longhornCattle, number_to_subtract)
+        #     else:
+        #         number_to_add = 77 - cowValue
+        #         self.add_herbivores(longhornCattle, number_to_add)
+        #     fallowValue = results_2.iloc[61]['Fallow deer']
+        #     if fallowValue >= 42:
+        #         number_to_subtract = -42 + fallowValue
+        #         self.remove_herbivores(fallowDeer, number_to_subtract)
+        #     else:
+        #         number_to_add = 42 - fallowValue
+        #         self.add_herbivores(fallowDeer, number_to_add)
+        #     pigsValue = results_2.iloc[61]['Tamworth pigs']
+        #     if pigsValue >= 17:
+        #         number_to_subtract = -17 + pigsValue
+        #         self.remove_herbivores(tamworthPigs, number_to_subtract)
+        #     else:
+        #         number_to_add = 17 - pigsValue
+        #         self.add_herbivores(tamworthPigs, number_to_add)
+        # # 2011
+        # if self.schedule.time == 73:
+        #     results_3 = self.datacollector.get_model_vars_dataframe()
+        #     exmoorValue = results_3.iloc[73]['Exmoor pony']
+        #     if exmoorValue >= 15: # randomly choose that many exmoor ponies and delete them
+        #         number_to_subtract = -15 + exmoorValue
+        #         self.remove_herbivores(exmoorPony, number_to_subtract)
+        #     else:
+        #         number_to_add = 15 - exmoorValue
+        #         self.add_herbivores(exmoorPony, number_to_add)
+        #     cowValue = results_3.iloc[73]['Longhorn cattle']
+        #     if cowValue >= 92:
+        #         number_to_subtract = -92 + cowValue
+        #         self.remove_herbivores(longhornCattle, number_to_subtract)
+        #     else:
+        #         number_to_add = 92 - cowValue
+        #         self.add_herbivores(longhornCattle, number_to_add)
+        #     fallowValue = results_3.iloc[73]['Fallow deer']
+        #     if fallowValue >= 81:
+        #         number_to_subtract = -81 + fallowValue
+        #         self.remove_herbivores(fallowDeer, number_to_subtract)
+        #     else:
+        #         number_to_add = 81 - fallowValue
+        #         self.add_herbivores(fallowDeer, number_to_add)
+        #     pigsValue = results_3.iloc[73]['Tamworth pigs']
+        #     if pigsValue >= 22:
+        #         number_to_subtract = -22 + pigsValue
+        #         self.remove_herbivores(tamworthPigs, number_to_subtract)
+        #     else:
+        #         number_to_add = 22 - pigsValue
+        #         self.add_herbivores(tamworthPigs, number_to_add)
+        # # 2012
+        # if self.schedule.time == 85:
+        #     results_4 = self.datacollector.get_model_vars_dataframe()
+        #     exmoorValue = results_4.iloc[85]['Exmoor pony']
+        #     if exmoorValue >= 17: # randomly choose that many exmoor ponies and delete them
+        #         number_to_subtract = -17 + exmoorValue
+        #         self.remove_herbivores(exmoorPony, number_to_subtract)
+        #     else:
+        #         number_to_add = 17 - exmoorValue
+        #         self.add_herbivores(exmoorPony, number_to_add)
+        #     cowValue = results_4.iloc[85]['Longhorn cattle']
+        #     if cowValue >= 116:
+        #         number_to_subtract = -116 + cowValue
+        #         self.remove_herbivores(longhornCattle, number_to_subtract)
+        #     else:
+        #         number_to_add = 116 - cowValue
+        #         self.add_herbivores(longhornCattle, number_to_add)
+        #     fallowValue = results_4.iloc[85]['Fallow deer']
+        #     if fallowValue >= 100:
+        #         number_to_subtract = -100 + fallowValue
+        #         self.remove_herbivores(fallowDeer, number_to_subtract)
+        #     else:
+        #         number_to_add = 100 - fallowValue
+        #         self.add_herbivores(fallowDeer, number_to_add)
+        #     pigsValue = results_4.iloc[85]['Tamworth pigs']
+        #     if pigsValue >= 33:
+        #         number_to_subtract = -33 + pigsValue
+        #         self.remove_herbivores(tamworthPigs, number_to_subtract)
+        #     else:
+        #         number_to_add = 33 - pigsValue
+        #         self.add_herbivores(tamworthPigs, number_to_add)
+        # # 2013
+        # if self.schedule.time == 97:
+        #     results_5 = self.datacollector.get_model_vars_dataframe()
+        #     # Exmoor ponies: 10
+        #     exmoorValue = results_5.iloc[97]['Exmoor pony']
+        #     if exmoorValue >= 10: # randomly choose that many exmoor ponies and delete them
+        #         number_to_subtract = -10 + exmoorValue
+        #         self.remove_herbivores(exmoorPony, number_to_subtract)
+        #     else:
+        #         number_to_add = 10 - exmoorValue
+        #         self.add_herbivores(exmoorPony, number_to_add)
+        #     # Longhorn cattle: 129
+        #     cowValue = results_5.iloc[97]['Longhorn cattle']
+        #     if cowValue >= 129:
+        #         number_to_subtract = -129 + cowValue
+        #         self.remove_herbivores(longhornCattle, number_to_subtract)
+        #     else:
+        #         number_to_add = 129 - cowValue
+        #         self.add_herbivores(longhornCattle, number_to_add)
+        #     # Fallow deer: 100
+        #     fallowValue = results_5.iloc[97]['Fallow deer']
+        #     if fallowValue >= 100:
+        #         number_to_subtract = -100 + fallowValue
+        #         self.remove_herbivores(fallowDeer, number_to_subtract)
+        #     else:
+        #         number_to_add = 100 - fallowValue
+        #         self.add_herbivores(fallowDeer, number_to_add)
+        #     # Pigs: 6
+        #     pigsValue = results_5.iloc[97]['Tamworth pigs']
+        #     if pigsValue >= 6:
+        #         number_to_subtract = -6 + pigsValue
+        #         self.remove_herbivores(tamworthPigs, number_to_subtract)
+        #     else:
+        #         number_to_add = 6 - pigsValue
+        #         self.add_herbivores(tamworthPigs, number_to_add)
+        #     # Red deer: add 13
+        #     self.add_herbivores(redDeer, 13)
+        # # 2014
+        # if self.schedule.time == 109:
+        #     results_6 = self.datacollector.get_model_vars_dataframe()
+        #     exmoorValue = results_6.iloc[109]['Exmoor pony']
+        #     if exmoorValue >= 10: # randomly choose that many exmoor ponies and delete them
+        #         number_to_subtract = -10 + exmoorValue
+        #         self.remove_herbivores(exmoorPony, number_to_subtract)
+        #     else:
+        #         number_to_add = 10 - exmoorValue
+        #         self.add_herbivores(exmoorPony, number_to_add)
+        #     cowValue = results_6.iloc[109]['Longhorn cattle']
+        #     if cowValue >= 264:
+        #         number_to_subtract = -264 + cowValue
+        #         self.remove_herbivores(longhornCattle, number_to_subtract)
+        #     else:
+        #         number_to_add = 264 - cowValue
+        #         self.add_herbivores(longhornCattle, number_to_add)
+        #     fallowValue = results_6.iloc[109]['Fallow deer']
+        #     if fallowValue >= 100:
+        #         number_to_subtract = -100 + fallowValue
+        #         self.remove_herbivores(fallowDeer, number_to_subtract)
+        #     else:
+        #         number_to_add = 100 - fallowValue
+        #         self.add_herbivores(fallowDeer, number_to_add)
+        #     # Pigs: 18
+        #     pigsValue = results_6.iloc[109]['Tamworth pigs']
+        #     if pigsValue >= 18:
+        #         number_to_subtract = -18 + pigsValue
+        #         self.remove_herbivores(tamworthPigs, number_to_subtract)
+        #     else:
+        #         number_to_add = 18 - pigsValue
+        #         self.add_herbivores(tamworthPigs, number_to_add)
+        #     redDeerValue = results_6.iloc[109]['Red deer']
+        #     if redDeerValue >= 13:
+        #         number_to_subtract = -13 + redDeerValue
+        #         self.remove_herbivores(redDeer, number_to_subtract)
+        #     else:
+        #         number_to_add = 13 - redDeerValue
+        #         self.add_herbivores(redDeer, number_to_add)
         
-        # March 2015
-        if self.schedule.time == 122:
-            results_7 = self.datacollector.get_model_vars_dataframe()
-            #  Exmoor ponies: 10
-            exmoorValue = results_7.iloc[122]['Exmoor pony']
-            if exmoorValue >= 10:
-                number_to_subtract = -10 + exmoorValue
-                self.remove_herbivores(exmoorPony, number_to_subtract)
-            else:
-                number_to_add = 10 - exmoorValue
-                self.add_herbivores(exmoorPony, number_to_add)
-            # Longhorn cattle: 107
-            cowValue = results_7.iloc[122]['Longhorn cattle']
-            if cowValue >= 107:
-                number_to_subtract = -107 + cowValue
-                self.remove_herbivores(longhornCattle, number_to_subtract)
-            else:
-                number_to_add = 107 - cowValue
-                self.add_herbivores(longhornCattle, number_to_add)
-            # Fallow deer: 100
-            fallowValue = results_7.iloc[122]['Fallow deer']
-            if fallowValue >= 100:
-                number_to_subtract = -100 + fallowValue
-                self.remove_herbivores(fallowDeer, number_to_subtract)
-            else:
-                number_to_add = 100 - fallowValue
-                self.add_herbivores(fallowDeer, number_to_add)
-            # Pigs: 18
-            pigsValue = results_7.iloc[122]['Tamworth pigs']
-            if pigsValue >= 18:
-                number_to_subtract = -18 + pigsValue
-                self.remove_herbivores(tamworthPigs, number_to_subtract)
-            else:
-                number_to_add = 18 - pigsValue
-                self.add_herbivores(tamworthPigs, number_to_add)
-            # Red deer: 13
-            redDeerValue = results_7.iloc[122]['Red deer']
-            if redDeerValue >= 13:
-                number_to_subtract = -13 + redDeerValue
-                self.remove_herbivores(redDeer, number_to_subtract)
-            else:
-                number_to_add = 13 - redDeerValue
-                self.add_herbivores(redDeer, number_to_add)
-        # April 2015
-        if self.schedule.time == 123:
-            # April 2015: one pig culled, 5 born
-            self.remove_herbivores(tamworthPigs, 1)
-        # May 2015
-        if self.schedule.time == 124:
-            # May 2015: 8 pigs culled
-            self.remove_herbivores(tamworthPigs, 8)
-        # June 2015: 5 cows culled
-        if self.schedule.time == 125:
-            self.remove_herbivores(longhornCattle, 5)
-        # August 2015: 2 fallow deer culled
-        if self.schedule.time == 127:
-            self.remove_herbivores(fallowDeer, 2)
-        # September 2015: 2 male fallow deer culled; 2 cattle culled and 3 bulls added
-        if self.schedule.time == 128:
-            self.remove_herbivores(fallowDeer, 2)
-            self.remove_herbivores(longhornCattle, 1)
-        # Oct 2015: 2 female and 1 male fallow deer culled; 38 female cows and 1 bull removed
-        if self.schedule.time == 129:
-            self.remove_herbivores(fallowDeer, 3)
-            self.remove_herbivores(longhornCattle, 39)
-        # Nov 2015: -7 fallow deer
-        if self.schedule.time == 130:
-            self.remove_herbivores(fallowDeer, 7)       
-        # Dec 2015: 6 fallow deer culled; 5 cows removed;
-        if self.schedule.time == 131:
-            self.remove_herbivores(fallowDeer, 6)
-            self.remove_herbivores(longhornCattle, 5)
-        # Jan 2016: 7 fallow deer culled; 4 pigs culled and 1 added
-        if self.schedule.time == 132:
-            self.remove_herbivores(fallowDeer, 7) 
-            self.remove_herbivores(tamworthPigs, 3)
-        # Feb 2016: 10 fallow deer culled; 2 pigs culled
-        if self.schedule.time == 133:
-            self.remove_herbivores(fallowDeer, 10)
-            self.remove_herbivores(tamworthPigs, 2)
+        # # March 2015
+        # if self.schedule.time == 121:
+        #     results_7 = self.datacollector.get_model_vars_dataframe()
+        #     #  Exmoor ponies: 10
+        #     exmoorValue = results_7.iloc[121]['Exmoor pony']
+        #     if exmoorValue >= 10: # randomly choose that many exmoor ponies and delete them
+        #         number_to_subtract = -10 + exmoorValue
+        #         self.remove_herbivores(exmoorPony, number_to_subtract)
+        #     else:
+        #         number_to_add = 10 - exmoorValue
+        #         self.add_herbivores(exmoorPony, number_to_add)
+        #     # Longhorn cattle: 107
+        #     cowValue = results_7.iloc[121]['Longhorn cattle']
+        #     if cowValue >= 107:
+        #         number_to_subtract = -107 + cowValue
+        #         self.remove_herbivores(longhornCattle, number_to_subtract)
+        #     else:
+        #         number_to_add = 107 - cowValue
+        #         self.add_herbivores(longhornCattle, number_to_add)
+        #     # Fallow deer: 100
+        #     fallowValue = results_7.iloc[121]['Fallow deer']
+        #     if fallowValue >= 100:
+        #         number_to_subtract = -100 + fallowValue
+        #         self.remove_herbivores(fallowDeer, number_to_subtract)
+        #     else:
+        #         number_to_add = 100 - fallowValue
+        #         self.add_herbivores(fallowDeer, number_to_add)
+        #     # Pigs: 18
+        #     pigsValue = results_7.iloc[121]['Tamworth pigs']
+        #     if pigsValue >= 18:
+        #         number_to_subtract = -18 + pigsValue
+        #         self.remove_herbivores(tamworthPigs, number_to_subtract)
+        #     else:
+        #         number_to_add = 18 - pigsValue
+        #         self.add_herbivores(tamworthPigs, number_to_add)
+        #     # Red deer: 13
+        #     redDeerValue = results_7.iloc[121]['Red deer']
+        #     if redDeerValue >= 13:
+        #         number_to_subtract = -13 + redDeerValue
+        #         self.remove_herbivores(redDeer, number_to_subtract)
+        #     else:
+        #         number_to_add = 13 - redDeerValue
+        #         self.add_herbivores(redDeer, number_to_add)
+
+        # # April 2015
+        # if self.schedule.time == 122:
+        #     # April 2015: one pig culled, 5 born
+        #     self.remove_herbivores(tamworthPigs, 1)
+        # # May 2015
+        # if self.schedule.time == 123:
+        #     # May 2015: 8 pigs culled
+        #     self.remove_herbivores(tamworthPigs, 8)
+        # # June 2015: 5 cows culled
+        # if self.schedule.time == 124:
+        #     self.remove_herbivores(longhornCattle, 5)
+        # # August 2015: 2 fallow deer culled
+        # if self.schedule.time == 126:
+        #     self.remove_herbivores(fallowDeer, 2)
+        # # September 2015: 2 male fallow deer culled; 2 cattle culled and 3 bulls added
+        # if self.schedule.time == 128:
+        #     self.remove_herbivores(fallowDeer, 2)
+        #     self.remove_herbivores(longhornCattle, 1)
+        # # Oct 2015: 2 female and 1 male fallow deer culled; 38 female cows and 1 bull removed
+        # if self.schedule.time == 128:
+        #     self.remove_herbivores(fallowDeer, 3)
+        #     self.remove_herbivores(longhornCattle, 39)
+        # # Nov 2015: -7 fallow deer
+        # if self.schedule.time == 129:
+        #     self.remove_herbivores(fallowDeer, 7)       
+        # # Dec 2015: 6 fallow deer culled; 5 cows removed;
+        # if self.schedule.time == 130:
+        #     self.remove_herbivores(fallowDeer, 6)
+        #     self.remove_herbivores(longhornCattle, 5)
+        # # Jan 2016: 7 fallow deer culled; 4 pigs culled and 1 added
+        # if self.schedule.time == 131:
+        #     self.remove_herbivores(fallowDeer, 7) 
+        #     self.remove_herbivores(tamworthPigs, 3)
+        # # Feb 2016: 10 fallow deer culled; 2 pigs culled
+        # if self.schedule.time == 132:
+        #     self.remove_herbivores(fallowDeer, 10)
+        #     self.remove_herbivores(tamworthPigs, 2)
                             
-                                       # # # # # # # 2016 # # # # # # #
+        #                                # # # # # # # 2016 # # # # # # #
 
-        # March 2016: 1 pony added; 3 pigs added and 4 culled
-        if self.schedule.time == 134:
-            self.add_herbivores(exmoorPony, 1)
-            self.remove_herbivores(tamworthPigs, 1)
-        # April 2016: 1 cow added & filtering for cows
-        if self.schedule.time == 135:
-            self.add_herbivores(longhornCattle, 1)
-        # May 2016: filtering for cows and pigs, and 2 cows culled
-        if self.schedule.time == 136:
-            self.remove_herbivores(longhornCattle, 2)
-        # June 2016: filtering for cows, 30 cows culled and 4 added 
-        if self.schedule.time == 137:
-            self.remove_herbivores(longhornCattle, 26)
-        # July 2016: 2 cows culled
-        if self.schedule.time == 138:
-            self.remove_herbivores(longhornCattle, 2)
-        # August 2016: -5 fallow deer
-        if self.schedule.time == 139:
-            self.remove_herbivores(fallowDeer, 5)
-        # September & Oct 2016: -9, +19 cows
-        if self.schedule.time == 140:
-            self.remove_herbivores(longhornCattle, 10)
-        # November 2016: -3 fallow deer; -5 cows
-        if self.schedule.time == 142:
-            self.remove_herbivores(fallowDeer, 3)
-            self.remove_herbivores(longhornCattle, 5)
-        # December 2016: -9 fallow; -13 cows; -4 pigs
-        if self.schedule.time == 143:
-            self.remove_herbivores(fallowDeer, 9)
-            self.remove_herbivores(longhornCattle, 13)
-            self.remove_herbivores(tamworthPigs, 4)
-        # January 2017: -4 pigs, +1 pig
-        if self.schedule.time == 144:
-            self.remove_herbivores(tamworthPigs, 3)
-        # February 2017: -8 fallow deer; -3 pigs; filtering for ponies
-        if self.schedule.time == 145:
-            self.remove_herbivores(fallowDeer, 8)
-            self.remove_herbivores(tamworthPigs, 3)
+        # # March 2016: 1 pony added; 3 pigs added and 4 culled
+        # if self.schedule.time == 133:
+        #     self.add_herbivores(exmoorPony, 1)
+        #     self.remove_herbivores(tamworthPigs, 1)
+        # # April 2016: 1 cow added & filtering for cows
+        # if self.schedule.time == 134:
+        #     self.add_herbivores(longhornCattle, 1)
+        # # May 2016: filtering for cows and pigs, and 2 cows culled
+        # if self.schedule.time == 135:
+        #     self.remove_herbivores(longhornCattle, 2)
+        # # June 2016: filtering for cows, 30 cows culled and 4 added 
+        # if self.schedule.time == 136:
+        #     self.remove_herbivores(longhornCattle, 26)
+        # # July 2016: 2 cows culled
+        # if self.schedule.time == 137:
+        #     self.remove_herbivores(longhornCattle, 2)
+        # # August 2016: -5 fallow deer
+        # if self.schedule.time == 138:
+        #     self.remove_herbivores(fallowDeer, 5)
+        # # September & Oct 2016: -9, +19 cows
+        # if self.schedule.time == 139:
+        #     self.remove_herbivores(longhornCattle, 10)
+        # # November 2016: -3 fallow deer; -5 cows
+        # if self.schedule.time == 141:
+        #     self.remove_herbivores(fallowDeer, 3)
+        #     self.remove_herbivores(longhornCattle, 5)
+        # # December 2016: -9 fallow; -13 cows; -4 pigs
+        # if self.schedule.time == 142:
+        #     self.remove_herbivores(fallowDeer, 9)
+        #     self.remove_herbivores(longhornCattle, 13)
+        #     self.remove_herbivores(tamworthPigs, 4)
+        # # January 2017: -4 pigs, +1 pig
+        # if self.schedule.time == 143:
+        #     self.remove_herbivores(tamworthPigs, 3)
+        # # February 2017: -8 fallow deer; -3 pigs; filtering for ponies
+        # if self.schedule.time == 144:
+        #     self.remove_herbivores(fallowDeer, 8)
+        #     self.remove_herbivores(tamworthPigs, 3)
 
 
 
-        # # # # # # # 2017 # # # # # # #
-        # minus 1 exmoor pony, -12 red deer; filtering for cows
-        if self.schedule.time == 146:
-            self.remove_herbivores(exmoorPony, 1)
-            self.remove_herbivores(redDeer, 12)
-        # April 2017: -3 cows, filtering for cows and pigs
-        if self.schedule.time == 147:
-            self.remove_herbivores(longhornCattle, 3)
-        # June & July 2017: -24 cows, +3 cows, and cow filtering condition
-        if self.schedule.time == 149:
-            self.remove_herbivores(longhornCattle, 21)
-        # August 2017: -16 fallow deer 
-        if self.schedule.time == 151:
-            self.remove_herbivores(fallowDeer, 16)
-        # September 2017: -5 fallow deer; -27, +23 cows
-        if self.schedule.time == 152:
-            self.remove_herbivores(fallowDeer, 5)
-            self.remove_herbivores(longhornCattle, 4)
-        # October 2017: -4 fallow deer; -2 cows
-        if self.schedule.time == 153:
-            self.remove_herbivores(fallowDeer, 4)
-            self.remove_herbivores(longhornCattle, 2)
-        # November 2017: -2 fallow deer
-        if self.schedule.time == 154:
-            self.remove_herbivores(fallowDeer, 2)
-        # December 2017: -46 fallow deer, -1 red deer; -4 pigs
-        if self.schedule.time == 155:
-            self.remove_herbivores(fallowDeer, 46)
-            self.remove_herbivores(redDeer, 1)
-            self.remove_herbivores(tamworthPigs, 4)
-        # January 2018: -9 pigs, +1 pig, and pig filtering conditions
-        if self.schedule.time == 156:
-            self.remove_herbivores(tamworthPigs, 8)
-        # February 2018: -14 fallow; -1 red deer; -1 pig; filtering for pig and exmoor
-        if self.schedule.time == 157:
-            self.remove_herbivores(fallowDeer, 14)
-            self.remove_herbivores(redDeer, 1)
-            self.remove_herbivores(tamworthPigs, 1)
+        # # # # # # # # 2017 # # # # # # #
+        # # minus 1 exmoor pony, -12 red deer; filtering for cows
+        # if self.schedule.time == 145:
+        #     self.remove_herbivores(exmoorPony, 1)
+        #     self.remove_herbivores(redDeer, 12)
+        # # April 2017: -3 cows, filtering for cows and pigs
+        # if self.schedule.time == 146:
+        #     self.remove_herbivores(longhornCattle, 3)
+        # # June & July 2017: -24 cows, +3 cows, and cow filtering condition
+        # if self.schedule.time == 148:
+        #     self.remove_herbivores(longhornCattle, 21)
+        # # August 2017: -16 fallow deer 
+        # if self.schedule.time == 150:
+        #     self.remove_herbivores(fallowDeer, 16)
+        # # September 2017: -5 fallow deer; -27, +23 cows
+        # if self.schedule.time == 151:
+        #     self.remove_herbivores(fallowDeer, 5)
+        #     self.remove_herbivores(longhornCattle, 4)
+        # # October 2017: -4 fallow deer; -2 cows
+        # if self.schedule.time == 152:
+        #     self.remove_herbivores(fallowDeer, 4)
+        #     self.remove_herbivores(longhornCattle, 2)
+        # # November 2017: -2 fallow deer
+        # if self.schedule.time == 153:
+        #     self.remove_herbivores(fallowDeer, 2)
+        # # December 2017: -46 fallow deer, -1 red deer; -4 pigs
+        # if self.schedule.time == 154:
+        #     self.remove_herbivores(fallowDeer, 46)
+        #     self.remove_herbivores(redDeer, 1)
+        #     self.remove_herbivores(tamworthPigs, 4)
+        # # January 2018: -9 pigs, +1 pig, and pig filtering conditions
+        # if self.schedule.time == 155:
+        #     self.remove_herbivores(tamworthPigs, 8)
+        # # February 2018: -14 fallow; -1 red deer; -1 pig; filtering for pig and exmoor
+        # if self.schedule.time == 156:
+        #     self.remove_herbivores(fallowDeer, 14)
+        #     self.remove_herbivores(redDeer, 1)
+        #     self.remove_herbivores(tamworthPigs, 1)
 
-        # # # # # # # 2018 # # # # # # #
+        # # # # # # # # 2018 # # # # # # #
             
-        # March 2018: -1 Exmoor; filtering for red and fallow deer
-        if self.schedule.time == 158:
-            self.remove_herbivores(exmoorPony, 1)
-        # April 2018: +1 cow and filtering for cow
-        if self.schedule.time == 159:
-            self.add_herbivores(longhornCattle, 1)
-        # June 2018: -22 cows, +2 cows; filtering for cows
-        if self.schedule.time == 161:
-            self.remove_herbivores(longhornCattle, 20)
-        # July 2018: -1 red deer; -1 pig
-        if self.schedule.time == 162:
-            self.remove_herbivores(redDeer, 1)
-            self.remove_herbivores(tamworthPigs, 1)
-        # August 2018: -9 ponies; -15 fallow deer; -1 cattle; -1 pig
-        if self.schedule.time == 163:
-            self.remove_herbivores(exmoorPony, 9)
-            self.remove_herbivores(fallowDeer, 15)
-            self.remove_herbivores(tamworthPigs, 1)
-            self.remove_herbivores(longhornCattle, 1)
-        # September 2018: -19 fallow; -16 and +20 cows
-        if self.schedule.time == 164:
-            self.remove_herbivores(fallowDeer, 19)
-            self.add_herbivores(longhornCattle, 4)
-        # October 2018: -4 cows; -4 fallow; -1 pig
-        if self.schedule.time == 165:
-            self.remove_herbivores(longhornCattle, 4)
-            self.remove_herbivores(fallowDeer, 4)
-            self.remove_herbivores(tamworthPigs, 1)
-        # November 2018: -8 cows; -12 pigs
-        if self.schedule.time == 166:
-            self.remove_herbivores(longhornCattle, 8)
-            self.remove_herbivores(tamworthPigs, 12)
-        # December & January 2018/2019: -19 fallow; -5 and +1 cow; -1 red deer 
-        if self.schedule.time == 167:
-            self.remove_herbivores(longhornCattle, 4)
-            self.remove_herbivores(fallowDeer, 19)
-            self.remove_herbivores(redDeer, 1)
-        # February 2019: +1 pig, -2 cows
-        if self.schedule.time == 169:
-            self.remove_herbivores(longhornCattle, 2)
-            self.add_herbivores(tamworthPigs, 1)                                                                       
+        # # March 2018: -1 Exmoor; filtering for red and fallow deer
+        # if self.schedule.time == 157:
+        #     self.remove_herbivores(exmoorPony, 1)
+        # # April 2018: +1 cow and filtering for cow
+        # if self.schedule.time == 158:
+        #     self.add_herbivores(longhornCattle, 1)
+        # # June 2018: -22 cows, +2 cows; filtering for cows
+        # if self.schedule.time == 160:
+        #     self.remove_herbivores(longhornCattle, 20)
+        # # July 2018: -1 red deer; -1 pig
+        # if self.schedule.time == 161:
+        #     self.remove_herbivores(redDeer, 1)
+        #     self.remove_herbivores(tamworthPigs, 1)
+        # # August 2018: -9 ponies; -15 fallow deer; -1 cattle; -1 pig
+        # if self.schedule.time == 162:
+        #     self.remove_herbivores(exmoorPony, 9)
+        #     self.remove_herbivores(fallowDeer, 15)
+        #     self.remove_herbivores(tamworthPigs, 1)
+        #     self.remove_herbivores(longhornCattle, 1)
+        # # September 2018: -19 fallow; -16 and +20 cows
+        # if self.schedule.time == 163:
+        #     self.remove_herbivores(fallowDeer, 19)
+        #     self.add_herbivores(longhornCattle, 4)
+        # # October 2018: -4 cows; -4 fallow; -1 pig
+        # if self.schedule.time == 164:
+        #     self.remove_herbivores(longhornCattle, 4)
+        #     self.remove_herbivores(fallowDeer, 4)
+        #     self.remove_herbivores(tamworthPigs, 1)
+        # # November 2018: -8 cows; -12 pigs
+        # if self.schedule.time == 165:
+        #     self.remove_herbivores(longhornCattle, 8)
+        #     self.remove_herbivores(tamworthPigs, 12)
+        # # December & January 2018/2019: -19 fallow; -5 and +1 cow; -1 red deer 
+        # if self.schedule.time == 166:
+        #     self.remove_herbivores(longhornCattle, 4)
+        #     self.remove_herbivores(fallowDeer, 19)
+        #     self.remove_herbivores(redDeer, 1)
+        # # February 2019: +1 pig, -2 cows
+        # if self.schedule.time == 168:
+        #     self.remove_herbivores(longhornCattle, 2)
+        #     self.add_herbivores(tamworthPigs, 1)                                                                       
                             
 
-        # # # # # # # 2019 # # # # # # #
+        # # # # # # # # 2019 # # # # # # #
 
 
-        # March 2019: -1 pig; fallow and red deer filters
-        if self.schedule.time == 170:
-            self.remove_herbivores(tamworthPigs, 1)
-        # June 2019: -28 cows and cow filtering condition
-        if self.schedule.time == 173:
-            self.remove_herbivores(longhornCattle, 28)
-        # July & Aug 2019: -3, +5 cows; -26 pigs; filtering for pigs
-        if self.schedule.time == 174:
-            self.remove_herbivores(tamworthPigs, 26)
-            self.add_herbivores(longhornCattle, 2)
-        # Sept 2019: -15 fallow; -23 and +25 cows
-        if self.schedule.time == 176:
-            self.remove_herbivores(fallowDeer, 15)
-            self.add_herbivores(longhornCattle, 2)
-        # Oct 2019: -5 cows
-        if self.schedule.time == 177:
-            self.remove_herbivores(longhornCattle, 5)
-        # November 2019: -7 fallow deer; -1 cows; -3 red deer
-        if self.schedule.time == 178:
-            self.remove_herbivores(longhornCattle, 1)
-            self.remove_herbivores(fallowDeer, 7)
-            self.remove_herbivores(redDeer, 3)
-        # December 2019: -12 fallow; -7 cows; -4 red; +1 pigs
-        if self.schedule.time == 179:
-            self.remove_herbivores(fallowDeer, 12)
-            self.remove_herbivores(longhornCattle, 7)
-            self.remove_herbivores(redDeer, 4)
-            self.add_herbivores(tamworthPigs, 1)
-        # January 2020: -24 fallow deer
-        if self.schedule.time == 180:
-            self.remove_herbivores(fallowDeer, 24)
-        # February 2020: -12 fallow; -1 cow; -2 red; -2 pigs
-        if self.schedule.time == 181:
-            self.remove_herbivores(fallowDeer, 12)
-            self.remove_herbivores(redDeer, 2)
-            self.remove_herbivores(tamworthPigs, 2)
-            self.remove_herbivores(longhornCattle, 1)                               
+        # # March 2019: -1 pig; fallow and red deer filters
+        # if self.schedule.time == 169:
+        #     self.remove_herbivores(tamworthPigs, 1)
+        # # June 2019: -28 cows and cow filtering condition
+        # if self.schedule.time == 172:
+        #     self.remove_herbivores(longhornCattle, 28)
+        # # July & Aug 2019: -3, +5 cows; -26 pigs; filtering for pigs
+        # if self.schedule.time == 173:
+        #     self.remove_herbivores(tamworthPigs, 26)
+        #     self.add_herbivores(longhornCattle, 2)
+        # # Sept 2019: -15 fallow; -23 and +25 cows
+        # if self.schedule.time == 175:
+        #     self.remove_herbivores(fallowDeer, 15)
+        #     self.add_herbivores(longhornCattle, 2)
+        # # Oct 2019: -5 cows
+        # if self.schedule.time == 176:
+        #     self.remove_herbivores(longhornCattle, 5)
+        # # November 2019: -7 fallow deer; -1 cows; -3 red deer
+        # if self.schedule.time == 177:
+        #     self.remove_herbivores(longhornCattle, 1)
+        #     self.remove_herbivores(fallowDeer, 7)
+        #     self.remove_herbivores(redDeer, 3)
+        # # December 2019: -12 fallow; -7 cows; -4 red; +1 pigs
+        # if self.schedule.time == 178:
+        #     self.remove_herbivores(fallowDeer, 12)
+        #     self.remove_herbivores(longhornCattle, 7)
+        #     self.remove_herbivores(redDeer, 4)
+        #     self.add_herbivores(tamworthPigs, 1)
+        # # January 2020: -24 fallow deer
+        # if self.schedule.time == 179:
+        #     self.remove_herbivores(fallowDeer, 24)
+        # # February 2020: -12 fallow; -1 cow; -2 red; -2 pigs
+        # if self.schedule.time == 180:
+        #     self.remove_herbivores(fallowDeer, 12)
+        #     self.remove_herbivores(redDeer, 2)
+        #     self.remove_herbivores(tamworthPigs, 2)
+        #     self.remove_herbivores(longhornCattle, 1)                               
 
-        # # # # # 2020 # # # # # #
-        # March & April 2020: +15 exmoor; -1 and +3 cows; -1 pig; filtering for red and fallow deer
-        if self.schedule.time == 182:
-            self.add_herbivores(exmoorPony, 15)
-            self.add_herbivores(longhornCattle, 2)
-            self.remove_herbivores(tamworthPigs, 1)
+        # # # # # # 2020 # # # # # #
+        # # March & April 2020: +15 exmoor; -1 and +3 cows; -1 pig; filtering for red and fallow deer
+        # if self.schedule.time == 181:
+        #     self.add_herbivores(exmoorPony, 15)
+        #     self.add_herbivores(longhornCattle, 2)
+        #     self.remove_herbivores(tamworthPigs, 1)
         
         # stop running it in May 2021
-        if self.schedule.time == 184:
+        if self.schedule.time == 50:
             self.running = False 
 
 
@@ -1180,7 +1184,7 @@ class KneppModel(Model):
 
     def run_model(self): 
         # run it for 184 steps
-        for i in range(184):
+        for i in range(50):
             self.step()
             # print(i)
             # results_step = self.datacollector.get_model_vars_dataframe()
