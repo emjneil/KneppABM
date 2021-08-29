@@ -17,7 +17,7 @@ def run_all_models():
     start = timeit.default_timer()
 
     # define number of simulations
-    number_simulations =  10
+    number_simulations =  100
     # make list of variables
     final_results_list = []
     final_parameters = []
@@ -25,103 +25,95 @@ def run_all_models():
 
 
     for _ in range(number_simulations):
-
         # choose my parameters 
-        initial_roeDeer = random.randint((int(output_parameters["variable"][0])-int((output_parameters["variable"][0])*0.1)), (int(output_parameters["variable"][0])+int((output_parameters["variable"][0]*0.1))))
-        initial_grassland = random.randint((int(output_parameters["variable"][1])-int((output_parameters["variable"][1])*0.1)), int((output_parameters["variable"][1])+int((output_parameters["variable"][1]*0.1))))
-        initial_woodland = random.randint((int(output_parameters["variable"][2])-int((output_parameters["variable"][2])*0.1)), int((output_parameters["variable"][2])+int((output_parameters["variable"][2]*0.1))))
-        initial_scrubland = random.randint((int(output_parameters["variable"][3])-int((output_parameters["variable"][3])*0.1)), int((output_parameters["variable"][3])+int((output_parameters["variable"][3]*0.1))))
+        initial_roeDeer = random.randint(round(output_parameters["variable"][0]-(output_parameters["variable"][0]*0.1)), round(output_parameters["variable"][0]+(output_parameters["variable"][0]*0.1)))
+        initial_grassland = random.randint(round(output_parameters["variable"][1]-(output_parameters["variable"][1]*0.1)), round(output_parameters["variable"][1]+(output_parameters["variable"][1]*0.1)))
+        initial_woodland = random.randint(round(output_parameters["variable"][2]-(output_parameters["variable"][2]*0.1)), round(output_parameters["variable"][2]+(output_parameters["variable"][2]*0.1)))
+        initial_scrubland = random.randint(round(output_parameters["variable"][3]-(output_parameters["variable"][3]*0.1)), round(output_parameters["variable"][3]+(output_parameters["variable"][3]*0.1)))
         # habitats
-        chance_reproduceSapling = random.uniform((output_parameters["variable"][4]-(output_parameters["variable"][4]*0.1)), (output_parameters["variable"][4]+(output_parameters["variable"][4]*0.1)))
-        chance_reproduceYoungScrub = random.uniform((output_parameters["variable"][5]-(output_parameters["variable"][5]*0.1)), (output_parameters["variable"][5]+(output_parameters["variable"][5]*0.1)))
-        chance_regrowGrass = random.uniform((output_parameters["variable"][6]-(output_parameters["variable"][6]*0.1)), (output_parameters["variable"][6]+(output_parameters["variable"][6]*0.1)))
-        chance_saplingBecomingTree = random.uniform((output_parameters["variable"][7]-(output_parameters["variable"][7]*0.1)), (output_parameters["variable"][7]+(output_parameters["variable"][7]*0.1)))
-        chance_youngScrubMatures = random.uniform((output_parameters["variable"][8]-(output_parameters["variable"][8]*0.1)), (output_parameters["variable"][8]+(output_parameters["variable"][8]*0.1)))
-        chance_scrubOutcompetedByTree = random.uniform((output_parameters["variable"][9]-(output_parameters["variable"][9]*0.1)), (output_parameters["variable"][9]+(output_parameters["variable"][9]*0.1)))
-        chance_grassOutcompetedByTree = random.uniform((output_parameters["variable"][10]-(output_parameters["variable"][10]*0.1)), (output_parameters["variable"][10]+(output_parameters["variable"][10]*0.1)))
-        chance_grassOutcompetedByScrub = random.uniform((output_parameters["variable"][11]-(output_parameters["variable"][11]*0.1)), (output_parameters["variable"][11]+(output_parameters["variable"][11]*0.1)))
-        chance_saplingOutcompetedByTree = random.uniform((output_parameters["variable"][12]-(output_parameters["variable"][12]*0.1)), (output_parameters["variable"][12]+(output_parameters["variable"][12]*0.1)))
-        chance_saplingOutcompetedByScrub = random.uniform((output_parameters["variable"][13]-(output_parameters["variable"][13]*0.1)), (output_parameters["variable"][13]+(output_parameters["variable"][13]*0.1)))
-        chance_youngScrubOutcompetedByScrub = random.uniform((output_parameters["variable"][14]-(output_parameters["variable"][14]*0.1)), (output_parameters["variable"][14]+(output_parameters["variable"][14]*0.1)))
-        chance_youngScrubOutcompetedByTree = random.uniform((output_parameters["variable"][15]-(output_parameters["variable"][15]*0.1)), (output_parameters["variable"][15]+(output_parameters["variable"][15]*0.1)))
+        chance_reproduceSapling = random.uniform(output_parameters["variable"][4]-(output_parameters["variable"][4]*0.1), output_parameters["variable"][4]+(output_parameters["variable"][4]*0.1))
+        chance_reproduceYoungScrub = random.uniform(output_parameters["variable"][5]-(output_parameters["variable"][5]*0.1), output_parameters["variable"][5]+(output_parameters["variable"][5]*0.1))
+        chance_regrowGrass = random.uniform(output_parameters["variable"][6]-(output_parameters["variable"][6]*0.1), output_parameters["variable"][6]+(output_parameters["variable"][6]*0.1))
+        chance_saplingBecomingTree = random.uniform(output_parameters["variable"][7]-(output_parameters["variable"][7]*0.1), output_parameters["variable"][7]+(output_parameters["variable"][7]*0.1))
+        chance_youngScrubMatures = random.uniform(output_parameters["variable"][8]-(output_parameters["variable"][8]*0.1), output_parameters["variable"][8]+(output_parameters["variable"][8]*0.1))
         # roe deer
-        roeDeer_reproduce = random.uniform((output_parameters["variable"][16]-(output_parameters["variable"][16]*0.1)), (output_parameters["variable"][16]+(output_parameters["variable"][16]*0.1)))
-        roeDeer_gain_from_grass = random.uniform((output_parameters["variable"][17]-(output_parameters["variable"][17]*0.1)), (output_parameters["variable"][17]+(output_parameters["variable"][17]*0.1)))
-        roeDeer_gain_from_Trees = random.uniform((output_parameters["variable"][18]-(output_parameters["variable"][18]*0.1)), (output_parameters["variable"][18]+(output_parameters["variable"][18]*0.1)))
-        roeDeer_gain_from_Scrub = random.uniform((output_parameters["variable"][19]-(output_parameters["variable"][19]*0.1)), (output_parameters["variable"][19]+(output_parameters["variable"][19]*0.1)))
-        roeDeer_gain_from_Saplings = random.uniform((output_parameters["variable"][20]-(output_parameters["variable"][20]*0.1)), (output_parameters["variable"][20]+(output_parameters["variable"][20]*0.1)))
-        roeDeer_gain_from_YoungScrub = random.uniform((output_parameters["variable"][21]-(output_parameters["variable"][21]*0.1)), (output_parameters["variable"][21]+(output_parameters["variable"][21]*0.1)))
+        roeDeer_reproduce = random.uniform((output_parameters["variable"][9]-(output_parameters["variable"][9]*0.1)), (output_parameters["variable"][9]+(output_parameters["variable"][9]*0.1)))
+        roeDeer_gain_from_grass = random.uniform((output_parameters["variable"][10]-(output_parameters["variable"][10]*0.1)), (output_parameters["variable"][10]+(output_parameters["variable"][10]*0.1)))
+        roeDeer_gain_from_Trees = random.uniform((output_parameters["variable"][11]-(output_parameters["variable"][11]*0.1)), (output_parameters["variable"][11]+(output_parameters["variable"][11]*0.1)))
+        roeDeer_gain_from_Scrub = random.uniform((output_parameters["variable"][12]-(output_parameters["variable"][12]*0.1)), (output_parameters["variable"][12]+(output_parameters["variable"][12]*0.1)))
+        roeDeer_gain_from_Saplings = random.uniform((output_parameters["variable"][13]-(output_parameters["variable"][13]*0.1)), (output_parameters["variable"][13]+(output_parameters["variable"][13]*0.1)))
+        roeDeer_gain_from_YoungScrub = random.uniform((output_parameters["variable"][14]-(output_parameters["variable"][14]*0.1)), (output_parameters["variable"][14]+(output_parameters["variable"][14]*0.1)))
         # Fallow deer
-        fallowDeer_reproduce = random.uniform((output_parameters["variable"][22]-(output_parameters["variable"][22]*0.1)), (output_parameters["variable"][22]+(output_parameters["variable"][22]*0.1)))
-        fallowDeer_gain_from_grass = random.uniform((output_parameters["variable"][23]-(output_parameters["variable"][23]*0.1)), (output_parameters["variable"][23]+(output_parameters["variable"][23]*0.1)))
-        fallowDeer_gain_from_Trees = random.uniform((output_parameters["variable"][24]-(output_parameters["variable"][24]*0.1)), (output_parameters["variable"][24]+(output_parameters["variable"][24]*0.1)))
-        fallowDeer_gain_from_Scrub = random.uniform((output_parameters["variable"][25]-(output_parameters["variable"][25]*0.1)), (output_parameters["variable"][25]+(output_parameters["variable"][25]*0.1)))
-        fallowDeer_gain_from_Saplings = random.uniform((output_parameters["variable"][26]-(output_parameters["variable"][26]*0.1)), (output_parameters["variable"][26]+(output_parameters["variable"][26]*0.1)))
-        fallowDeer_gain_from_YoungScrub = random.uniform((output_parameters["variable"][27]-(output_parameters["variable"][27]*0.1)), (output_parameters["variable"][27]+(output_parameters["variable"][27]*0.1)))
+        fallowDeer_reproduce = random.uniform((output_parameters["variable"][15]-(output_parameters["variable"][15]*0.1)), (output_parameters["variable"][15]+(output_parameters["variable"][15]*0.1)))
+        fallowDeer_gain_from_grass = random.uniform((output_parameters["variable"][16]-(output_parameters["variable"][16]*0.1)), (output_parameters["variable"][16]+(output_parameters["variable"][16]*0.1)))
+        fallowDeer_gain_from_Trees = random.uniform((output_parameters["variable"][17]-(output_parameters["variable"][17]*0.1)), (output_parameters["variable"][17]+(output_parameters["variable"][17]*0.1)))
+        fallowDeer_gain_from_Scrub = random.uniform((output_parameters["variable"][18]-(output_parameters["variable"][18]*0.1)), (output_parameters["variable"][18]+(output_parameters["variable"][18]*0.1)))
+        fallowDeer_gain_from_Saplings = random.uniform((output_parameters["variable"][19]-(output_parameters["variable"][19]*0.1)), (output_parameters["variable"][19]+(output_parameters["variable"][19]*0.1)))
+        fallowDeer_gain_from_YoungScrub = random.uniform((output_parameters["variable"][20]-(output_parameters["variable"][20]*0.1)), (output_parameters["variable"][20]+(output_parameters["variable"][20]*0.1)))
          # Red deer
-        redDeer_reproduce = random.uniform((output_parameters["variable"][28]-(output_parameters["variable"][28]*0.1)), (output_parameters["variable"][28]+(output_parameters["variable"][28]*0.1)))
-        redDeer_gain_from_grass = random.uniform((output_parameters["variable"][29]-(output_parameters["variable"][29]*0.1)), (output_parameters["variable"][29]+(output_parameters["variable"][29]*0.1)))
-        redDeer_gain_from_Trees = random.uniform((output_parameters["variable"][30]-(output_parameters["variable"][30]*0.1)), (output_parameters["variable"][30]+(output_parameters["variable"][30]*0.1)))
-        redDeer_gain_from_Scrub = random.uniform((output_parameters["variable"][31]-(output_parameters["variable"][31]*0.1)), (output_parameters["variable"][31]+(output_parameters["variable"][31]*0.1)))
-        redDeer_gain_from_Saplings = random.uniform((output_parameters["variable"][32]-(output_parameters["variable"][32]*0.1)), (output_parameters["variable"][32]+(output_parameters["variable"][32]*0.1)))
-        redDeer_gain_from_YoungScrub = random.uniform((output_parameters["variable"][33]-(output_parameters["variable"][33]*0.1)), (output_parameters["variable"][33]+(output_parameters["variable"][33]*0.1)))
+        redDeer_reproduce = random.uniform((output_parameters["variable"][21]-(output_parameters["variable"][21]*0.1)), (output_parameters["variable"][21]+(output_parameters["variable"][21]*0.1)))
+        redDeer_gain_from_grass = random.uniform((output_parameters["variable"][22]-(output_parameters["variable"][22]*0.1)), (output_parameters["variable"][22]+(output_parameters["variable"][22]*0.1)))
+        redDeer_gain_from_Trees = random.uniform((output_parameters["variable"][23]-(output_parameters["variable"][23]*0.1)), (output_parameters["variable"][23]+(output_parameters["variable"][23]*0.1)))
+        redDeer_gain_from_Scrub = random.uniform((output_parameters["variable"][24]-(output_parameters["variable"][24]*0.1)), (output_parameters["variable"][24]+(output_parameters["variable"][24]*0.1)))
+        redDeer_gain_from_Saplings = random.uniform((output_parameters["variable"][25]-(output_parameters["variable"][25]*0.1)), (output_parameters["variable"][25]+(output_parameters["variable"][25]*0.1)))
+        redDeer_gain_from_YoungScrub = random.uniform((output_parameters["variable"][26]-(output_parameters["variable"][26]*0.1)), (output_parameters["variable"][26]+(output_parameters["variable"][26]*0.1)))
         # Exmoor ponies
-        ponies_gain_from_grass = random.uniform((output_parameters["variable"][34]-(output_parameters["variable"][34]*0.1)), (output_parameters["variable"][34]+(output_parameters["variable"][34]*0.1)))
-        ponies_gain_from_Trees = random.uniform((output_parameters["variable"][35]-(output_parameters["variable"][35]*0.1)), (output_parameters["variable"][35]+(output_parameters["variable"][35]*0.1)))
-        ponies_gain_from_Scrub = random.uniform((output_parameters["variable"][36]-(output_parameters["variable"][36]*0.1)), (output_parameters["variable"][36]+(output_parameters["variable"][36]*0.1)))
-        ponies_gain_from_Saplings = random.uniform((output_parameters["variable"][37]-(output_parameters["variable"][37]*0.1)), (output_parameters["variable"][37]+(output_parameters["variable"][37]*0.1)))
-        ponies_gain_from_YoungScrub = random.uniform((output_parameters["variable"][38]-(output_parameters["variable"][38]*0.1)), (output_parameters["variable"][38]+(output_parameters["variable"][38]*0.1)))
+        ponies_gain_from_grass = random.uniform((output_parameters["variable"][27]-(output_parameters["variable"][27]*0.1)), (output_parameters["variable"][27]+(output_parameters["variable"][27]*0.1)))
+        ponies_gain_from_Trees = random.uniform((output_parameters["variable"][28]-(output_parameters["variable"][28]*0.1)), (output_parameters["variable"][28]+(output_parameters["variable"][28]*0.1)))
+        ponies_gain_from_Scrub = random.uniform((output_parameters["variable"][29]-(output_parameters["variable"][29]*0.1)), (output_parameters["variable"][29]+(output_parameters["variable"][29]*0.1)))
+        ponies_gain_from_Saplings = random.uniform((output_parameters["variable"][30]-(output_parameters["variable"][30]*0.1)), (output_parameters["variable"][30]+(output_parameters["variable"][30]*0.1)))
+        ponies_gain_from_YoungScrub = random.uniform((output_parameters["variable"][31]-(output_parameters["variable"][31]*0.1)), (output_parameters["variable"][31]+(output_parameters["variable"][31]*0.1)))
         # Longhorn cattle
-        cows_reproduce = random.uniform((output_parameters["variable"][39]-(output_parameters["variable"][39]*0.1)), (output_parameters["variable"][39]+(output_parameters["variable"][39]*0.1)))
-        cows_gain_from_grass = random.uniform((output_parameters["variable"][40]-(output_parameters["variable"][40]*0.1)), (output_parameters["variable"][40]+(output_parameters["variable"][40]*0.1)))
-        cows_gain_from_Trees = random.uniform((output_parameters["variable"][41]-(output_parameters["variable"][41]*0.1)), (output_parameters["variable"][41]+(output_parameters["variable"][41]*0.1)))
-        cows_gain_from_Scrub = random.uniform((output_parameters["variable"][42]-(output_parameters["variable"][42]*0.1)), (output_parameters["variable"][42]+(output_parameters["variable"][42]*0.1)))
-        cows_gain_from_Saplings = random.uniform((output_parameters["variable"][43]-(output_parameters["variable"][43]*0.1)), (output_parameters["variable"][43]+(output_parameters["variable"][43]*0.1)))
-        cows_gain_from_YoungScrub = random.uniform((output_parameters["variable"][44]-(output_parameters["variable"][44]*0.1)), (output_parameters["variable"][44]+(output_parameters["variable"][44]*0.1)))
+        cows_reproduce = random.uniform((output_parameters["variable"][32]-(output_parameters["variable"][32]*0.1)), (output_parameters["variable"][32]+(output_parameters["variable"][32]*0.1)))
+        cows_gain_from_grass = random.uniform((output_parameters["variable"][33]-(output_parameters["variable"][33]*0.1)), (output_parameters["variable"][33]+(output_parameters["variable"][33]*0.1)))
+        cows_gain_from_Trees = random.uniform((output_parameters["variable"][34]-(output_parameters["variable"][34]*0.1)), (output_parameters["variable"][34]+(output_parameters["variable"][34]*0.1)))
+        cows_gain_from_Scrub = random.uniform((output_parameters["variable"][35]-(output_parameters["variable"][35]*0.1)), (output_parameters["variable"][35]+(output_parameters["variable"][35]*0.1)))
+        cows_gain_from_Saplings = random.uniform((output_parameters["variable"][36]-(output_parameters["variable"][36]*0.1)), (output_parameters["variable"][36]+(output_parameters["variable"][36]*0.1)))
+        cows_gain_from_YoungScrub = random.uniform((output_parameters["variable"][37]-(output_parameters["variable"][37]*0.1)), (output_parameters["variable"][37]+(output_parameters["variable"][37]*0.1)))
         # Tamworth pigs
-        pigs_reproduce = random.uniform((output_parameters["variable"][45]-(output_parameters["variable"][45]*0.1)), (output_parameters["variable"][45]+(output_parameters["variable"][45]*0.1)))
-        pigs_gain_from_grass = random.uniform((output_parameters["variable"][46]-(output_parameters["variable"][46]*0.1)), (output_parameters["variable"][46]+(output_parameters["variable"][46]*0.1)))
-        pigs_gain_from_Saplings = random.uniform((output_parameters["variable"][47]-(output_parameters["variable"][47]*0.1)), (output_parameters["variable"][47]+(output_parameters["variable"][47]*0.1)))
-        pigs_gain_from_YoungScrub = random.uniform((output_parameters["variable"][48]-(output_parameters["variable"][48]*0.1)), (output_parameters["variable"][48]+(output_parameters["variable"][48]*0.1)))
+        pigs_reproduce = random.uniform((output_parameters["variable"][38]-(output_parameters["variable"][38]*0.1)), (output_parameters["variable"][38]+(output_parameters["variable"][38]*0.1)))
+        pigs_gain_from_grass = random.uniform((output_parameters["variable"][39]-(output_parameters["variable"][39]*0.1)), (output_parameters["variable"][39]+(output_parameters["variable"][39]*0.1)))
+        pigs_gain_from_Saplings = random.uniform((output_parameters["variable"][40]-(output_parameters["variable"][40]*0.1)), (output_parameters["variable"][40]+(output_parameters["variable"][40]*0.1)))
+        pigs_gain_from_YoungScrub = random.uniform((output_parameters["variable"][41]-(output_parameters["variable"][41]*0.1)), (output_parameters["variable"][41]+(output_parameters["variable"][41]*0.1)))
         # impact grass
-        roeDeer_impactGrass = random.randint((int(output_parameters["variable"][49])-int((output_parameters["variable"][49]*0.1))), (int(output_parameters["variable"][49])+int((output_parameters["variable"][49]*0.1))))
-        fallowDeer_impactGrass = random.randint((int(output_parameters["variable"][50])-int((output_parameters["variable"][50]*0.1))), (int(output_parameters["variable"][50]+int((output_parameters["variable"][50]*0.1)))))
-        redDeer_impactGrass = random.randint((int(output_parameters["variable"][51])-int((output_parameters["variable"][51]*0.1))), (int(output_parameters["variable"][51])+int((output_parameters["variable"][51]*0.1))))
-        ponies_impactGrass = random.randint((int(output_parameters["variable"][52])-int((output_parameters["variable"][52]*0.1))), (int(output_parameters["variable"][52])+int((output_parameters["variable"][52]*0.1))))
-        cows_impactGrass = random.randint((int(output_parameters["variable"][53])-int((output_parameters["variable"][53]*0.1))), (int(output_parameters["variable"][53])+int((output_parameters["variable"][53]*0.1))))
-        pigs_impactGrass = random.randint((int(output_parameters["variable"][54])-int((output_parameters["variable"][54]*0.1))), (int(output_parameters["variable"][54])+int((output_parameters["variable"][54]*0.1))))
+        roeDeer_impactGrass = random.randint(round(output_parameters["variable"][42]-(output_parameters["variable"][42]*0.1)), round(output_parameters["variable"][42]+(output_parameters["variable"][42]*0.1)))
+        fallowDeer_impactGrass = random.randint(round(output_parameters["variable"][43]-(output_parameters["variable"][43]*0.1)),round(output_parameters["variable"][43]+(output_parameters["variable"][43]*0.1)))
+        redDeer_impactGrass = random.randint(round(output_parameters["variable"][44]-(output_parameters["variable"][44]*0.1)), round(output_parameters["variable"][44]+(output_parameters["variable"][44]*0.1)))
+        ponies_impactGrass = random.randint(round(output_parameters["variable"][45]-(output_parameters["variable"][45]*0.1)), round(output_parameters["variable"][45]+(output_parameters["variable"][45]*0.1)))
+        cows_impactGrass = random.randint(round(output_parameters["variable"][46]-(output_parameters["variable"][46]*0.1)), round(output_parameters["variable"][46]+(output_parameters["variable"][46]*0.1)))
+        pigs_impactGrass = random.randint(round(output_parameters["variable"][47]-(output_parameters["variable"][47]*0.1)), round(output_parameters["variable"][47]+(output_parameters["variable"][47]*0.1)))
         # impact saplings
-        roeDeer_saplingsEaten = random.randint((int(output_parameters["variable"][55])-int((output_parameters["variable"][55]*0.1))), (int(output_parameters["variable"][55]+(output_parameters["variable"][55]*0.1))))
-        fallowDeer_saplingsEaten = random.randint((int(output_parameters["variable"][56])-int((output_parameters["variable"][56]*0.1))), (int(output_parameters["variable"][56]+int((output_parameters["variable"][56]*0.1)))))
-        redDeer_saplingsEaten = random.randint((int(output_parameters["variable"][57])-int((output_parameters["variable"][57]*0.1))), (int(output_parameters["variable"][57])+int((output_parameters["variable"][57]*0.1))))
-        ponies_saplingsEaten = random.randint((int(output_parameters["variable"][58])-int((output_parameters["variable"][58]*0.1))), (int(output_parameters["variable"][58])+int((output_parameters["variable"][58]*0.1))))
-        cows_saplingsEaten =  random.randint((int(output_parameters["variable"][59])-int((output_parameters["variable"][59]*0.1))), (int(output_parameters["variable"][59])+int((output_parameters["variable"][59]*0.1))))
-        pigs_saplingsEaten = random.randint((int(output_parameters["variable"][60])-int((output_parameters["variable"][60]*0.1))), (int(output_parameters["variable"][60])+int((output_parameters["variable"][60]*0.1))))
+        roeDeer_saplingsEaten = random.randint(round(output_parameters["variable"][48]-(output_parameters["variable"][48]*0.1)), round(output_parameters["variable"][48]+(output_parameters["variable"][48]*0.1)))
+        fallowDeer_saplingsEaten = random.randint(round(output_parameters["variable"][49]-(output_parameters["variable"][49]*0.1)), round(output_parameters["variable"][49]+(output_parameters["variable"][49]*0.1)))
+        redDeer_saplingsEaten = random.randint(round(output_parameters["variable"][50]-(output_parameters["variable"][50]*0.1)), round(output_parameters["variable"][50]+(output_parameters["variable"][50]*0.1)))
+        ponies_saplingsEaten = random.randint(round(output_parameters["variable"][51]-(output_parameters["variable"][51]*0.1)), round(output_parameters["variable"][51]+(output_parameters["variable"][51]*0.1)))
+        cows_saplingsEaten =  random.randint(round(output_parameters["variable"][52]-(output_parameters["variable"][52]*0.1)), round(output_parameters["variable"][52]+(output_parameters["variable"][52]*0.1)))
+        pigs_saplingsEaten = random.randint(round(output_parameters["variable"][53]-(output_parameters["variable"][53]*0.1)), round(output_parameters["variable"][53]+(output_parameters["variable"][53]*0.1)))
         # impact young scrub
-        roeDeer_youngScrubEaten = random.randint((int(output_parameters["variable"][61])-int((output_parameters["variable"][61]*0.1))), (int(output_parameters["variable"][61])+int((output_parameters["variable"][61]*0.1))))
-        fallowDeer_youngScrubEaten = random.randint((int(output_parameters["variable"][62])-int((output_parameters["variable"][62]*0.1))), (int(output_parameters["variable"][62])+int((output_parameters["variable"][62]*0.1))))
-        redDeer_youngScrubEaten = random.randint((int(output_parameters["variable"][63])-int((output_parameters["variable"][63]*0.1))), (int(output_parameters["variable"][63])+int((output_parameters["variable"][63]*0.1))))
-        ponies_youngScrubEaten = random.randint((int(output_parameters["variable"][64])-int((output_parameters["variable"][64]*0.1))), (int(output_parameters["variable"][64])+int((output_parameters["variable"][64]*0.1))))
-        cows_youngScrubEaten = random.randint((int(output_parameters["variable"][65])-int((output_parameters["variable"][65]*0.1))), (int(output_parameters["variable"][65])+int((output_parameters["variable"][65]*0.1))))
-        pigs_youngScrubEaten = random.randint((int(output_parameters["variable"][66])-int((output_parameters["variable"][66]*0.1))), (int(output_parameters["variable"][66])+int((output_parameters["variable"][66]*0.1))))
+        roeDeer_youngScrubEaten = random.randint(round(output_parameters["variable"][54]-(output_parameters["variable"][54]*0.1)), round(output_parameters["variable"][54]+(output_parameters["variable"][54]*0.1)))
+        fallowDeer_youngScrubEaten = random.randint(round(output_parameters["variable"][55]-(output_parameters["variable"][55]*0.1)), round(output_parameters["variable"][55]+(output_parameters["variable"][55]*0.1)))
+        redDeer_youngScrubEaten = random.randint(round(output_parameters["variable"][56]-(output_parameters["variable"][56]*0.1)), round(output_parameters["variable"][56]+(output_parameters["variable"][56]*0.1)))
+        ponies_youngScrubEaten = random.randint(round(output_parameters["variable"][57]-(output_parameters["variable"][57]*0.1)), round(output_parameters["variable"][57]+(output_parameters["variable"][57]*0.1)))
+        cows_youngScrubEaten = random.randint(round(output_parameters["variable"][58]-(output_parameters["variable"][58]*0.1)), round(output_parameters["variable"][58]+(output_parameters["variable"][58]*0.1)))
+        pigs_youngScrubEaten = random.randint(round(output_parameters["variable"][59]-(output_parameters["variable"][59]*0.1)), round(output_parameters["variable"][59]+(output_parameters["variable"][59]*0.1)))
         # impact scrub
-        roeDeer_scrubEaten = random.randint((int(output_parameters["variable"][67])-int((output_parameters["variable"][67]*0.1))), (int(output_parameters["variable"][67])+int((output_parameters["variable"][67]*0.1))))
-        fallowDeer_scrubEaten = random.randint((int(output_parameters["variable"][68])-int((output_parameters["variable"][68]*0.1))), (int(output_parameters["variable"][68])+int((output_parameters["variable"][68]*0.1))))
-        redDeer_scrubEaten = random.randint((int(output_parameters["variable"][69])-int((output_parameters["variable"][69]*0.1))), (int(output_parameters["variable"][69])+int((output_parameters["variable"][69]*0.1))))
-        ponies_scrubEaten = random.randint((int(output_parameters["variable"][70])-int((output_parameters["variable"][70]*0.1))), (int(output_parameters["variable"][70])+int((output_parameters["variable"][70]*0.1))))
-        cows_scrubEaten = random.randint((int(output_parameters["variable"][71])-int((output_parameters["variable"][71]*0.1))), (int(output_parameters["variable"][71])+int((output_parameters["variable"][71]*0.1))))
+        roeDeer_scrubEaten = random.randint(round(output_parameters["variable"][60]-(output_parameters["variable"][60]*0.1)), round(output_parameters["variable"][60]+(output_parameters["variable"][60]*0.1)))
+        fallowDeer_scrubEaten = random.randint(round(output_parameters["variable"][61]-(output_parameters["variable"][61]*0.1)), round(output_parameters["variable"][61]+(output_parameters["variable"][61]*0.1)))
+        redDeer_scrubEaten = random.randint(round(output_parameters["variable"][62]-(output_parameters["variable"][62]*0.1)), round(output_parameters["variable"][62]+(output_parameters["variable"][62]*0.1)))
+        ponies_scrubEaten = random.randint(round(output_parameters["variable"][63]-(output_parameters["variable"][63]*0.1)), round(output_parameters["variable"][63]+(output_parameters["variable"][63]*0.1)))
+        cows_scrubEaten = random.randint(round(output_parameters["variable"][64]-(output_parameters["variable"][64]*0.1)), round(output_parameters["variable"][64]+(output_parameters["variable"][64]*0.1)))
         # impact trees
-        roeDeer_treesEaten = random.randint((int(output_parameters["variable"][72])-int((output_parameters["variable"][72]*0.1))), (int(output_parameters["variable"][72])+int((output_parameters["variable"][72]*0.1))))
-        fallowDeer_treesEaten = random.randint((int(output_parameters["variable"][73])-int((output_parameters["variable"][73]*0.1))), (int(output_parameters["variable"][73])+int((output_parameters["variable"][73]*0.1))))
-        redDeer_treesEaten = random.randint((int(output_parameters["variable"][74])-int((output_parameters["variable"][74]*0.1))), (int(output_parameters["variable"][74])+int((output_parameters["variable"][74]*0.1))))
-        ponies_treesEaten = random.randint((int(output_parameters["variable"][75])-int((output_parameters["variable"][75]*0.1))), (int(output_parameters["variable"][75])+int((output_parameters["variable"][75]*0.1))))
-        cows_treesEaten =  random.randint((int(output_parameters["variable"][76])-int((output_parameters["variable"][76]*0.1))), (int(output_parameters["variable"][76])+int((output_parameters["variable"][76]*0.1))))
+        roeDeer_treesEaten = random.randint(round(output_parameters["variable"][65]-(output_parameters["variable"][65]*0.1)), round(output_parameters["variable"][65]+(output_parameters["variable"][65]*0.1)))
+        fallowDeer_treesEaten = random.randint(round(output_parameters["variable"][66]-(output_parameters["variable"][66]*0.1)), round(output_parameters["variable"][66]+(output_parameters["variable"][66]*0.1)))
+        redDeer_treesEaten = random.randint(round(output_parameters["variable"][67]-(output_parameters["variable"][67]*0.1)), round(output_parameters["variable"][67]+(output_parameters["variable"][67]*0.1)))
+        ponies_treesEaten = random.randint(round(output_parameters["variable"][68]-(output_parameters["variable"][68]*0.1)), round(output_parameters["variable"][68]+(output_parameters["variable"][68]*0.1)))
+        cows_treesEaten =  random.randint(round(output_parameters["variable"][69]-(output_parameters["variable"][69]*0.1)), round(output_parameters["variable"][69]+(output_parameters["variable"][69]*0.1)))
+
 
         # keep track of my parameters
         parameters_used = [
             run_number,
             chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
-            chance_scrubOutcompetedByTree, chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
             initial_roeDeer, initial_grassland, initial_woodland, initial_scrubland, 
             roeDeer_reproduce, roeDeer_gain_from_grass, roeDeer_gain_from_Trees, roeDeer_gain_from_Scrub, roeDeer_gain_from_Saplings, roeDeer_gain_from_YoungScrub,
             roeDeer_impactGrass, roeDeer_saplingsEaten, roeDeer_youngScrubEaten, roeDeer_treesEaten, roeDeer_scrubEaten,
@@ -144,7 +136,6 @@ def run_all_models():
         print(run_number)
         model = KneppModel(
             chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
-            chance_scrubOutcompetedByTree, chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
             initial_roeDeer, initial_grassland, initial_woodland, initial_scrubland, 
             roeDeer_reproduce, roeDeer_gain_from_grass, roeDeer_gain_from_Trees, roeDeer_gain_from_Scrub, roeDeer_gain_from_Saplings, roeDeer_gain_from_YoungScrub,
             roeDeer_impactGrass, roeDeer_saplingsEaten, roeDeer_youngScrubEaten, roeDeer_treesEaten, roeDeer_scrubEaten,
@@ -178,13 +169,6 @@ def run_all_models():
         "chance_regrowGrass", # this is to initialize the initial dominant condition
         "chance_saplingBecomingTree",
         "chance_youngScrubMatures",
-        "chance_scrubOutcompetedByTree", # if tree matures, chance of scrub decreasing
-        "chance_grassOutcompetedByTree",
-        "chance_grassOutcompetedByScrub",
-        "chance_saplingOutcompetedByTree",
-        "chance_saplingOutcompetedByScrub",
-        "chance_youngScrubOutcompetedByScrub",
-        "chance_youngScrubOutcompetedByTree",
         # initial values
         "initial_roeDeer",
         "initial_grassland",

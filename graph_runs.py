@@ -47,6 +47,7 @@ def graph_runs():
     final_df = final_df.join(perc2, on=['Time','runType', 'Ecosystem Element'])
     colors = ["#6788ee", "#e26952", "#3F9E4D"]
 
+    final_df.to_excel("combined_df.xlsx")
 
     # first graph: counterfactual & forecasting
     counterfactual_graph = final_df.loc[(final_df['runType'] == "Accepted") | (final_df['runType'] == "noReintro")]

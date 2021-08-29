@@ -15,7 +15,7 @@ from random import choice as rchoice
 # herbivore eating habitat types
 def eat_saplings(habitat_patch, eatenSaps):
     # rescale this according to how many shrubs there are (they protect the saplings)
-    eatenSaps_scaled = eatenSaps - int((eatenSaps*(habitat_patch.scrub_here/100)))
+    eatenSaps_scaled = eatenSaps - round((eatenSaps*(habitat_patch.scrub_here/500)))
     habitat_patch.saplings_here -= eatenSaps_scaled
     # don't let number of saplings go negative
     if habitat_patch.saplings_here < 0:
@@ -37,7 +37,7 @@ def eat_scrub(habitat_patch, eatenScrub):
 
 def eat_youngscrub(habitat_patch, eatenYoungScrub):
     # rescale according to number of scrub plants
-    eatenYoungScrub_scaled = eatenYoungScrub - int((eatenYoungScrub*(habitat_patch.scrub_here/100)))
+    eatenYoungScrub_scaled = eatenYoungScrub - round((eatenYoungScrub*(habitat_patch.scrub_here/500)))
     habitat_patch.youngscrub_here -= eatenYoungScrub_scaled
     # don't let it go negative
     if habitat_patch.youngscrub_here < 0:
@@ -69,93 +69,90 @@ class habitatAgent (Agent):
 
     def step(self):
 
+        # chance of habitat being outcompeted by mature trees (e.g. that 1% grass is outcompeted by 1 tree)
+        # outcompeted_grass_byTree = self.model.chance_grassOutcompetedByTree * self.perc_grass_here
+        self.perc_bareground_here += round(self.perc_grass_here*(self.trees_here/500))
+        # self.perc_bareground_here += round(outcompeted_grass_byTree - (outcompeted_grass_byTree*(self.trees_here/500)))
+        self.perc_grass_here -= round(self.perc_grass_here*(self.trees_here/500))
+        self.scrub_here -= round(self.scrub_here*(self.trees_here/500))
+        self.saplings_here -= round(self.saplings_here*(self.trees_here/500))
+        self.youngscrub_here -= round(self.youngscrub_here*(self.trees_here/500))
+
+        # chance of habitat being outcompeted by mature scrub
+        self.perc_bareground_here += round(self.perc_grass_here*(self.scrub_here/500))
+        self.perc_grass_here -= round(self.perc_grass_here*(self.scrub_here/500))
+        self.saplings_here -= round(self.saplings_here*(self.scrub_here/500))
+        self.youngscrub_here -= round(self.youngscrub_here*(self.scrub_here/500))
+
+        # chance of reproducing saplings
         # are there trees here?
-        if self.trees_here > 0 and random.random() < ((self.model.chance_reproduceSapling * self.trees_here)/100):
+        if self.trees_here > 0 and random.random() < ((self.model.chance_reproduceSapling * self.trees_here)/500):
             # if so, each tree looks at my cell and my neighboring cells and has a chance of reproducing
             neighborhood_list = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=True)
             items_in_neighborhood = list(map(self.model.grid.get_cell_list_contents, neighborhood_list)) 
             only_habitat_cells = [obj for obj in items_in_neighborhood if (isinstance(x, habitatAgent) for x in obj)]
             no_herbivores = [item[0] for item in only_habitat_cells]
             # are there any that aren't full of other saplings/trees?
-            available_sapling_cell = [i for i in no_herbivores if i.saplings_here < 1000 and i.trees_here < 100]
+            available_sapling_cell = [i for i in no_herbivores if i.saplings_here < 25000 and i.trees_here < 500]
             # if yes, put a sapling there
             if len(available_sapling_cell) > 0:
             # there's a chance that each tree reproduces some saplings to one of the cells
                 new_patch_sapling = self.random.choice(available_sapling_cell)
-                new_patch_sapling.saplings_here += random.randint(0,1000)
-                if new_patch_sapling.saplings_here > 1000:
-                    new_patch_sapling.saplings_here = 1000  
+                new_patch_sapling.saplings_here += random.randint(0,25000)
+                if new_patch_sapling.saplings_here > 25000:
+                    new_patch_sapling.saplings_here = 25000  
 
+        # chance of reproducing shrubs
         # are there are scrub here?
-        if self.scrub_here > 0 and random.random() < ((self.model.chance_reproduceYoungScrub*self.scrub_here)/100):
+        if self.scrub_here > 0 and random.random() < ((self.model.chance_reproduceYoungScrub*self.scrub_here)/500):
             # look at my cell and my neighboring cells
             neighborhood_list = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=True)
             items_in_neighborhood = list(map(self.model.grid.get_cell_list_contents, neighborhood_list)) 
             only_habitat_cells = [obj for obj in items_in_neighborhood if (isinstance(x, habitatAgent) for x in obj)]
             no_herbivores = [item[0] for item in only_habitat_cells]
             # are there any that aren't full of other scrub/young scrub?
-            available_youngscrub_cell = [i for i in no_herbivores if i.youngscrub_here < 1000 and i.scrub_here < 100]
+            available_youngscrub_cell = [i for i in no_herbivores if i.youngscrub_here < 25000 and i.scrub_here < 500]
             # if yes, put a scrub there
             if len(available_youngscrub_cell) > 0:
                 new_patch_youngscrub = self.random.choice(available_youngscrub_cell)
-                new_patch_youngscrub.youngscrub_here += random.randint(0,1000)
-                if new_patch_youngscrub.youngscrub_here > 1000:
-                    new_patch_youngscrub.youngscrub_here = 1000  
+                new_patch_youngscrub.youngscrub_here += random.randint(0,25000)
+                if new_patch_youngscrub.youngscrub_here > 25000:
+                    new_patch_youngscrub.youngscrub_here = 25000  
 
 
         # chance of bare ground becoming grassland
         amount_regrown = self.model.chance_regrowGrass * self.perc_bareground_here
-        self.perc_grass_here += int(amount_regrown)
-        self.perc_bareground_here -= int(amount_regrown)
+        self.perc_grass_here += round(amount_regrown)
+        self.perc_bareground_here -= round(amount_regrown)
 
         # chance of young scrub becoming mature scrub
         scrub_maturing = self.model.chance_youngScrubMatures * self.youngscrub_here
-        if (self.scrub_here + scrub_maturing) > 100: 
-            scrub_maturing = 100 - self.scrub_here
-        self.scrub_here += int(scrub_maturing)
-        self.youngscrub_here -= int(scrub_maturing)
+        if (self.scrub_here + scrub_maturing) > 500: 
+            scrub_maturing = 500 - self.scrub_here
+        self.scrub_here += round(scrub_maturing)
+        self.youngscrub_here -= round(scrub_maturing)
 
         # chance of sapling becoming tree
         tree_maturing = self.model.chance_saplingBecomingTree * self.saplings_here
-        if (self.trees_here + tree_maturing) > 100: 
-            tree_maturing = 100 - self.trees_here
-        self.trees_here += int(tree_maturing)
-        self.saplings_here -= int(tree_maturing)
+        if (self.trees_here + tree_maturing) > 500: 
+            tree_maturing = 500 - self.trees_here
+        self.trees_here += round(tree_maturing)
+        self.saplings_here -= round(tree_maturing)
    
-        # chance that 1% grass is outcompeted by 1 tree
-        outcompeted_grass = self.model.chance_grassOutcompetedByTree * self.perc_grass_here
-        self.perc_bareground_here += int(outcompeted_grass - (outcompeted_grass*(self.trees_here/100)))
-        self.perc_grass_here -= int(outcompeted_grass - (outcompeted_grass*(self.trees_here/100)))
-        outcompeted_scrub = self.model.chance_scrubOutcompetedByTree * self.scrub_here
-        self.scrub_here -= int(outcompeted_scrub - (outcompeted_scrub*(self.trees_here/100)))
-        outcompeted_saplings = self.model.chance_saplingOutcompetedByTree * self.saplings_here
-        self.saplings_here -= int(outcompeted_saplings - (outcompeted_saplings*(self.trees_here/100)))
-        outcompeted_youngscrub = self.model.chance_youngScrubOutcompetedByTree * self.youngscrub_here
-        self.youngscrub_here -= int(outcompeted_youngscrub - (outcompeted_youngscrub*(self.trees_here/100)))
-        
-        # outcompeted by mature scrub
-        outcompeted_grass_byScrub = self.model.chance_grassOutcompetedByScrub * self.perc_grass_here
-        self.perc_bareground_here += int(outcompeted_grass_byScrub - (outcompeted_grass_byScrub*(self.scrub_here/100)))
-        self.perc_grass_here -= int(outcompeted_grass_byScrub - (outcompeted_grass_byScrub*(self.scrub_here/100)))
-        outcompeted_saplings_byScrub = self.model.chance_saplingOutcompetedByScrub * self.saplings_here
-        self.saplings_here -= int(outcompeted_saplings_byScrub - (outcompeted_saplings_byScrub*(self.scrub_here/100)))
-        outcompeted_youngscrub = self.model.chance_youngScrubOutcompetedByScrub * self.youngscrub_here
-        self.youngscrub_here -= int(outcompeted_youngscrub - (outcompeted_youngscrub*(self.scrub_here/100)))
-
+        # reassess dominant condition
+        if self.trees_here < 50 and self.scrub_here < 50 and self.perc_grass_here >= 50:
+            self.condition = "grassland"
+        elif self.trees_here < 50 and self.scrub_here >= 50:
+            self.condition = "thorny_scrubland"
+        elif self.trees_here >= 50:
+            self.condition = "woodland" 
+        elif self.trees_here < 50 and self.scrub_here < 50 and self.perc_bareground_here > 50:
+            self.condition = "bare_ground"
 
         # print(self.unique_id, "trees", self.trees_here, "scrub", self.scrub_here, "saplings", self.saplings_here, "youngScrub", self.youngscrub_here, "grass", self.perc_grass_here, "Bare", self.perc_bareground_here)
         
-        # reassess dominant condition
-        if self.trees_here < 10 and self.scrub_here < 10 and self.perc_grass_here >= 50:
-            self.condition = "grassland"
-        if self.trees_here < 10 and self.scrub_here < 10 and self.perc_bareground_here > 50:
-            self.condition = "bare_ground"
-        if self.trees_here < 10 and self.scrub_here >= 10:
-            self.condition = "thorny_scrubland"
-        if self.trees_here >= 10:
-            self.condition = "woodland"        
 
-
+                
 class roeDeer_agent(RandomWalker):
     def __init__(self, unique_id, pos, model, moore, energy):
         super().__init__(unique_id, pos, model, moore=moore)
@@ -193,7 +190,6 @@ class roeDeer_agent(RandomWalker):
                 eatenYoungScrub = random.randint(0,self.model.roeDeer_youngScrubEaten)
                 eat_youngscrub(habitat_patch, eatenYoungScrub)
                 self.energy += (self.model.roeDeer_gain_from_YoungScrub * eatenYoungScrub)
-
             elif self.energy < 1 and my_choice == "grass" and habitat_patch.perc_grass_here > 0:
                 eatenGrass = random.randint(0,self.model.roeDeer_impactGrass)
                 eat_grass(habitat_patch, eatenGrass)
@@ -518,7 +514,6 @@ class KneppModel(Model):
     
     def __init__(self,             
             chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
-            chance_scrubOutcompetedByTree, chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
             initial_roeDeer, initial_grassland, initial_woodland, initial_scrubland,
             roeDeer_reproduce, roeDeer_gain_from_grass, roeDeer_gain_from_Trees, roeDeer_gain_from_Scrub, roeDeer_gain_from_Saplings, roeDeer_gain_from_YoungScrub,
             roeDeer_impactGrass, roeDeer_saplingsEaten, roeDeer_youngScrubEaten, roeDeer_treesEaten, roeDeer_scrubEaten,
@@ -544,13 +539,6 @@ class KneppModel(Model):
         self.chance_regrowGrass = chance_regrowGrass
         self.chance_saplingBecomingTree = chance_saplingBecomingTree
         self.chance_youngScrubMatures = chance_youngScrubMatures
-        self.chance_scrubOutcompetedByTree = chance_scrubOutcompetedByTree
-        self.chance_saplingOutcompetedByScrub = chance_saplingOutcompetedByScrub
-        self.chance_grassOutcompetedByTree = chance_grassOutcompetedByTree
-        self.chance_grassOutcompetedByScrub = chance_grassOutcompetedByScrub
-        self.chance_saplingOutcompetedByTree = chance_saplingOutcompetedByTree
-        self.chance_youngScrubOutcompetedByScrub = chance_youngScrubOutcompetedByScrub
-        self.chance_youngScrubOutcompetedByTree = chance_youngScrubOutcompetedByTree
         # roe deer parameters
         self.roeDeer_gain_from_grass = roeDeer_gain_from_grass
         self.roeDeer_gain_from_Trees = roeDeer_gain_from_Trees
@@ -641,42 +629,41 @@ class KneppModel(Model):
             prob_scrubland = initial_scrubland/100
             prob_woodland = initial_woodland/100
             prob_bare_ground = 1-((initial_grassland + initial_scrubland + initial_woodland)/100)
-        count = 0
         for _, x, y in self.grid.coord_iter():
             condition = np.random.choice(["grassland", "thorny_scrubland", "woodland", "bare_ground"], p=[prob_grassland, prob_scrubland, prob_woodland, prob_bare_ground])            
             # put a random number of trees, shrubs, etc., depending on dominant condition
             if condition == "grassland": # more than 50% grassland, no more than 10 mature trees/shrubs
-                trees_here = random.randint(0, 10)
-                saplings_here = random.randint(0, 1000)
-                scrub_here = random.randint(0, 10)
-                youngscrub_here = random.randint(0, 1000)
+                trees_here = random.randint(0, 49)
+                saplings_here = random.randint(0, 25000)
+                scrub_here = random.randint(0, 49)
+                youngscrub_here = random.randint(0, 25000)
                 perc_grass_here = random.randint(50, 100)
                 perc_bareground_here = 100 - perc_grass_here
-            if condition == "bare_ground": # more than 50% bare ground
-                trees_here = random.randint(0, 10)
-                saplings_here = random.randint(0, 1000)
-                scrub_here = random.randint(0, 10)
-                youngscrub_here = random.randint(0, 1000)
-                perc_bareground_here = random.randint(50, 100)
+            elif condition == "thorny_scrubland":  # at least 10 scrub plants, no more than 10 trees
+                trees_here = random.randint(0, 49)
+                saplings_here = random.randint(0, 25000)
+                scrub_here = random.randint(50, 500)
+                youngscrub_here = random.randint(0, 25000)
+                perc_grass_here = random.randint(0, 100)
+                perc_bareground_here = 100 - perc_grass_here
+            elif condition == "woodland":  # woodland has 10-100 trees
+                trees_here = random.randint(49, 500)
+                saplings_here = random.randint(0, 25000)
+                scrub_here = random.randint(0, 500)
+                youngscrub_here = random.randint(0, 25000)
+                perc_grass_here = random.randint(0, 100)
+                perc_bareground_here = 100 - perc_grass_here
+            elif condition == "bare_ground": # more than 50% bare ground
+                trees_here = random.randint(0, 49)
+                saplings_here = random.randint(0, 25000)
+                scrub_here = random.randint(0, 49)
+                youngscrub_here = random.randint(0, 25000)
+                perc_bareground_here = random.randint(51, 100)
                 perc_grass_here = 100 - perc_bareground_here
-            if condition == "thorny_scrubland":  # at least 10 scrub plants, no more than 10 trees
-                trees_here = random.randint(0, 10)
-                saplings_here = random.randint(0, 1000)
-                scrub_here = random.randint(10, 100)
-                youngscrub_here = random.randint(0, 1000)
-                perc_grass_here = random.randint(0, 100)
-                perc_bareground_here = 100 - perc_grass_here
-            if condition == "woodland":  # woodland has 10-100 trees
-                trees_here = random.randint(10, 100)
-                saplings_here = random.randint(0, 1000)
-                scrub_here = random.randint(0, 100)
-                youngscrub_here = random.randint(0, 1000)
-                perc_grass_here = random.randint(0, 100)
-                perc_bareground_here = 100 - perc_grass_here
-                count += 1
             patch = habitatAgent(self.next_id(), (x, y), self, condition, trees_here, saplings_here, scrub_here, youngscrub_here, perc_grass_here, perc_bareground_here)
             self.grid.place_agent(patch, (x, y))
             self.schedule.add(patch)
+
 
         # Create roe deer
         for i in range(self.initial_roeDeer):
@@ -706,7 +693,6 @@ class KneppModel(Model):
                             }
                             )
 
-
         self.running = True
         self.datacollector.collect(self)
 
@@ -718,7 +704,7 @@ class KneppModel(Model):
             if value.condition == habitat_condition:
                 count += 1
         # return percentage of entire area
-        return int((count/1800)*100)
+        return round((count/1800)*100)
 
 
     def add_herbivores(self, herbivore, count):

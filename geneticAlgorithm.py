@@ -9,104 +9,96 @@ from geneticalgorithm import geneticalgorithm as ga
 
 def objectiveFunction(x):
     # define the parameters
-    initial_roeDeer = int(x[0])
-    initial_grassland = int(x[1])
-    initial_woodland = int(x[2])
-    initial_scrubland = int(x[3]) 
+    initial_roeDeer = round(x[0])
+    initial_grassland = round(x[1])
+    initial_woodland = round(x[2])
+    initial_scrubland = round(x[3]) 
     chance_reproduceSapling = x[4] 
     chance_reproduceYoungScrub = x[5] 
     chance_regrowGrass = x[6] 
     chance_saplingBecomingTree = x[7] 
     chance_youngScrubMatures = x[8] 
-    chance_scrubOutcompetedByTree = x[9] 
-    chance_grassOutcompetedByTree = x[10] 
-    chance_grassOutcompetedByScrub = x[11]
-    chance_saplingOutcompetedByTree = x[12] 
-    chance_saplingOutcompetedByScrub = x[13] 
-    chance_youngScrubOutcompetedByScrub = x[14] 
-    chance_youngScrubOutcompetedByTree = x[15] 
-    roeDeer_reproduce = x[16] 
-    roeDeer_gain_from_grass = x[17] 
-    roeDeer_gain_from_Trees = x[18] 
-    roeDeer_gain_from_Scrub = x[19] 
-    roeDeer_gain_from_Saplings = x[20] 
-    roeDeer_gain_from_YoungScrub = x[21] 
-    fallowDeer_reproduce = x[22] 
-    fallowDeer_gain_from_grass = x[23] 
-    fallowDeer_gain_from_Trees = x[24] 
-    fallowDeer_gain_from_Scrub = x[25] 
-    fallowDeer_gain_from_Saplings = x[26] 
-    fallowDeer_gain_from_YoungScrub = x[27] 
-    redDeer_reproduce = x[28] 
-    redDeer_gain_from_grass = x[29] 
-    redDeer_gain_from_Trees = x[30] 
-    redDeer_gain_from_Scrub = x[31] 
-    redDeer_gain_from_Saplings = x[32] 
-    redDeer_gain_from_YoungScrub = x[33] 
-    ponies_gain_from_grass = x[34] 
-    ponies_gain_from_Trees = x[35] 
-    ponies_gain_from_Scrub = x[36] 
-    ponies_gain_from_Saplings = x[37] 
-    ponies_gain_from_YoungScrub = x[38] 
-    cows_reproduce = x[39] 
-    cows_gain_from_grass = x[40] 
-    cows_gain_from_Trees = x[41] 
-    cows_gain_from_Scrub = x[42] 
-    cows_gain_from_Saplings = x[43] 
-    cows_gain_from_YoungScrub = x[44] 
-    pigs_reproduce = x[45] 
-    pigs_gain_from_grass = x[46]
-    pigs_gain_from_Saplings = x[47]
-    pigs_gain_from_YoungScrub = x[48]
+    roeDeer_reproduce = x[9] 
+    roeDeer_gain_from_grass = x[10] 
+    roeDeer_gain_from_Trees = x[11] 
+    roeDeer_gain_from_Scrub = x[12] 
+    roeDeer_gain_from_Saplings = x[13] 
+    roeDeer_gain_from_YoungScrub = x[14] 
+    fallowDeer_reproduce = x[15] 
+    fallowDeer_gain_from_grass = x[16] 
+    fallowDeer_gain_from_Trees = x[17] 
+    fallowDeer_gain_from_Scrub = x[18] 
+    fallowDeer_gain_from_Saplings = x[19] 
+    fallowDeer_gain_from_YoungScrub = x[20] 
+    redDeer_reproduce = x[21] 
+    redDeer_gain_from_grass = x[22] 
+    redDeer_gain_from_Trees = x[23] 
+    redDeer_gain_from_Scrub = x[24] 
+    redDeer_gain_from_Saplings = x[25] 
+    redDeer_gain_from_YoungScrub = x[26] 
+    ponies_gain_from_grass = x[27] 
+    ponies_gain_from_Trees = x[28] 
+    ponies_gain_from_Scrub = x[29] 
+    ponies_gain_from_Saplings = x[30] 
+    ponies_gain_from_YoungScrub = x[31] 
+    cows_reproduce = x[32] 
+    cows_gain_from_grass = x[33] 
+    cows_gain_from_Trees = x[34] 
+    cows_gain_from_Scrub = x[35] 
+    cows_gain_from_Saplings = x[36] 
+    cows_gain_from_YoungScrub = x[37] 
+    pigs_reproduce = x[38] 
+    pigs_gain_from_grass = x[39]
+    pigs_gain_from_Saplings = x[40]
+    pigs_gain_from_YoungScrub = x[41]
 
     # put large herbivore impacts in order 
     # grass_impact_bds = list(x[49:55])
     # organized_grass = np.sort(grass_impact_bds)
     # roeDeer_impactGrass = int(organized_grass[0])
-    roeDeer_impactGrass = int(x[49])
-    fallowDeer_impactGrass = int(x[50])
-    redDeer_impactGrass = int(x[51])
-    ponies_impactGrass = int(x[52])
-    cows_impactGrass = int(x[53])
-    pigs_impactGrass = int(x[54])
+    roeDeer_impactGrass = round(x[42])
+    fallowDeer_impactGrass = round(x[43])
+    redDeer_impactGrass = round(x[44])
+    ponies_impactGrass = round(x[45])
+    cows_impactGrass = round(x[46])
+    pigs_impactGrass = round(x[47])
     # saplings 
     # saplings_impact_bds = list(x[55:61])
     # organized_saplings = np.sort(saplings_impact_bds)
-    roeDeer_saplingsEaten = int(x[55])
-    fallowDeer_saplingsEaten = int(x[56])
-    redDeer_saplingsEaten = int(x[57])
-    ponies_saplingsEaten = int(x[58])
-    cows_saplingsEaten = int(x[59])
-    pigs_saplingsEaten = int(x[60])
+    roeDeer_saplingsEaten = round(x[48])
+    fallowDeer_saplingsEaten = round(x[49])
+    redDeer_saplingsEaten = round(x[50])
+    ponies_saplingsEaten = round(x[51])
+    cows_saplingsEaten = round(x[52])
+    pigs_saplingsEaten = round(x[53])
     # young scrub 
     # youngScrub_impact_bds = list(x[61:67])
     # organized_youngScrub = np.sort(youngScrub_impact_bds)
-    roeDeer_youngScrubEaten = int(x[61])
-    fallowDeer_youngScrubEaten = int(x[62])
-    redDeer_youngScrubEaten = int(x[63])
-    ponies_youngScrubEaten = int(x[64])
-    cows_youngScrubEaten = int(x[65])
-    pigs_youngScrubEaten = int(x[66])
+    roeDeer_youngScrubEaten = round(x[54])
+    fallowDeer_youngScrubEaten = round(x[55])
+    redDeer_youngScrubEaten = round(x[56])
+    ponies_youngScrubEaten = round(x[57])
+    cows_youngScrubEaten = round(x[58])
+    pigs_youngScrubEaten = round(x[59])
     # scrub eaten
     # scrub_impact_bds = list(x[67:72])
     # organizedScrub = np.sort(scrub_impact_bds)
-    roeDeer_scrubEaten = int(x[67])
-    fallowDeer_scrubEaten = int(x[68])
-    redDeer_scrubEaten = int(x[69])
-    ponies_scrubEaten = int(x[70])
-    cows_scrubEaten = int(x[71])
+    roeDeer_scrubEaten = round(x[60])
+    fallowDeer_scrubEaten = round(x[61])
+    redDeer_scrubEaten = round(x[62])
+    ponies_scrubEaten = round(x[63])
+    cows_scrubEaten = round(x[64])
     # trees eaten
     # trees_impact_bds = list(x[72:77])
     # organized_trees = np.sort(trees_impact_bds)
-    roeDeer_treesEaten = int(x[72])
-    fallowDeer_treesEaten = int(x[73])
-    redDeer_treesEaten = int(x[74])
-    ponies_treesEaten = int(x[75])
-    cows_treesEaten = int(x[76])
+    roeDeer_treesEaten = round(x[65])
+    fallowDeer_treesEaten = round(x[66])
+    redDeer_treesEaten = round(x[67])
+    ponies_treesEaten = round(x[68])
+    cows_treesEaten = round(x[69])
 
     model = KneppModel(
         chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
-        chance_scrubOutcompetedByTree, chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
         initial_roeDeer, initial_grassland, initial_woodland, initial_scrubland, 
         roeDeer_reproduce, roeDeer_gain_from_grass, roeDeer_gain_from_Trees, roeDeer_gain_from_Scrub, roeDeer_gain_from_Saplings, roeDeer_gain_from_YoungScrub,
         roeDeer_impactGrass, roeDeer_saplingsEaten, roeDeer_youngScrubEaten, roeDeer_treesEaten, roeDeer_scrubEaten,
@@ -129,6 +121,7 @@ def objectiveFunction(x):
     # find the middle of each filter
     filtered_result = (
         # pre-reintro model
+        (((list(results.loc[results['Time'] == 25, 'Thorny Scrub'])[0])-6)**2) +
         (((list(results.loc[results['Time'] == 49, 'Roe deer'])[0])-23)**2) +
         (((list(results.loc[results['Time'] == 49, 'Grassland'])[0])-70)**2) +
         (((list(results.loc[results['Time'] == 49, 'Thorny Scrub'])[0])-11)**2) +
@@ -202,9 +195,11 @@ def objectiveFunction(x):
         # ((((list(results.loc[results['Time'] == 184, 'Woodland'])[0])-19)**2)/19))
                          
 
-    if filtered_result < 10000:
+    if filtered_result < 5000:
         print("r:", filtered_result)
         with pd.option_context('display.max_columns',None):
+            print(results[results['Time'] == 0])
+            print(results[results['Time'] == 1])
             print(results[results['Time'] == 50])
 
     return filtered_result
@@ -214,11 +209,11 @@ def run_optimizer():
     # Define bounds
     bds = np.array([
         # initial values
-        [6,18],[70,90],[4,24],[0,11],
+        [6,18],[75,85],[9,19],[0,6],
         # habitat parameters
-        [0,0.01],[0,0.01],[0,0.1],[0,0.001],[0,0.001],[0,0.1],[0,0.1],[0,0.1],[0,0.1],[0,0.1],[0,0.1],[0,0.1],
+        [0,0.25],[0,0.25],[0,1],[0,0.01],[0,0.1],
         # roe deer parameters
-        [0,1],[0,1],[0,1],[0,1],[0,1],[0,1],
+        [0,0.5],[0,1],[0,1],[0,1],[0,1],[0,1],
         # fallow deer parameters
         [0,1],[0,1],[0,1],[0,1],[0,1],[0,1],
         # red deer parameters
@@ -232,9 +227,9 @@ def run_optimizer():
         # grass impact
         [0,100],[0,1],[0,1],[0,1],[0,1],[0,1],
         # sapling impact
-        [0,1000],[0,1],[0,1],[0,1],[0,1],[0,1],
+        [0,5000],[0,1],[0,1],[0,1],[0,1],[0,1],
         # young scrub impact
-        [0,1000],[0,1],[0,1],[0,1],[0,1],[0,1],
+        [0,5000],[0,1],[0,1],[0,1],[0,1],[0,1],
         # scrub impact
         [0,100],[0,1],[0,1],[0,1],[0,1],
         # tree impact
@@ -243,7 +238,9 @@ def run_optimizer():
 
 
 
-    algorithm_param = {'max_num_iteration': 100,\
+
+
+    algorithm_param = {'max_num_iteration': 500,\
                     'population_size':10,\
                     'mutation_probability':0.1,\
                     'elit_ratio': 0.01,\
@@ -253,7 +250,7 @@ def run_optimizer():
                     'max_iteration_without_improv':None}
 
 
-    optimization =  ga(function = objectiveFunction, dimension = 77, variable_type = 'real',variable_boundaries= bds, algorithm_parameters = algorithm_param, function_timeout=6000)
+    optimization =  ga(function = objectiveFunction, dimension = 70, variable_type = 'real',variable_boundaries= bds, algorithm_parameters = algorithm_param, function_timeout=6000)
     optimization.run()
     print(optimization)
     return optimization.output_dict
