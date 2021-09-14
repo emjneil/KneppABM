@@ -11,46 +11,29 @@ from mesa.space import MultiGrid
 from random import choice as rchoice
 
 
-
 # herbivore eating habitat types
 def eat_saplings(habitat_patch, eatenSaps):
     # rescale this according to how many shrubs there are (they protect the saplings)
-    eatenSaps_scaled = eatenSaps - round((eatenSaps*(habitat_patch.scrub_here/500)))
+    eatenSaps_scaled = eatenSaps - round((eatenSaps*(habitat_patch.scrub_here/300)))
     habitat_patch.saplings_here -= eatenSaps_scaled
-    # don't let number of saplings go negative
-    if habitat_patch.saplings_here < 0:
-        habitat_patch.saplings_here = 0
 
 def eat_trees(habitat_patch, eatenTrees):
     # roll dice between 0 and my maximum number I'll eat
     habitat_patch.trees_here -= eatenTrees
-    # don't let it go negative
-    if habitat_patch.trees_here < 0:
-        habitat_patch.trees_here = 0
 
 def eat_scrub(habitat_patch, eatenScrub):
     # roll dice between 0 and my maximum number I'll eat
     habitat_patch.scrub_here -= eatenScrub
-    # don't let it go negative
-    if habitat_patch.scrub_here < 0:
-        habitat_patch.scrub_here = 0
 
 def eat_youngscrub(habitat_patch, eatenYoungScrub):
     # rescale according to number of scrub plants
-    eatenYoungScrub_scaled = eatenYoungScrub - round((eatenYoungScrub*(habitat_patch.scrub_here/500)))
+    eatenYoungScrub_scaled = eatenYoungScrub - round((eatenYoungScrub*(habitat_patch.scrub_here/300)))
     habitat_patch.youngscrub_here -= eatenYoungScrub_scaled
-    # don't let it go negative
-    if habitat_patch.youngscrub_here < 0:
-        habitat_patch.youngscrub_here = 0
 
 def eat_grass(habitat_patch, eatenGrass):
     # roll dice between 0 and my maximum number I'll eat
     habitat_patch.perc_grass_here -= eatenGrass
     habitat_patch.perc_bareground_here += eatenGrass
-    # don't let it go negative
-    if habitat_patch.perc_grass_here < 0:
-        habitat_patch.perc_grass_here = 0
-        habitat_patch.perc_bareground_here = 100
 
 
                             # # # # ------ Define the agents ------ # # # #
@@ -69,76 +52,95 @@ class habitatAgent (Agent):
 
     def step(self):
 
-        # chance of habitat being outcompeted by mature trees (e.g. that 1% grass is outcompeted by 1 tree)
-        # outcompeted_grass_byTree = self.model.chance_grassOutcompetedByTree * self.perc_grass_here
-        self.perc_bareground_here += round(self.perc_grass_here*(self.trees_here/500))
-        # self.perc_bareground_here += round(outcompeted_grass_byTree - (outcompeted_grass_byTree*(self.trees_here/500)))
-        self.perc_grass_here -= round(self.perc_grass_here*(self.trees_here/500))
-        self.scrub_here -= round(self.scrub_here*(self.trees_here/500))
-        self.saplings_here -= round(self.saplings_here*(self.trees_here/500))
-        self.youngscrub_here -= round(self.youngscrub_here*(self.trees_here/500))
-
-        # chance of habitat being outcompeted by mature scrub
-        self.perc_bareground_here += round(self.perc_grass_here*(self.scrub_here/500))
-        self.perc_grass_here -= round(self.perc_grass_here*(self.scrub_here/500))
-        self.saplings_here -= round(self.saplings_here*(self.scrub_here/500))
-        self.youngscrub_here -= round(self.youngscrub_here*(self.scrub_here/500))
-
+        # chance of reproducing saplings or young shrubs
+        neighborhood_list = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=True)
+        items_in_neighborhood = list(map(self.model.grid.get_cell_list_contents, neighborhood_list)) 
+        only_habitat_cells = [obj for obj in items_in_neighborhood if (isinstance(x, habitatAgent) for x in obj)]
+        no_herbivores = [item[0] for item in only_habitat_cells]
+        
         # chance of reproducing saplings
-        # are there trees here?
-        if self.trees_here > 0 and random.random() < ((self.model.chance_reproduceSapling * self.trees_here)/500):
-            # if so, each tree looks at my cell and my neighboring cells and has a chance of reproducing
-            neighborhood_list = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=True)
-            items_in_neighborhood = list(map(self.model.grid.get_cell_list_contents, neighborhood_list)) 
-            only_habitat_cells = [obj for obj in items_in_neighborhood if (isinstance(x, habitatAgent) for x in obj)]
-            no_herbivores = [item[0] for item in only_habitat_cells]
+        number_reproduce_trees = np.random.binomial(n=self.trees_here, p=self.model.chance_reproduceSapling)
+        for _ in range(number_reproduce_trees):
             # are there any that aren't full of other saplings/trees?
-            available_sapling_cell = [i for i in no_herbivores if i.saplings_here < 25000 and i.trees_here < 500]
-            # if yes, put a sapling there
-            if len(available_sapling_cell) > 0:
-            # there's a chance that each tree reproduces some saplings to one of the cells
+            available_sapling_cell = [i for i in no_herbivores if i.saplings_here < 3000 and i.trees_here < 300]
+            if len(available_sapling_cell) > 0: 
                 new_patch_sapling = self.random.choice(available_sapling_cell)
-                new_patch_sapling.saplings_here += random.randint(0,25000)
-                if new_patch_sapling.saplings_here > 25000:
-                    new_patch_sapling.saplings_here = 25000  
+                new_patch_sapling.saplings_here += 1 
 
-        # chance of reproducing shrubs
-        # are there are scrub here?
-        if self.scrub_here > 0 and random.random() < ((self.model.chance_reproduceYoungScrub*self.scrub_here)/500):
-            # look at my cell and my neighboring cells
-            neighborhood_list = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=True)
-            items_in_neighborhood = list(map(self.model.grid.get_cell_list_contents, neighborhood_list)) 
-            only_habitat_cells = [obj for obj in items_in_neighborhood if (isinstance(x, habitatAgent) for x in obj)]
-            no_herbivores = [item[0] for item in only_habitat_cells]
+        # chance of reproducing scrub
+        number_reproduce_shrubs = np.random.binomial(n=self.scrub_here, p=self.model.chance_reproduceYoungScrub)
+        for _ in range(number_reproduce_shrubs):
             # are there any that aren't full of other scrub/young scrub?
-            available_youngscrub_cell = [i for i in no_herbivores if i.youngscrub_here < 25000 and i.scrub_here < 500]
-            # if yes, put a scrub there
+            available_youngscrub_cell = [i for i in no_herbivores if i.youngscrub_here < 3000 and i.scrub_here < 300]
             if len(available_youngscrub_cell) > 0:
                 new_patch_youngscrub = self.random.choice(available_youngscrub_cell)
-                new_patch_youngscrub.youngscrub_here += random.randint(0,25000)
-                if new_patch_youngscrub.youngscrub_here > 25000:
-                    new_patch_youngscrub.youngscrub_here = 25000  
+                new_patch_youngscrub.youngscrub_here += 1 
 
+        # chance of 1% bare ground becoming 1% grassland
+        number_reproduce_bareGround = np.random.binomial(n=self.perc_bareground_here, p=self.model.chance_regrowGrass)
+        self.perc_grass_here += number_reproduce_bareGround
+        self.perc_bareground_here -= number_reproduce_bareGround
 
-        # chance of bare ground becoming grassland
-        amount_regrown = self.model.chance_regrowGrass * self.perc_bareground_here
-        self.perc_grass_here += round(amount_regrown)
-        self.perc_bareground_here -= round(amount_regrown)
-
-        # chance of young scrub becoming mature scrub
-        scrub_maturing = self.model.chance_youngScrubMatures * self.youngscrub_here
-        if (self.scrub_here + scrub_maturing) > 500: 
-            scrub_maturing = 500 - self.scrub_here
-        self.scrub_here += round(scrub_maturing)
-        self.youngscrub_here -= round(scrub_maturing)
+        # chance of 1 young scrub becoming 1 mature scrub
+        number_scrub_maturing = np.random.binomial(n=self.youngscrub_here, p=self.model.chance_youngScrubMatures)
+        # don't let it go over 300 mature shrubs
+        number_scrub_maturing = min(number_scrub_maturing, 300 - self.scrub_here)
+        self.scrub_here += number_scrub_maturing
+        self.youngscrub_here -= number_scrub_maturing
 
         # chance of sapling becoming tree
-        tree_maturing = self.model.chance_saplingBecomingTree * self.saplings_here
-        if (self.trees_here + tree_maturing) > 500: 
-            tree_maturing = 500 - self.trees_here
-        self.trees_here += round(tree_maturing)
-        self.saplings_here -= round(tree_maturing)
-   
+        number_saplings_maturing = np.random.binomial(n=self.saplings_here, p=self.model.chance_saplingBecomingTree)
+        # don't let it go over 300 trees
+        number_saplings_maturing = min(number_saplings_maturing, 300 - self.trees_here)
+        self.trees_here += number_saplings_maturing
+        self.saplings_here -= number_saplings_maturing
+
+        # random.multinomial(n=self.perc_grass_here, probability = [outcompeted_by_tree,outcompeted_by_scrub,1-thosetwoprobabilities])
+        #  chance of habitat being outcompeted by mature trees
+        # for _ in range(self.perc_grass_here):
+        #     if random.random() < self.trees_here/300*self.model.chance_grassOutcompetedByTree:
+        #         self.perc_grass_here -= 1
+        #         self.perc_bareground_here += 1
+        #     elif random.random() < self.scrub_here/300*self.model.chance_grassOutcompetedByScrub:
+        #         self.perc_grass_here -= 1
+        #         self.perc_bareground_here += 1
+        # for _ in range(self.scrub_here):
+        #     if random.random() < self.trees_here/300*self.model.chance_scrubOutcompetedByTree:
+        #         self.scrub_here -= 1
+        # for _ in range(self.saplings_here):
+        #     if random.random() < self.trees_here/300*self.model.chance_saplingOutcompetedByTree:
+        #         self.saplings_here -= 1
+        #     elif random.random() < self.scrub_here/300*self.model.chance_saplingOutcompetedByScrub:
+        #         self.saplings_here -= 1
+        # for _ in range(self.youngscrub_here):
+        #     if random.random() < self.trees_here/300*self.model.chance_youngScrubOutcompetedByTree:
+        #         self.youngscrub_here -= 1
+        #     elif random.random() < self.scrub_here/300*self.model.chance_youngScrubOutcompetedByScrub:
+        #         self.youngscrub_here -= 1
+
+        # chance of grass being outcompeted by mature trees and scrub
+        combined_trees_shrubs = ((self.trees_here/300)*self.model.chance_grassOutcompetedByTree) + ((self.scrub_here/300)*self.model.chance_grassOutcompetedByScrub)
+        if combined_trees_shrubs > 1: combined_trees_shrubs = 1
+        outcompeted_grass = np.random.binomial(n=self.perc_grass_here, p=combined_trees_shrubs)
+        self.perc_grass_here -= outcompeted_grass
+        self.perc_bareground_here += outcompeted_grass
+
+        # chance of mature scrub being outcompeted by trees 
+        mature_scrub_outcompeted = np.random.binomial(n=self.scrub_here, p=(self.trees_here/300)*self.model.chance_scrubOutcompetedByTree)
+        self.scrub_here -= mature_scrub_outcompeted
+
+        # saplings being outcompeted by scrub/trees
+        combined_saplings = ((self.trees_here/300)*self.model.chance_saplingOutcompetedByTree) + ((self.scrub_here/300)*self.model.chance_saplingOutcompetedByScrub)
+        if combined_saplings > 1: combined_saplings = 1
+        outcompeted_saplings = np.random.binomial(n=self.saplings_here, p=combined_saplings)
+        self.saplings_here -= outcompeted_saplings
+
+        # young scrub being outcompeted by scrub/trees
+        combined_scrub = ((self.trees_here/300)*self.model.chance_youngScrubOutcompetedByTree) + ((self.scrub_here/300)*self.model.chance_youngScrubOutcompetedByScrub)
+        if combined_scrub > 1: combined_scrub = 1
+        outcompeted_youngscrub = np.random.binomial(n=self.youngscrub_here, p=combined_scrub)
+        self.youngscrub_here -= outcompeted_youngscrub
+    
         # reassess dominant condition
         if self.trees_here < 50 and self.scrub_here < 50 and self.perc_grass_here >= 50:
             self.condition = "grassland"
@@ -150,9 +152,8 @@ class habitatAgent (Agent):
             self.condition = "bare_ground"
 
         # print(self.unique_id, "trees", self.trees_here, "scrub", self.scrub_here, "saplings", self.saplings_here, "youngScrub", self.youngscrub_here, "grass", self.perc_grass_here, "Bare", self.perc_bareground_here)
-        
 
-                
+
 class roeDeer_agent(RandomWalker):
     def __init__(self, unique_id, pos, model, moore, energy):
         super().__init__(unique_id, pos, model, moore=moore)
@@ -173,27 +174,43 @@ class roeDeer_agent(RandomWalker):
             # pick a habitat type
             my_choice = rchoice(habitat_choices)
             habitat_choices.remove(my_choice)
+            if self.energy < 1:
             # if my energy is low enough, eat it 
-            if self.energy < 1 and my_choice == "saplings" and habitat_patch.saplings_here > 0:
-                eatenSaps = random.randint(0,self.model.roeDeer_saplingsEaten)
-                eat_saplings(habitat_patch, eatenSaps)
-                self.energy += (self.model.roeDeer_gain_from_Saplings * eatenSaps)
-            elif self.energy < 1 and my_choice== "trees" and habitat_patch.trees_here > 0:
-                eatenTrees = random.randint(0,self.model.roeDeer_treesEaten)
-                eat_trees(habitat_patch, eatenTrees)
-                self.energy += (self.model.roeDeer_gain_from_Trees * eatenTrees)
-            elif self.energy < 1 and my_choice == "scrub" and habitat_patch.scrub_here > 0:
-                eatenScrub = random.randint(0,self.model.roeDeer_scrubEaten)
-                eat_scrub(habitat_patch, eatenScrub)
-                self.energy += (self.model.roeDeer_gain_from_Scrub * eatenScrub)
-            elif self.energy < 1 and my_choice == "youngscrub" and habitat_patch.youngscrub_here > 0:
-                eatenYoungScrub = random.randint(0,self.model.roeDeer_youngScrubEaten)
-                eat_youngscrub(habitat_patch, eatenYoungScrub)
-                self.energy += (self.model.roeDeer_gain_from_YoungScrub * eatenYoungScrub)
-            elif self.energy < 1 and my_choice == "grass" and habitat_patch.perc_grass_here > 0:
-                eatenGrass = random.randint(0,self.model.roeDeer_impactGrass)
-                eat_grass(habitat_patch, eatenGrass)
-                self.energy += (self.model.roeDeer_gain_from_grass * eatenGrass)
+                if my_choice == "saplings":
+                    if self.model.roeDeer_saplingsEaten <= habitat_patch.saplings_here:
+                        eatenSaps = self.model.roeDeer_saplingsEaten
+                    else:
+                        eatenSaps = habitat_patch.saplings_here
+                    eat_saplings(habitat_patch, eatenSaps)
+                    self.energy += (self.model.roeDeer_gain_from_Saplings * eatenSaps)
+                elif my_choice== "trees":
+                    if self.model.roeDeer_treesEaten <= habitat_patch.trees_here:
+                        eatenTrees = self.model.roeDeer_treesEaten
+                    else:
+                        eatenTrees = habitat_patch.trees_here
+                    eat_trees(habitat_patch, eatenTrees)
+                    self.energy += (self.model.roeDeer_gain_from_Trees * eatenTrees)
+                elif my_choice == "scrub":
+                    if self.model.roeDeer_scrubEaten <= habitat_patch.scrub_here:
+                        eatenScrub = self.model.roeDeer_scrubEaten
+                    else:
+                        eatenScrub = habitat_patch.scrub_here
+                    eat_scrub(habitat_patch, eatenScrub)
+                    self.energy += (self.model.roeDeer_gain_from_Scrub * eatenScrub)
+                elif my_choice == "youngscrub":
+                    if self.model.roeDeer_youngScrubEaten <= habitat_patch.youngscrub_here:
+                        eatenYoungScrub = self.model.roeDeer_youngScrubEaten
+                    else:
+                        eatenYoungScrub = habitat_patch.youngscrub_here
+                    eat_youngscrub(habitat_patch, eatenYoungScrub)
+                    self.energy += (self.model.roeDeer_gain_from_YoungScrub * eatenYoungScrub)
+                elif my_choice == "grass":
+                    if self.model.roeDeer_impactGrass <= habitat_patch.perc_grass_here:
+                        eatenGrass = self.model.roeDeer_impactGrass
+                    else:
+                        eatenGrass = habitat_patch.perc_grass_here
+                    eat_grass(habitat_patch, eatenGrass)
+                    self.energy += (self.model.roeDeer_gain_from_grass * eatenGrass)
         # don't let energy be above 1
         if self.energy > 1:
             self.energy = 1
@@ -234,26 +251,42 @@ class exmoorPony(RandomWalker):
             my_choice = rchoice(habitat_choices)
             habitat_choices.remove(my_choice)
             # if my energy is low enough, eat it 
-            if self.energy < 1 and my_choice == "saplings" and habitat_patch.saplings_here > 0:
-                eatenSaps = random.randint(0,self.model.ponies_saplingsEaten)
-                eat_saplings(habitat_patch, eatenSaps)
-                self.energy += (self.model.ponies_gain_from_Saplings * eatenSaps)
-            elif self.energy < 1 and my_choice== "trees" and habitat_patch.trees_here > 0:
-                eatenTrees = random.randint(0,self.model.ponies_treesEaten)
-                eat_trees(habitat_patch, eatenTrees)
-                self.energy += (self.model.ponies_gain_from_Trees * eatenTrees)
-            elif self.energy < 1 and my_choice == "scrub" and habitat_patch.scrub_here > 0:
-                eatenScrub = random.randint(0,self.model.ponies_scrubEaten)
-                eat_scrub(habitat_patch, eatenScrub)
-                self.energy += (self.model.ponies_gain_from_Scrub*eatenScrub)
-            elif self.energy < 1 and my_choice == "youngscrub" and habitat_patch.youngscrub_here > 0:
-                eatenYoungScrub = random.randint(0,self.model.ponies_youngScrubEaten)
-                eat_youngscrub(habitat_patch, eatenYoungScrub)
-                self.energy += (self.model.ponies_gain_from_YoungScrub*eatenYoungScrub)
-            elif self.energy < 1 and my_choice == "grass" and habitat_patch.perc_grass_here > 0:
-                eatenGrass = random.randint(0,self.model.ponies_impactGrass)
-                eat_grass(habitat_patch, eatenGrass)
-                self.energy += (self.model.ponies_gain_from_grass*eatenGrass)
+            if self.energy < 1:
+                if my_choice == "saplings":
+                    if self.model.ponies_saplingsEaten <= habitat_patch.saplings_here:
+                        eatenSaps = self.model.ponies_saplingsEaten
+                    else:
+                        eatenSaps = habitat_patch.saplings_here
+                    eat_saplings(habitat_patch, eatenSaps)
+                    self.energy += (self.model.ponies_gain_from_Saplings * eatenSaps)
+                elif my_choice== "trees":
+                    if self.model.ponies_treesEaten <= habitat_patch.trees_here:
+                        eatenTrees = self.model.ponies_treesEaten
+                    else:
+                        eatenTrees = habitat_patch.trees_here
+                    eat_trees(habitat_patch, eatenTrees)
+                    self.energy += (self.model.ponies_gain_from_Trees * eatenTrees)
+                elif my_choice == "scrub":
+                    if self.model.ponies_scrubEaten <= habitat_patch.scrub_here:
+                        eatenScrub = self.model.ponies_scrubEaten
+                    else:
+                        eatenScrub = habitat_patch.scrub_here
+                    eat_scrub(habitat_patch, eatenScrub)
+                    self.energy += (self.model.ponies_gain_from_Scrub*eatenScrub)
+                elif my_choice == "youngscrub":
+                    if self.model.ponies_youngScrubEaten <= habitat_patch.youngscrub_here:
+                        eatenYoungScrub = self.model.ponies_youngScrubEaten
+                    else:
+                        eatenYoungScrub = habitat_patch.youngscrub_here
+                    eat_youngscrub(habitat_patch, eatenYoungScrub)
+                    self.energy += (self.model.ponies_gain_from_YoungScrub*eatenYoungScrub)
+                elif my_choice == "grass":
+                    if self.model.ponies_impactGrass <= habitat_patch.perc_grass_here:
+                        eatenGrass = self.model.ponies_impactGrass
+                    else:
+                        eatenGrass = habitat_patch.perc_grass_here
+                    eat_grass(habitat_patch, eatenGrass)
+                    self.energy += (self.model.ponies_gain_from_grass*eatenGrass)
 
         if self.energy > 1:
             self.energy = 1
@@ -289,26 +322,42 @@ class longhornCattle(RandomWalker):
             my_choice = rchoice(habitat_choices)
             habitat_choices.remove(my_choice)
             # if my energy is low enough, eat it 
-            if self.energy < 1 and my_choice == "saplings" and habitat_patch.saplings_here > 0:
-                eatenSaps = random.randint(0,self.model.cows_saplingsEaten)
-                eat_saplings(habitat_patch, eatenSaps)
-                self.energy += (self.model.cows_gain_from_Saplings*eatenSaps)
-            elif self.energy < 1 and my_choice== "trees" and habitat_patch.trees_here > 0:
-                eatenTrees = random.randint(0,self.model.cows_treesEaten)
-                eat_trees(habitat_patch, eatenTrees)
-                self.energy += (self.model.cows_gain_from_Trees*eatenTrees)
-            elif self.energy < 1 and my_choice == "scrub" and habitat_patch.scrub_here > 0:
-                eatenScrub = random.randint(0,self.model.cows_scrubEaten)
-                eat_scrub(habitat_patch, eatenScrub)
-                self.energy += (self.model.cows_gain_from_Scrub*eatenScrub)
-            elif self.energy < 1 and my_choice == "youngscrub" and habitat_patch.youngscrub_here > 0:
-                eatenYoungScrub = random.randint(0,self.model.cows_youngScrubEaten)
-                eat_youngscrub(habitat_patch, eatenYoungScrub)
-                self.energy += (self.model.cows_gain_from_YoungScrub*eatenYoungScrub)
-            elif self.energy < 1 and my_choice == "grass" and habitat_patch.perc_grass_here > 0:
-                eatenGrass = random.randint(0,self.model.cows_impactGrass)
-                eat_grass(habitat_patch, eatenGrass)
-                self.energy += (self.model.cows_gain_from_grass*eatenGrass)
+            if self.energy < 1:
+                if my_choice == "saplings":
+                    if self.model.cows_saplingsEaten <= habitat_patch.saplings_here:
+                        eatenSaps = self.model.cows_saplingsEaten 
+                    else:
+                        eatenSaps = habitat_patch.saplings_here
+                    eat_saplings(habitat_patch, eatenSaps)
+                    self.energy += (self.model.cows_gain_from_Saplings*eatenSaps)
+                elif my_choice== "trees":
+                    if self.model.cows_treesEaten <= habitat_patch.trees_here:
+                        eatenTrees = self.model.cows_treesEaten
+                    else:
+                        eatenTrees = habitat_patch.trees_here
+                    eat_trees(habitat_patch, eatenTrees)
+                    self.energy += (self.model.cows_gain_from_Trees*eatenTrees)
+                elif my_choice == "scrub":
+                    if self.model.cows_scrubEaten <= habitat_patch.scrub_here:
+                        eatenScrub = self.model.cows_scrubEaten
+                    else:
+                        eatenScrub = habitat_patch.scrub_here
+                    eat_scrub(habitat_patch, eatenScrub)
+                    self.energy += (self.model.cows_gain_from_Scrub*eatenScrub)
+                elif my_choice == "youngscrub":
+                    if self.model.cows_youngScrubEaten <= habitat_patch.youngscrub_here:
+                        eatenYoungScrub = self.model.cows_youngScrubEaten
+                    else:
+                        eatenYoungScrub = habitat_patch.youngscrub_here
+                    eat_youngscrub(habitat_patch, eatenYoungScrub)
+                    self.energy += (self.model.cows_gain_from_YoungScrub*eatenYoungScrub)
+                elif my_choice == "grass":
+                    if self.model.cows_impactGrass <= habitat_patch.perc_grass_here:
+                        eatenGrass = self.model.cows_impactGrass
+                    else:
+                        eatenGrass = habitat_patch.perc_grass_here
+                    eat_grass(habitat_patch, eatenGrass)
+                    self.energy += (self.model.cows_gain_from_grass*eatenGrass)
         if self.energy > 1:
             self.energy = 1
 
@@ -352,26 +401,42 @@ class fallowDeer(RandomWalker):
             my_choice = rchoice(habitat_choices)
             habitat_choices.remove(my_choice)
             # if my energy is low enough, eat it 
-            if self.energy < 1 and my_choice == "saplings" and habitat_patch.saplings_here > 0:
-                eatenSaps = random.randint(0,self.model.fallowDeer_saplingsEaten)
-                eat_saplings(habitat_patch, eatenSaps)
-                self.energy += (self.model.fallowDeer_gain_from_Saplings*eatenSaps)
-            elif self.energy < 1 and my_choice== "trees" and habitat_patch.trees_here > 0:
-                eatenTrees = random.randint(0,self.model.fallowDeer_treesEaten)
-                eat_trees(habitat_patch, eatenTrees)
-                self.energy += (self.model.fallowDeer_gain_from_Trees*eatenTrees)
-            elif self.energy < 1 and my_choice == "scrub" and habitat_patch.scrub_here > 0:
-                eatenScrub = random.randint(0,self.model.fallowDeer_scrubEaten)
-                eat_scrub(habitat_patch, eatenScrub)
-                self.energy += (self.model.fallowDeer_gain_from_Scrub*eatenScrub)
-            elif self.energy < 1 and my_choice == "youngscrub" and habitat_patch.youngscrub_here > 0:
-                eatenYoungScrub = random.randint(0,self.model.fallowDeer_youngScrubEaten)
-                eat_youngscrub(habitat_patch, eatenYoungScrub)
-                self.energy += (self.model.fallowDeer_gain_from_YoungScrub *eatenYoungScrub)
-            elif self.energy < 1 and my_choice == "grass" and habitat_patch.perc_grass_here > 0:
-                eatenGrass = random.randint(0,self.model.fallowDeer_impactGrass)
-                eat_grass(habitat_patch, eatenGrass)
-                self.energy += (self.model.fallowDeer_gain_from_grass*eatenGrass)
+            if self.energy < 1:
+                if my_choice == "saplings":
+                    if self.model.fallowDeer_saplingsEaten <= habitat_patch.saplings_here:
+                        eatenSaps = self.model.fallowDeer_saplingsEaten
+                    else:
+                        eatenSaps = habitat_patch.saplings_here
+                    eat_saplings(habitat_patch, eatenSaps)
+                    self.energy += (self.model.fallowDeer_gain_from_Saplings*eatenSaps)
+                elif my_choice== "trees":
+                    if self.model.fallowDeer_treesEaten <= habitat_patch.trees_here:
+                        eatenTrees = self.model.fallowDeer_treesEaten
+                    else:
+                        eatenTrees = habitat_patch.trees_here
+                    eat_trees(habitat_patch, eatenTrees)
+                    self.energy += (self.model.fallowDeer_gain_from_Trees*eatenTrees)
+                elif my_choice == "scrub":
+                    if self.model.fallowDeer_scrubEaten <= habitat_patch.scrub_here:
+                        eatenScrub = self.model.fallowDeer_scrubEaten
+                    else:
+                        eatenScrub = habitat_patch.scrub_here
+                    eat_scrub(habitat_patch, eatenScrub)
+                    self.energy += (self.model.fallowDeer_gain_from_Scrub*eatenScrub)
+                elif my_choice == "youngscrub":
+                    if self.model.fallowDeer_youngScrubEaten <= habitat_patch.youngscrub_here:
+                        eatenYoungScrub = self.model.fallowDeer_youngScrubEaten
+                    else:
+                        eatenYoungScrub = habitat_patch.youngscrub_here
+                    eat_youngscrub(habitat_patch, eatenYoungScrub)
+                    self.energy += (self.model.fallowDeer_gain_from_YoungScrub *eatenYoungScrub)
+                elif my_choice == "grass":
+                    if self.model.fallowDeer_impactGrass <= habitat_patch.perc_grass_here:
+                        eatenGrass = self.model.fallowDeer_impactGrass
+                    else:
+                        eatenGrass = habitat_patch.perc_grass_here
+                    eat_grass(habitat_patch, eatenGrass)
+                    self.energy += (self.model.fallowDeer_gain_from_grass*eatenGrass)
         if self.energy > 1:
             self.energy = 1
     
@@ -411,26 +476,42 @@ class redDeer(RandomWalker):
             my_choice = rchoice(habitat_choices)
             habitat_choices.remove(my_choice)
             # if my energy is low enough, eat it 
-            if self.energy < 1 and my_choice == "saplings" and habitat_patch.saplings_here > 0:
-                eatenSaps = random.randint(0,self.model.redDeer_saplingsEaten)
-                eat_saplings(habitat_patch, eatenSaps)
-                self.energy += (self.model.redDeer_gain_from_Saplings*eatenSaps)
-            elif self.energy < 1 and my_choice== "trees" and habitat_patch.trees_here > 0:
-                eatenTrees = random.randint(0,self.model.redDeer_treesEaten)
-                eat_trees(habitat_patch, eatenTrees)
-                self.energy += (self.model.redDeer_gain_from_Trees*eatenTrees)
-            elif self.energy < 1 and my_choice == "scrub" and habitat_patch.scrub_here > 0:
-                eatenScrub = random.randint(0,self.model.redDeer_scrubEaten)
-                eat_scrub(habitat_patch, eatenScrub)
-                self.energy += (self.model.redDeer_gain_from_Scrub*eatenScrub)
-            elif self.energy < 1 and my_choice == "youngscrub" and habitat_patch.youngscrub_here > 0:
-                eatenYoungScrub = random.randint(0,self.model.redDeer_youngScrubEaten)
-                eat_youngscrub(habitat_patch, eatenYoungScrub)
-                self.energy += (self.model.redDeer_gain_from_YoungScrub*eatenYoungScrub)
-            elif self.energy < 1 and my_choice == "grass" and habitat_patch.perc_grass_here > 0:
-                eatenGrass = random.randint(0,self.model.redDeer_impactGrass)
-                eat_grass(habitat_patch, eatenGrass)
-                self.energy += (self.model.redDeer_gain_from_grass*eatenGrass)
+            if self.energy < 1:
+                if my_choice == "saplings":
+                    if self.model.redDeer_saplingsEaten <= habitat_patch.saplings_here:
+                        eatenSaps = self.model.redDeer_saplingsEaten
+                    else:
+                        eatenSaps = habitat_patch.saplings_here
+                    eat_saplings(habitat_patch, eatenSaps)
+                    self.energy += (self.model.redDeer_gain_from_Saplings*eatenSaps)
+                elif my_choice== "trees":
+                    if self.model.redDeer_treesEaten <= habitat_patch.trees_here:
+                        eatenTrees = self.model.redDeer_treesEaten
+                    else:
+                        eatenTrees = habitat_patch.trees_here
+                    eat_trees(habitat_patch, eatenTrees)
+                    self.energy += (self.model.redDeer_gain_from_Trees*eatenTrees)
+                elif my_choice == "scrub":
+                    if self.model.redDeer_scrubEaten <= habitat_patch.scrub_here:
+                        eatenScrub = self.model.redDeer_scrubEaten
+                    else:
+                        eatenScrub = habitat_patch.scrub_here
+                    eat_scrub(habitat_patch, eatenScrub)
+                    self.energy += (self.model.redDeer_gain_from_Scrub*eatenScrub)
+                elif my_choice == "youngscrub":
+                    if self.model.redDeer_youngScrubEaten <= habitat_patch.youngscrub_here:
+                        eatenYoungScrub = self.model.redDeer_youngScrubEaten
+                    else:
+                        eatenYoungScrub = habitat_patch.youngscrub_here
+                    eat_youngscrub(habitat_patch, eatenYoungScrub)
+                    self.energy += (self.model.redDeer_gain_from_YoungScrub*eatenYoungScrub)
+                elif my_choice == "grass":
+                    if self.model.redDeer_impactGrass <= habitat_patch.perc_grass_here:
+                        eatenGrass = self.model.redDeer_impactGrass
+                    else:
+                        eatenGrass = habitat_patch.perc_grass_here
+                    eat_grass(habitat_patch, eatenGrass)
+                    self.energy += (self.model.redDeer_gain_from_grass*eatenGrass)
         if self.energy > 1:
             self.energy = 1
 
@@ -470,18 +551,28 @@ class tamworthPigs(RandomWalker):
             my_choice = rchoice(habitat_choices)
             habitat_choices.remove(my_choice)
             # if my energy is low enough, eat it 
-            if self.energy < 1 and my_choice == "saplings" and habitat_patch.saplings_here > 0:
-                eatenSaps = random.randint(0,self.model.pigs_saplingsEaten)
-                eat_saplings(habitat_patch, eatenSaps)
-                self.energy += (self.model.pigs_gain_from_Saplings*eatenSaps)
-            elif self.energy < 1 and my_choice == "youngscrub" and habitat_patch.youngscrub_here > 0:
-                eatenYoungScrub = random.randint(0,self.model.pigs_youngScrubEaten)
-                eat_youngscrub(habitat_patch, eatenYoungScrub)
-                self.energy += (self.model.pigs_gain_from_YoungScrub*eatenYoungScrub)
-            elif self.energy < 1 and my_choice == "grass" and habitat_patch.perc_grass_here > 0:
-                eatenGrass = random.randint(0,self.model.pigs_impactGrass)
-                eat_grass(habitat_patch, eatenGrass)
-                self.energy += (self.model.pigs_gain_from_grass*eatenGrass)
+            if self.energy < 1:
+                if my_choice == "saplings":
+                    if self.model.pigs_saplingsEaten <= habitat_patch.saplings_here:
+                        eatenSaps = self.model.pigs_saplingsEaten
+                    else:
+                        eatenSaps = habitat_patch.saplings_here
+                    eat_saplings(habitat_patch, eatenSaps)
+                    self.energy += (self.model.pigs_gain_from_Saplings*eatenSaps)
+                elif my_choice == "youngscrub":
+                    if self.model.pigs_youngScrubEaten <= habitat_patch.youngscrub_here:
+                        eatenYoungScrub = self.model.pigs_youngScrubEaten
+                    else:
+                        eatenYoungScrub = habitat_patch.youngscrub_here
+                    eat_youngscrub(habitat_patch, eatenYoungScrub)
+                    self.energy += (self.model.pigs_gain_from_YoungScrub*eatenYoungScrub)
+                elif my_choice == "grass":
+                    if self.model.pigs_impactGrass <= habitat_patch.perc_grass_here:
+                        eatenGrass = self.model.pigs_impactGrass
+                    else:
+                        eatenGrass = habitat_patch.perc_grass_here
+                    eat_grass(habitat_patch, eatenGrass)
+                    self.energy += (self.model.pigs_gain_from_grass*eatenGrass)
  
         if self.energy > 1:
             self.energy = 1
@@ -497,13 +588,10 @@ class tamworthPigs(RandomWalker):
             # divide my energy
             self.energy = np.random.uniform(0, self.energy)
             # Pick a number of piglets to have
-            for _ in range(random.randint(1,10)):
-                piglet = tamworthPigs(self.model.next_id(), self.pos, self.model, self.moore, self.energy)
-                self.model.grid.place_agent(piglet, self.pos)
-                self.model.schedule.add(piglet)
-
-
-
+            # for _ in range(random.randint(1,10)):
+            piglet = tamworthPigs(self.model.next_id(), self.pos, self.model, self.moore, self.energy)
+            self.model.grid.place_agent(piglet, self.pos)
+            self.model.schedule.add(piglet)
 
 
 
@@ -514,6 +602,7 @@ class KneppModel(Model):
     
     def __init__(self,             
             chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
+            chance_scrubOutcompetedByTree, chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
             initial_roeDeer, initial_grassland, initial_woodland, initial_scrubland,
             roeDeer_reproduce, roeDeer_gain_from_grass, roeDeer_gain_from_Trees, roeDeer_gain_from_Scrub, roeDeer_gain_from_Saplings, roeDeer_gain_from_YoungScrub,
             roeDeer_impactGrass, roeDeer_saplingsEaten, roeDeer_youngScrubEaten, roeDeer_treesEaten, roeDeer_scrubEaten,
@@ -539,6 +628,13 @@ class KneppModel(Model):
         self.chance_regrowGrass = chance_regrowGrass
         self.chance_saplingBecomingTree = chance_saplingBecomingTree
         self.chance_youngScrubMatures = chance_youngScrubMatures
+        self.chance_scrubOutcompetedByTree = chance_scrubOutcompetedByTree
+        self.chance_saplingOutcompetedByScrub = chance_saplingOutcompetedByScrub
+        self.chance_grassOutcompetedByTree = chance_grassOutcompetedByTree
+        self.chance_grassOutcompetedByScrub = chance_grassOutcompetedByScrub
+        self.chance_saplingOutcompetedByTree = chance_saplingOutcompetedByTree
+        self.chance_youngScrubOutcompetedByScrub = chance_youngScrubOutcompetedByScrub
+        self.chance_youngScrubOutcompetedByTree = chance_youngScrubOutcompetedByTree
         # roe deer parameters
         self.roeDeer_gain_from_grass = roeDeer_gain_from_grass
         self.roeDeer_gain_from_Trees = roeDeer_gain_from_Trees
@@ -634,30 +730,30 @@ class KneppModel(Model):
             # put a random number of trees, shrubs, etc., depending on dominant condition
             if condition == "grassland": # more than 50% grassland, no more than 10 mature trees/shrubs
                 trees_here = random.randint(0, 49)
-                saplings_here = random.randint(0, 25000)
+                saplings_here = random.randint(0, 3000)
                 scrub_here = random.randint(0, 49)
-                youngscrub_here = random.randint(0, 25000)
+                youngscrub_here = random.randint(0, 3000)
                 perc_grass_here = random.randint(50, 100)
                 perc_bareground_here = 100 - perc_grass_here
             elif condition == "thorny_scrubland":  # at least 10 scrub plants, no more than 10 trees
                 trees_here = random.randint(0, 49)
-                saplings_here = random.randint(0, 25000)
-                scrub_here = random.randint(50, 500)
-                youngscrub_here = random.randint(0, 25000)
+                saplings_here = random.randint(0, 3000)
+                scrub_here = random.randint(50, 300)
+                youngscrub_here = random.randint(0, 3000)
                 perc_grass_here = random.randint(0, 100)
                 perc_bareground_here = 100 - perc_grass_here
             elif condition == "woodland":  # woodland has 10-100 trees
-                trees_here = random.randint(49, 500)
-                saplings_here = random.randint(0, 25000)
-                scrub_here = random.randint(0, 500)
-                youngscrub_here = random.randint(0, 25000)
+                trees_here = random.randint(49, 300)
+                saplings_here = random.randint(0, 3000)
+                scrub_here = random.randint(0, 300)
+                youngscrub_here = random.randint(0, 3000)
                 perc_grass_here = random.randint(0, 100)
                 perc_bareground_here = 100 - perc_grass_here
             elif condition == "bare_ground": # more than 50% bare ground
                 trees_here = random.randint(0, 49)
-                saplings_here = random.randint(0, 25000)
+                saplings_here = random.randint(0, 3000)
                 scrub_here = random.randint(0, 49)
-                youngscrub_here = random.randint(0, 25000)
+                youngscrub_here = random.randint(0, 3000)
                 perc_bareground_here = random.randint(51, 100)
                 perc_grass_here = 100 - perc_bareground_here
             patch = habitatAgent(self.next_id(), (x, y), self, condition, trees_here, saplings_here, scrub_here, youngscrub_here, perc_grass_here, perc_bareground_here)
@@ -734,449 +830,441 @@ class KneppModel(Model):
             self.add_herbivores(exmoorPony, 23)
             self.add_herbivores(longhornCattle, 53)
             self.add_herbivores(tamworthPigs, 20)
-        # # # March 2010
-        # if self.schedule.time == 61: 
-        #     results_2 = self.datacollector.get_model_vars_dataframe()
-        #     exmoorValue = results_2.iloc[61]['Exmoor pony']
-        #     if exmoorValue >= 13: # randomly choose that many exmoor ponies and delete them
-        #         number_to_subtract = -13 + exmoorValue
-        #         self.remove_herbivores(exmoorPony, number_to_subtract)
-        #     else:
-        #         number_to_add = 13 - exmoorValue
-        #         self.add_herbivores(exmoorPony, number_to_add)
-        #     cowValue = results_2.iloc[61]['Longhorn cattle']
-        #     if cowValue >= 77:
-        #         number_to_subtract = -77 + cowValue
-        #         self.remove_herbivores(longhornCattle, number_to_subtract)
-        #     else:
-        #         number_to_add = 77 - cowValue
-        #         self.add_herbivores(longhornCattle, number_to_add)
-        #     fallowValue = results_2.iloc[61]['Fallow deer']
-        #     if fallowValue >= 42:
-        #         number_to_subtract = -42 + fallowValue
-        #         self.remove_herbivores(fallowDeer, number_to_subtract)
-        #     else:
-        #         number_to_add = 42 - fallowValue
-        #         self.add_herbivores(fallowDeer, number_to_add)
-        #     pigsValue = results_2.iloc[61]['Tamworth pigs']
-        #     if pigsValue >= 17:
-        #         number_to_subtract = -17 + pigsValue
-        #         self.remove_herbivores(tamworthPigs, number_to_subtract)
-        #     else:
-        #         number_to_add = 17 - pigsValue
-        #         self.add_herbivores(tamworthPigs, number_to_add)
-        # # 2011
-        # if self.schedule.time == 73:
-        #     results_3 = self.datacollector.get_model_vars_dataframe()
-        #     exmoorValue = results_3.iloc[73]['Exmoor pony']
-        #     if exmoorValue >= 15: # randomly choose that many exmoor ponies and delete them
-        #         number_to_subtract = -15 + exmoorValue
-        #         self.remove_herbivores(exmoorPony, number_to_subtract)
-        #     else:
-        #         number_to_add = 15 - exmoorValue
-        #         self.add_herbivores(exmoorPony, number_to_add)
-        #     cowValue = results_3.iloc[73]['Longhorn cattle']
-        #     if cowValue >= 92:
-        #         number_to_subtract = -92 + cowValue
-        #         self.remove_herbivores(longhornCattle, number_to_subtract)
-        #     else:
-        #         number_to_add = 92 - cowValue
-        #         self.add_herbivores(longhornCattle, number_to_add)
-        #     fallowValue = results_3.iloc[73]['Fallow deer']
-        #     if fallowValue >= 81:
-        #         number_to_subtract = -81 + fallowValue
-        #         self.remove_herbivores(fallowDeer, number_to_subtract)
-        #     else:
-        #         number_to_add = 81 - fallowValue
-        #         self.add_herbivores(fallowDeer, number_to_add)
-        #     pigsValue = results_3.iloc[73]['Tamworth pigs']
-        #     if pigsValue >= 22:
-        #         number_to_subtract = -22 + pigsValue
-        #         self.remove_herbivores(tamworthPigs, number_to_subtract)
-        #     else:
-        #         number_to_add = 22 - pigsValue
-        #         self.add_herbivores(tamworthPigs, number_to_add)
-        # # 2012
-        # if self.schedule.time == 85:
-        #     results_4 = self.datacollector.get_model_vars_dataframe()
-        #     exmoorValue = results_4.iloc[85]['Exmoor pony']
-        #     if exmoorValue >= 17: # randomly choose that many exmoor ponies and delete them
-        #         number_to_subtract = -17 + exmoorValue
-        #         self.remove_herbivores(exmoorPony, number_to_subtract)
-        #     else:
-        #         number_to_add = 17 - exmoorValue
-        #         self.add_herbivores(exmoorPony, number_to_add)
-        #     cowValue = results_4.iloc[85]['Longhorn cattle']
-        #     if cowValue >= 116:
-        #         number_to_subtract = -116 + cowValue
-        #         self.remove_herbivores(longhornCattle, number_to_subtract)
-        #     else:
-        #         number_to_add = 116 - cowValue
-        #         self.add_herbivores(longhornCattle, number_to_add)
-        #     fallowValue = results_4.iloc[85]['Fallow deer']
-        #     if fallowValue >= 100:
-        #         number_to_subtract = -100 + fallowValue
-        #         self.remove_herbivores(fallowDeer, number_to_subtract)
-        #     else:
-        #         number_to_add = 100 - fallowValue
-        #         self.add_herbivores(fallowDeer, number_to_add)
-        #     pigsValue = results_4.iloc[85]['Tamworth pigs']
-        #     if pigsValue >= 33:
-        #         number_to_subtract = -33 + pigsValue
-        #         self.remove_herbivores(tamworthPigs, number_to_subtract)
-        #     else:
-        #         number_to_add = 33 - pigsValue
-        #         self.add_herbivores(tamworthPigs, number_to_add)
-        # # 2013
-        # if self.schedule.time == 97:
-        #     results_5 = self.datacollector.get_model_vars_dataframe()
-        #     # Exmoor ponies: 10
-        #     exmoorValue = results_5.iloc[97]['Exmoor pony']
-        #     if exmoorValue >= 10: # randomly choose that many exmoor ponies and delete them
-        #         number_to_subtract = -10 + exmoorValue
-        #         self.remove_herbivores(exmoorPony, number_to_subtract)
-        #     else:
-        #         number_to_add = 10 - exmoorValue
-        #         self.add_herbivores(exmoorPony, number_to_add)
-        #     # Longhorn cattle: 129
-        #     cowValue = results_5.iloc[97]['Longhorn cattle']
-        #     if cowValue >= 129:
-        #         number_to_subtract = -129 + cowValue
-        #         self.remove_herbivores(longhornCattle, number_to_subtract)
-        #     else:
-        #         number_to_add = 129 - cowValue
-        #         self.add_herbivores(longhornCattle, number_to_add)
-        #     # Fallow deer: 100
-        #     fallowValue = results_5.iloc[97]['Fallow deer']
-        #     if fallowValue >= 100:
-        #         number_to_subtract = -100 + fallowValue
-        #         self.remove_herbivores(fallowDeer, number_to_subtract)
-        #     else:
-        #         number_to_add = 100 - fallowValue
-        #         self.add_herbivores(fallowDeer, number_to_add)
-        #     # Pigs: 6
-        #     pigsValue = results_5.iloc[97]['Tamworth pigs']
-        #     if pigsValue >= 6:
-        #         number_to_subtract = -6 + pigsValue
-        #         self.remove_herbivores(tamworthPigs, number_to_subtract)
-        #     else:
-        #         number_to_add = 6 - pigsValue
-        #         self.add_herbivores(tamworthPigs, number_to_add)
-        #     # Red deer: add 13
-        #     self.add_herbivores(redDeer, 13)
-        # # 2014
-        # if self.schedule.time == 109:
-        #     results_6 = self.datacollector.get_model_vars_dataframe()
-        #     exmoorValue = results_6.iloc[109]['Exmoor pony']
-        #     if exmoorValue >= 10: # randomly choose that many exmoor ponies and delete them
-        #         number_to_subtract = -10 + exmoorValue
-        #         self.remove_herbivores(exmoorPony, number_to_subtract)
-        #     else:
-        #         number_to_add = 10 - exmoorValue
-        #         self.add_herbivores(exmoorPony, number_to_add)
-        #     cowValue = results_6.iloc[109]['Longhorn cattle']
-        #     if cowValue >= 264:
-        #         number_to_subtract = -264 + cowValue
-        #         self.remove_herbivores(longhornCattle, number_to_subtract)
-        #     else:
-        #         number_to_add = 264 - cowValue
-        #         self.add_herbivores(longhornCattle, number_to_add)
-        #     fallowValue = results_6.iloc[109]['Fallow deer']
-        #     if fallowValue >= 100:
-        #         number_to_subtract = -100 + fallowValue
-        #         self.remove_herbivores(fallowDeer, number_to_subtract)
-        #     else:
-        #         number_to_add = 100 - fallowValue
-        #         self.add_herbivores(fallowDeer, number_to_add)
-        #     # Pigs: 18
-        #     pigsValue = results_6.iloc[109]['Tamworth pigs']
-        #     if pigsValue >= 18:
-        #         number_to_subtract = -18 + pigsValue
-        #         self.remove_herbivores(tamworthPigs, number_to_subtract)
-        #     else:
-        #         number_to_add = 18 - pigsValue
-        #         self.add_herbivores(tamworthPigs, number_to_add)
-        #     redDeerValue = results_6.iloc[109]['Red deer']
-        #     if redDeerValue >= 13:
-        #         number_to_subtract = -13 + redDeerValue
-        #         self.remove_herbivores(redDeer, number_to_subtract)
-        #     else:
-        #         number_to_add = 13 - redDeerValue
-        #         self.add_herbivores(redDeer, number_to_add)
+        # # March 2010
+        if self.schedule.time == 61: 
+            results_2 = self.datacollector.get_model_vars_dataframe()
+            exmoorValue = results_2.iloc[61]['Exmoor pony']
+            if exmoorValue >= 13: # randomly choose that many exmoor ponies and delete them
+                number_to_subtract = -13 + exmoorValue
+                self.remove_herbivores(exmoorPony, number_to_subtract)
+            else:
+                number_to_add = 13 - exmoorValue
+                self.add_herbivores(exmoorPony, number_to_add)
+            cowValue = results_2.iloc[61]['Longhorn cattle']
+            if cowValue >= 77:
+                number_to_subtract = -77 + cowValue
+                self.remove_herbivores(longhornCattle, number_to_subtract)
+            else:
+                number_to_add = 77 - cowValue
+                self.add_herbivores(longhornCattle, number_to_add)
+            fallowValue = results_2.iloc[61]['Fallow deer']
+            if fallowValue >= 42:
+                number_to_subtract = -42 + fallowValue
+                self.remove_herbivores(fallowDeer, number_to_subtract)
+            else:
+                number_to_add = 42 - fallowValue
+                self.add_herbivores(fallowDeer, number_to_add)
+            pigsValue = results_2.iloc[61]['Tamworth pigs']
+            if pigsValue >= 17:
+                number_to_subtract = -17 + pigsValue
+                self.remove_herbivores(tamworthPigs, number_to_subtract)
+            else:
+                number_to_add = 17 - pigsValue
+                self.add_herbivores(tamworthPigs, number_to_add)
+        # 2011
+        if self.schedule.time == 73:
+            results_3 = self.datacollector.get_model_vars_dataframe()
+            exmoorValue = results_3.iloc[73]['Exmoor pony']
+            if exmoorValue >= 15: # randomly choose that many exmoor ponies and delete them
+                number_to_subtract = -15 + exmoorValue
+                self.remove_herbivores(exmoorPony, number_to_subtract)
+            else:
+                number_to_add = 15 - exmoorValue
+                self.add_herbivores(exmoorPony, number_to_add)
+            cowValue = results_3.iloc[73]['Longhorn cattle']
+            if cowValue >= 92:
+                number_to_subtract = -92 + cowValue
+                self.remove_herbivores(longhornCattle, number_to_subtract)
+            else:
+                number_to_add = 92 - cowValue
+                self.add_herbivores(longhornCattle, number_to_add)
+            fallowValue = results_3.iloc[73]['Fallow deer']
+            if fallowValue >= 81:
+                number_to_subtract = -81 + fallowValue
+                self.remove_herbivores(fallowDeer, number_to_subtract)
+            else:
+                number_to_add = 81 - fallowValue
+                self.add_herbivores(fallowDeer, number_to_add)
+            pigsValue = results_3.iloc[73]['Tamworth pigs']
+            if pigsValue >= 22:
+                number_to_subtract = -22 + pigsValue
+                self.remove_herbivores(tamworthPigs, number_to_subtract)
+            else:
+                number_to_add = 22 - pigsValue
+                self.add_herbivores(tamworthPigs, number_to_add)
+        # 2012
+        if self.schedule.time == 85:
+            results_4 = self.datacollector.get_model_vars_dataframe()
+            exmoorValue = results_4.iloc[85]['Exmoor pony']
+            if exmoorValue >= 17: # randomly choose that many exmoor ponies and delete them
+                number_to_subtract = -17 + exmoorValue
+                self.remove_herbivores(exmoorPony, number_to_subtract)
+            else:
+                number_to_add = 17 - exmoorValue
+                self.add_herbivores(exmoorPony, number_to_add)
+            cowValue = results_4.iloc[85]['Longhorn cattle']
+            if cowValue >= 116:
+                number_to_subtract = -116 + cowValue
+                self.remove_herbivores(longhornCattle, number_to_subtract)
+            else:
+                number_to_add = 116 - cowValue
+                self.add_herbivores(longhornCattle, number_to_add)
+            fallowValue = results_4.iloc[85]['Fallow deer']
+            if fallowValue >= 100:
+                number_to_subtract = -100 + fallowValue
+                self.remove_herbivores(fallowDeer, number_to_subtract)
+            else:
+                number_to_add = 100 - fallowValue
+                self.add_herbivores(fallowDeer, number_to_add)
+            pigsValue = results_4.iloc[85]['Tamworth pigs']
+            if pigsValue >= 33:
+                number_to_subtract = -33 + pigsValue
+                self.remove_herbivores(tamworthPigs, number_to_subtract)
+            else:
+                number_to_add = 33 - pigsValue
+                self.add_herbivores(tamworthPigs, number_to_add)
+        # 2013
+        if self.schedule.time == 97:
+            results_5 = self.datacollector.get_model_vars_dataframe()
+            # Exmoor ponies: 10
+            exmoorValue = results_5.iloc[97]['Exmoor pony']
+            if exmoorValue >= 10: # randomly choose that many exmoor ponies and delete them
+                number_to_subtract = -10 + exmoorValue
+                self.remove_herbivores(exmoorPony, number_to_subtract)
+            else:
+                number_to_add = 10 - exmoorValue
+                self.add_herbivores(exmoorPony, number_to_add)
+            # Longhorn cattle: 129
+            cowValue = results_5.iloc[97]['Longhorn cattle']
+            if cowValue >= 129:
+                number_to_subtract = -129 + cowValue
+                self.remove_herbivores(longhornCattle, number_to_subtract)
+            else:
+                number_to_add = 129 - cowValue
+                self.add_herbivores(longhornCattle, number_to_add)
+            # Fallow deer: 100
+            fallowValue = results_5.iloc[97]['Fallow deer']
+            if fallowValue >= 100:
+                number_to_subtract = -100 + fallowValue
+                self.remove_herbivores(fallowDeer, number_to_subtract)
+            else:
+                number_to_add = 100 - fallowValue
+                self.add_herbivores(fallowDeer, number_to_add)
+            # Pigs: 6
+            pigsValue = results_5.iloc[97]['Tamworth pigs']
+            if pigsValue >= 6:
+                number_to_subtract = -6 + pigsValue
+                self.remove_herbivores(tamworthPigs, number_to_subtract)
+            else:
+                number_to_add = 6 - pigsValue
+                self.add_herbivores(tamworthPigs, number_to_add)
+            # Red deer: add 13
+            self.add_herbivores(redDeer, 13)
+        # 2014
+        if self.schedule.time == 109:
+            results_6 = self.datacollector.get_model_vars_dataframe()
+            exmoorValue = results_6.iloc[109]['Exmoor pony']
+            if exmoorValue >= 10: # randomly choose that many exmoor ponies and delete them
+                number_to_subtract = -10 + exmoorValue
+                self.remove_herbivores(exmoorPony, number_to_subtract)
+            else:
+                number_to_add = 10 - exmoorValue
+                self.add_herbivores(exmoorPony, number_to_add)
+            cowValue = results_6.iloc[109]['Longhorn cattle']
+            if cowValue >= 264:
+                number_to_subtract = -264 + cowValue
+                self.remove_herbivores(longhornCattle, number_to_subtract)
+            else:
+                number_to_add = 264 - cowValue
+                self.add_herbivores(longhornCattle, number_to_add)
+            fallowValue = results_6.iloc[109]['Fallow deer']
+            if fallowValue >= 100:
+                number_to_subtract = -100 + fallowValue
+                self.remove_herbivores(fallowDeer, number_to_subtract)
+            else:
+                number_to_add = 100 - fallowValue
+                self.add_herbivores(fallowDeer, number_to_add)
+            # Pigs: 18
+            pigsValue = results_6.iloc[109]['Tamworth pigs']
+            if pigsValue >= 18:
+                number_to_subtract = -18 + pigsValue
+                self.remove_herbivores(tamworthPigs, number_to_subtract)
+            else:
+                number_to_add = 18 - pigsValue
+                self.add_herbivores(tamworthPigs, number_to_add)
+            redDeerValue = results_6.iloc[109]['Red deer']
+            if redDeerValue >= 13:
+                number_to_subtract = -13 + redDeerValue
+                self.remove_herbivores(redDeer, number_to_subtract)
+            else:
+                number_to_add = 13 - redDeerValue
+                self.add_herbivores(redDeer, number_to_add)
         
-        # # March 2015
-        # if self.schedule.time == 121:
-        #     results_7 = self.datacollector.get_model_vars_dataframe()
-        #     #  Exmoor ponies: 10
-        #     exmoorValue = results_7.iloc[121]['Exmoor pony']
-        #     if exmoorValue >= 10: # randomly choose that many exmoor ponies and delete them
-        #         number_to_subtract = -10 + exmoorValue
-        #         self.remove_herbivores(exmoorPony, number_to_subtract)
-        #     else:
-        #         number_to_add = 10 - exmoorValue
-        #         self.add_herbivores(exmoorPony, number_to_add)
-        #     # Longhorn cattle: 107
-        #     cowValue = results_7.iloc[121]['Longhorn cattle']
-        #     if cowValue >= 107:
-        #         number_to_subtract = -107 + cowValue
-        #         self.remove_herbivores(longhornCattle, number_to_subtract)
-        #     else:
-        #         number_to_add = 107 - cowValue
-        #         self.add_herbivores(longhornCattle, number_to_add)
-        #     # Fallow deer: 100
-        #     fallowValue = results_7.iloc[121]['Fallow deer']
-        #     if fallowValue >= 100:
-        #         number_to_subtract = -100 + fallowValue
-        #         self.remove_herbivores(fallowDeer, number_to_subtract)
-        #     else:
-        #         number_to_add = 100 - fallowValue
-        #         self.add_herbivores(fallowDeer, number_to_add)
-        #     # Pigs: 18
-        #     pigsValue = results_7.iloc[121]['Tamworth pigs']
-        #     if pigsValue >= 18:
-        #         number_to_subtract = -18 + pigsValue
-        #         self.remove_herbivores(tamworthPigs, number_to_subtract)
-        #     else:
-        #         number_to_add = 18 - pigsValue
-        #         self.add_herbivores(tamworthPigs, number_to_add)
-        #     # Red deer: 13
-        #     redDeerValue = results_7.iloc[121]['Red deer']
-        #     if redDeerValue >= 13:
-        #         number_to_subtract = -13 + redDeerValue
-        #         self.remove_herbivores(redDeer, number_to_subtract)
-        #     else:
-        #         number_to_add = 13 - redDeerValue
-        #         self.add_herbivores(redDeer, number_to_add)
+        # March 2015
+        if self.schedule.time == 121:
+            results_7 = self.datacollector.get_model_vars_dataframe()
+            #  Exmoor ponies: 10
+            exmoorValue = results_7.iloc[121]['Exmoor pony']
+            if exmoorValue >= 10: # randomly choose that many exmoor ponies and delete them
+                number_to_subtract = -10 + exmoorValue
+                self.remove_herbivores(exmoorPony, number_to_subtract)
+            else:
+                number_to_add = 10 - exmoorValue
+                self.add_herbivores(exmoorPony, number_to_add)
+            # Longhorn cattle: 107
+            cowValue = results_7.iloc[121]['Longhorn cattle']
+            if cowValue >= 107:
+                number_to_subtract = -107 + cowValue
+                self.remove_herbivores(longhornCattle, number_to_subtract)
+            else:
+                number_to_add = 107 - cowValue
+                self.add_herbivores(longhornCattle, number_to_add)
+            # Fallow deer: 100
+            fallowValue = results_7.iloc[121]['Fallow deer']
+            if fallowValue >= 100:
+                number_to_subtract = -100 + fallowValue
+                self.remove_herbivores(fallowDeer, number_to_subtract)
+            else:
+                number_to_add = 100 - fallowValue
+                self.add_herbivores(fallowDeer, number_to_add)
+            # Pigs: 18
+            pigsValue = results_7.iloc[121]['Tamworth pigs']
+            if pigsValue >= 18:
+                number_to_subtract = -18 + pigsValue
+                self.remove_herbivores(tamworthPigs, number_to_subtract)
+            else:
+                number_to_add = 18 - pigsValue
+                self.add_herbivores(tamworthPigs, number_to_add)
+            # Red deer: 13
+            redDeerValue = results_7.iloc[121]['Red deer']
+            if redDeerValue >= 13:
+                number_to_subtract = -13 + redDeerValue
+                self.remove_herbivores(redDeer, number_to_subtract)
+            else:
+                number_to_add = 13 - redDeerValue
+                self.add_herbivores(redDeer, number_to_add)
 
-        # # April 2015
-        # if self.schedule.time == 122:
-        #     # April 2015: one pig culled, 5 born
-        #     self.remove_herbivores(tamworthPigs, 1)
-        # # May 2015
-        # if self.schedule.time == 123:
-        #     # May 2015: 8 pigs culled
-        #     self.remove_herbivores(tamworthPigs, 8)
-        # # June 2015: 5 cows culled
-        # if self.schedule.time == 124:
-        #     self.remove_herbivores(longhornCattle, 5)
-        # # August 2015: 2 fallow deer culled
-        # if self.schedule.time == 126:
-        #     self.remove_herbivores(fallowDeer, 2)
-        # # September 2015: 2 male fallow deer culled; 2 cattle culled and 3 bulls added
-        # if self.schedule.time == 128:
-        #     self.remove_herbivores(fallowDeer, 2)
-        #     self.remove_herbivores(longhornCattle, 1)
-        # # Oct 2015: 2 female and 1 male fallow deer culled; 38 female cows and 1 bull removed
-        # if self.schedule.time == 128:
-        #     self.remove_herbivores(fallowDeer, 3)
-        #     self.remove_herbivores(longhornCattle, 39)
-        # # Nov 2015: -7 fallow deer
-        # if self.schedule.time == 129:
-        #     self.remove_herbivores(fallowDeer, 7)       
-        # # Dec 2015: 6 fallow deer culled; 5 cows removed;
-        # if self.schedule.time == 130:
-        #     self.remove_herbivores(fallowDeer, 6)
-        #     self.remove_herbivores(longhornCattle, 5)
-        # # Jan 2016: 7 fallow deer culled; 4 pigs culled and 1 added
-        # if self.schedule.time == 131:
-        #     self.remove_herbivores(fallowDeer, 7) 
-        #     self.remove_herbivores(tamworthPigs, 3)
-        # # Feb 2016: 10 fallow deer culled; 2 pigs culled
-        # if self.schedule.time == 132:
-        #     self.remove_herbivores(fallowDeer, 10)
-        #     self.remove_herbivores(tamworthPigs, 2)
+        # April 2015
+        if self.schedule.time == 122:
+            # April 2015: one pig culled, 5 born
+            self.remove_herbivores(tamworthPigs, 1)
+
+        # May 2015
+        if self.schedule.time == 123:
+            # May 2015: 8 pigs culled
+            self.remove_herbivores(tamworthPigs, 8)
+        # June 2015: 5 cows culled
+        if self.schedule.time == 124:
+            self.remove_herbivores(longhornCattle, 5)
+        # August 2015: 2 fallow deer culled
+        if self.schedule.time == 126:
+            self.remove_herbivores(fallowDeer, 2)
+        # September 2015: 2 male fallow deer culled; 2 cattle culled and 3 bulls added
+        if self.schedule.time == 128:
+            self.remove_herbivores(fallowDeer, 2)
+            self.remove_herbivores(longhornCattle, 1)
+        # Oct 2015: 2 female and 1 male fallow deer culled; 38 female cows and 1 bull removed
+        if self.schedule.time == 128:
+            self.remove_herbivores(fallowDeer, 3)
+            self.remove_herbivores(longhornCattle, 39)
+        # Nov 2015: -7 fallow deer
+        if self.schedule.time == 129:
+            self.remove_herbivores(fallowDeer, 7)       
+        # Dec 2015: 6 fallow deer culled; 5 cows removed;
+        if self.schedule.time == 130:
+            self.remove_herbivores(fallowDeer, 6)
+            self.remove_herbivores(longhornCattle, 5)
+        # Jan 2016: 7 fallow deer culled; 4 pigs culled and 1 added
+        if self.schedule.time == 131:
+            self.remove_herbivores(fallowDeer, 7) 
+            self.remove_herbivores(tamworthPigs, 3)
+        # Feb 2016: 10 fallow deer culled; 2 pigs culled
+        if self.schedule.time == 132:
+            self.remove_herbivores(fallowDeer, 10)
+            self.remove_herbivores(tamworthPigs, 2)
                             
-        #                                # # # # # # # 2016 # # # # # # #
+                                       # # # # # # # 2016 # # # # # # #
 
-        # # March 2016: 1 pony added; 3 pigs added and 4 culled
-        # if self.schedule.time == 133:
-        #     self.add_herbivores(exmoorPony, 1)
-        #     self.remove_herbivores(tamworthPigs, 1)
-        # # April 2016: 1 cow added & filtering for cows
-        # if self.schedule.time == 134:
-        #     self.add_herbivores(longhornCattle, 1)
-        # # May 2016: filtering for cows and pigs, and 2 cows culled
-        # if self.schedule.time == 135:
-        #     self.remove_herbivores(longhornCattle, 2)
-        # # June 2016: filtering for cows, 30 cows culled and 4 added 
-        # if self.schedule.time == 136:
-        #     self.remove_herbivores(longhornCattle, 26)
-        # # July 2016: 2 cows culled
-        # if self.schedule.time == 137:
-        #     self.remove_herbivores(longhornCattle, 2)
-        # # August 2016: -5 fallow deer
-        # if self.schedule.time == 138:
-        #     self.remove_herbivores(fallowDeer, 5)
-        # # September & Oct 2016: -9, +19 cows
-        # if self.schedule.time == 139:
-        #     self.remove_herbivores(longhornCattle, 10)
-        # # November 2016: -3 fallow deer; -5 cows
-        # if self.schedule.time == 141:
-        #     self.remove_herbivores(fallowDeer, 3)
-        #     self.remove_herbivores(longhornCattle, 5)
-        # # December 2016: -9 fallow; -13 cows; -4 pigs
-        # if self.schedule.time == 142:
-        #     self.remove_herbivores(fallowDeer, 9)
-        #     self.remove_herbivores(longhornCattle, 13)
-        #     self.remove_herbivores(tamworthPigs, 4)
-        # # January 2017: -4 pigs, +1 pig
-        # if self.schedule.time == 143:
-        #     self.remove_herbivores(tamworthPigs, 3)
-        # # February 2017: -8 fallow deer; -3 pigs; filtering for ponies
-        # if self.schedule.time == 144:
-        #     self.remove_herbivores(fallowDeer, 8)
-        #     self.remove_herbivores(tamworthPigs, 3)
+        # March 2016: 1 pony added; 3 pigs added and 4 culled
+        if self.schedule.time == 133:
+            self.add_herbivores(exmoorPony, 1)
+            self.remove_herbivores(tamworthPigs, 1)
+        # April 2016: 1 cow added & filtering for cows
+        if self.schedule.time == 134:
+            self.add_herbivores(longhornCattle, 1)
+        # May 2016: filtering for cows and pigs, and 2 cows culled
+        if self.schedule.time == 135:
+            self.remove_herbivores(longhornCattle, 2)
+        # June 2016: filtering for cows, 30 cows culled and 4 added 
+        if self.schedule.time == 136:
+            self.remove_herbivores(longhornCattle, 26)
+        # July 2016: 2 cows culled
+        if self.schedule.time == 137:
+            self.remove_herbivores(longhornCattle, 2)
+        # August 2016: -5 fallow deer
+        if self.schedule.time == 138:
+            self.remove_herbivores(fallowDeer, 5)
+        # September & Oct 2016: -9, +19 cows
+        if self.schedule.time == 139:
+            self.remove_herbivores(longhornCattle, 10)
+        # November 2016: -3 fallow deer; -5 cows
+        if self.schedule.time == 141:
+            self.remove_herbivores(fallowDeer, 3)
+            self.remove_herbivores(longhornCattle, 5)
+        # December 2016: -9 fallow; -13 cows; -4 pigs
+        if self.schedule.time == 142:
+            self.remove_herbivores(fallowDeer, 9)
+            self.remove_herbivores(longhornCattle, 13)
+            self.remove_herbivores(tamworthPigs, 4)
+        # January 2017: -4 pigs, +1 pig
+        if self.schedule.time == 143:
+            self.remove_herbivores(tamworthPigs, 3)
+        # February 2017: -8 fallow deer; -3 pigs; filtering for ponies
+        if self.schedule.time == 144:
+            self.remove_herbivores(fallowDeer, 8)
+            self.remove_herbivores(tamworthPigs, 3)
 
 
 
-        # # # # # # # # 2017 # # # # # # #
-        # # minus 1 exmoor pony, -12 red deer; filtering for cows
-        # if self.schedule.time == 145:
-        #     self.remove_herbivores(exmoorPony, 1)
-        #     self.remove_herbivores(redDeer, 12)
-        # # April 2017: -3 cows, filtering for cows and pigs
-        # if self.schedule.time == 146:
-        #     self.remove_herbivores(longhornCattle, 3)
-        # # June & July 2017: -24 cows, +3 cows, and cow filtering condition
-        # if self.schedule.time == 148:
-        #     self.remove_herbivores(longhornCattle, 21)
-        # # August 2017: -16 fallow deer 
-        # if self.schedule.time == 150:
-        #     self.remove_herbivores(fallowDeer, 16)
-        # # September 2017: -5 fallow deer; -27, +23 cows
-        # if self.schedule.time == 151:
-        #     self.remove_herbivores(fallowDeer, 5)
-        #     self.remove_herbivores(longhornCattle, 4)
-        # # October 2017: -4 fallow deer; -2 cows
-        # if self.schedule.time == 152:
-        #     self.remove_herbivores(fallowDeer, 4)
-        #     self.remove_herbivores(longhornCattle, 2)
-        # # November 2017: -2 fallow deer
-        # if self.schedule.time == 153:
-        #     self.remove_herbivores(fallowDeer, 2)
-        # # December 2017: -46 fallow deer, -1 red deer; -4 pigs
-        # if self.schedule.time == 154:
-        #     self.remove_herbivores(fallowDeer, 46)
-        #     self.remove_herbivores(redDeer, 1)
-        #     self.remove_herbivores(tamworthPigs, 4)
-        # # January 2018: -9 pigs, +1 pig, and pig filtering conditions
-        # if self.schedule.time == 155:
-        #     self.remove_herbivores(tamworthPigs, 8)
-        # # February 2018: -14 fallow; -1 red deer; -1 pig; filtering for pig and exmoor
-        # if self.schedule.time == 156:
-        #     self.remove_herbivores(fallowDeer, 14)
-        #     self.remove_herbivores(redDeer, 1)
-        #     self.remove_herbivores(tamworthPigs, 1)
+        # # # # # # # 2017 # # # # # # #
+        # minus 1 exmoor pony, -12 red deer; filtering for cows
+        if self.schedule.time == 145:
+            self.remove_herbivores(exmoorPony, 1)
+            self.remove_herbivores(redDeer, 12)
+        # April 2017: -3 cows, filtering for cows and pigs
+        if self.schedule.time == 146:
+            self.remove_herbivores(longhornCattle, 3)
+        # June & July 2017: -24 cows, +3 cows, and cow filtering condition
+        if self.schedule.time == 148:
+            self.remove_herbivores(longhornCattle, 21)
+        # August 2017: -16 fallow deer 
+        if self.schedule.time == 150:
+            self.remove_herbivores(fallowDeer, 16)
+        # September 2017: -5 fallow deer; -27, +23 cows
+        if self.schedule.time == 151:
+            self.remove_herbivores(fallowDeer, 5)
+            self.remove_herbivores(longhornCattle, 4)
+        # October 2017: -4 fallow deer; -2 cows
+        if self.schedule.time == 152:
+            self.remove_herbivores(fallowDeer, 4)
+            self.remove_herbivores(longhornCattle, 2)
+        # November 2017: -2 fallow deer
+        if self.schedule.time == 153:
+            self.remove_herbivores(fallowDeer, 2)
+        # December 2017: -46 fallow deer, -1 red deer; -4 pigs
+        if self.schedule.time == 154:
+            self.remove_herbivores(fallowDeer, 46)
+            self.remove_herbivores(redDeer, 1)
+            self.remove_herbivores(tamworthPigs, 4)
+        # January 2018: -9 pigs, +1 pig, and pig filtering conditions
+        if self.schedule.time == 155:
+            self.remove_herbivores(tamworthPigs, 8)
+        # February 2018: -14 fallow; -1 red deer; -1 pig; filtering for pig and exmoor
+        if self.schedule.time == 156:
+            self.remove_herbivores(fallowDeer, 14)
+            self.remove_herbivores(redDeer, 1)
+            self.remove_herbivores(tamworthPigs, 1)
 
-        # # # # # # # # 2018 # # # # # # #
+        # # # # # # # 2018 # # # # # # #
             
-        # # March 2018: -1 Exmoor; filtering for red and fallow deer
-        # if self.schedule.time == 157:
-        #     self.remove_herbivores(exmoorPony, 1)
-        # # April 2018: +1 cow and filtering for cow
-        # if self.schedule.time == 158:
-        #     self.add_herbivores(longhornCattle, 1)
-        # # June 2018: -22 cows, +2 cows; filtering for cows
-        # if self.schedule.time == 160:
-        #     self.remove_herbivores(longhornCattle, 20)
-        # # July 2018: -1 red deer; -1 pig
-        # if self.schedule.time == 161:
-        #     self.remove_herbivores(redDeer, 1)
-        #     self.remove_herbivores(tamworthPigs, 1)
-        # # August 2018: -9 ponies; -15 fallow deer; -1 cattle; -1 pig
-        # if self.schedule.time == 162:
-        #     self.remove_herbivores(exmoorPony, 9)
-        #     self.remove_herbivores(fallowDeer, 15)
-        #     self.remove_herbivores(tamworthPigs, 1)
-        #     self.remove_herbivores(longhornCattle, 1)
-        # # September 2018: -19 fallow; -16 and +20 cows
-        # if self.schedule.time == 163:
-        #     self.remove_herbivores(fallowDeer, 19)
-        #     self.add_herbivores(longhornCattle, 4)
-        # # October 2018: -4 cows; -4 fallow; -1 pig
-        # if self.schedule.time == 164:
-        #     self.remove_herbivores(longhornCattle, 4)
-        #     self.remove_herbivores(fallowDeer, 4)
-        #     self.remove_herbivores(tamworthPigs, 1)
-        # # November 2018: -8 cows; -12 pigs
-        # if self.schedule.time == 165:
-        #     self.remove_herbivores(longhornCattle, 8)
-        #     self.remove_herbivores(tamworthPigs, 12)
-        # # December & January 2018/2019: -19 fallow; -5 and +1 cow; -1 red deer 
-        # if self.schedule.time == 166:
-        #     self.remove_herbivores(longhornCattle, 4)
-        #     self.remove_herbivores(fallowDeer, 19)
-        #     self.remove_herbivores(redDeer, 1)
-        # # February 2019: +1 pig, -2 cows
-        # if self.schedule.time == 168:
-        #     self.remove_herbivores(longhornCattle, 2)
-        #     self.add_herbivores(tamworthPigs, 1)                                                                       
-                            
+        # March 2018: -1 Exmoor; filtering for red and fallow deer
+        if self.schedule.time == 157:
+            self.remove_herbivores(exmoorPony, 1)
+        # April 2018: +1 cow and filtering for cow
+        if self.schedule.time == 158:
+            self.add_herbivores(longhornCattle, 1)
+        # June 2018: -22 cows, +2 cows; filtering for cows
+        if self.schedule.time == 160:
+            self.remove_herbivores(longhornCattle, 20)
+        # July 2018: -1 red deer; -1 pig
+        if self.schedule.time == 161:
+            self.remove_herbivores(redDeer, 1)
+            self.remove_herbivores(tamworthPigs, 1)
+        # August 2018: -9 ponies; -15 fallow deer; -1 cattle; -1 pig
+        if self.schedule.time == 162:
+            self.remove_herbivores(exmoorPony, 9)
+            self.remove_herbivores(fallowDeer, 15)
+            self.remove_herbivores(tamworthPigs, 1)
+            self.remove_herbivores(longhornCattle, 1)
+        # September 2018: -19 fallow; -16 and +20 cows
+        if self.schedule.time == 163:
+            self.remove_herbivores(fallowDeer, 19)
+            self.add_herbivores(longhornCattle, 4)
+        # October 2018: -4 cows; -4 fallow; -1 pig
+        if self.schedule.time == 164:
+            self.remove_herbivores(longhornCattle, 4)
+            self.remove_herbivores(fallowDeer, 4)
+            self.remove_herbivores(tamworthPigs, 1)
+        # November 2018: -8 cows; -12 pigs
+        if self.schedule.time == 165:
+            self.remove_herbivores(longhornCattle, 8)
+            self.remove_herbivores(tamworthPigs, 12)
+        # December & January 2018/2019: -19 fallow; -5 and +1 cow; -1 red deer 
+        if self.schedule.time == 166:
+            self.remove_herbivores(longhornCattle, 4)
+            self.remove_herbivores(fallowDeer, 19)
+            self.remove_herbivores(redDeer, 1)
+        # February 2019: +1 pig, -2 cows
+        if self.schedule.time == 168:
+            self.remove_herbivores(longhornCattle, 2)
+            self.add_herbivores(tamworthPigs, 1)                                                                                   
 
-        # # # # # # # # 2019 # # # # # # #
+        # # # # # # # 2019 # # # # # # #
 
+        # March 2019: -1 pig; fallow and red deer filters
+        if self.schedule.time == 169:
+            self.remove_herbivores(tamworthPigs, 1)
+        # June 2019: -28 cows and cow filtering condition
+        if self.schedule.time == 172:
+            self.remove_herbivores(longhornCattle, 28)
+        # July & Aug 2019: -3, +5 cows; -26 pigs; filtering for pigs
+        if self.schedule.time == 173:
+            self.remove_herbivores(tamworthPigs, 26)
+            self.add_herbivores(longhornCattle, 2)
+        # Sept 2019: -15 fallow; -23 and +25 cows
+        if self.schedule.time == 175:
+            self.remove_herbivores(fallowDeer, 15)
+            self.add_herbivores(longhornCattle, 2)
+        # Oct 2019: -5 cows
+        if self.schedule.time == 176:
+            self.remove_herbivores(longhornCattle, 5)
+        # November 2019: -7 fallow deer; -1 cows; -3 red deer
+        if self.schedule.time == 177:
+            self.remove_herbivores(longhornCattle, 1)
+            self.remove_herbivores(fallowDeer, 7)
+            self.remove_herbivores(redDeer, 3)
+        # December 2019: -12 fallow; -7 cows; -4 red; +1 pigs
+        if self.schedule.time == 178:
+            self.remove_herbivores(fallowDeer, 12)
+            self.remove_herbivores(longhornCattle, 7)
+            self.remove_herbivores(redDeer, 4)
+            self.add_herbivores(tamworthPigs, 1)
+        # January 2020: -24 fallow deer
+        if self.schedule.time == 179:
+            self.remove_herbivores(fallowDeer, 24)
+        # February 2020: -12 fallow; -1 cow; -2 red; -2 pigs
+        if self.schedule.time == 180:
+            self.remove_herbivores(fallowDeer, 12)
+            self.remove_herbivores(redDeer, 2)
+            self.remove_herbivores(tamworthPigs, 2)
+            self.remove_herbivores(longhornCattle, 1)                               
 
-        # # March 2019: -1 pig; fallow and red deer filters
-        # if self.schedule.time == 169:
-        #     self.remove_herbivores(tamworthPigs, 1)
-        # # June 2019: -28 cows and cow filtering condition
-        # if self.schedule.time == 172:
-        #     self.remove_herbivores(longhornCattle, 28)
-        # # July & Aug 2019: -3, +5 cows; -26 pigs; filtering for pigs
-        # if self.schedule.time == 173:
-        #     self.remove_herbivores(tamworthPigs, 26)
-        #     self.add_herbivores(longhornCattle, 2)
-        # # Sept 2019: -15 fallow; -23 and +25 cows
-        # if self.schedule.time == 175:
-        #     self.remove_herbivores(fallowDeer, 15)
-        #     self.add_herbivores(longhornCattle, 2)
-        # # Oct 2019: -5 cows
-        # if self.schedule.time == 176:
-        #     self.remove_herbivores(longhornCattle, 5)
-        # # November 2019: -7 fallow deer; -1 cows; -3 red deer
-        # if self.schedule.time == 177:
-        #     self.remove_herbivores(longhornCattle, 1)
-        #     self.remove_herbivores(fallowDeer, 7)
-        #     self.remove_herbivores(redDeer, 3)
-        # # December 2019: -12 fallow; -7 cows; -4 red; +1 pigs
-        # if self.schedule.time == 178:
-        #     self.remove_herbivores(fallowDeer, 12)
-        #     self.remove_herbivores(longhornCattle, 7)
-        #     self.remove_herbivores(redDeer, 4)
-        #     self.add_herbivores(tamworthPigs, 1)
-        # # January 2020: -24 fallow deer
-        # if self.schedule.time == 179:
-        #     self.remove_herbivores(fallowDeer, 24)
-        # # February 2020: -12 fallow; -1 cow; -2 red; -2 pigs
-        # if self.schedule.time == 180:
-        #     self.remove_herbivores(fallowDeer, 12)
-        #     self.remove_herbivores(redDeer, 2)
-        #     self.remove_herbivores(tamworthPigs, 2)
-        #     self.remove_herbivores(longhornCattle, 1)                               
-
-        # # # # # # 2020 # # # # # #
-        # # March & April 2020: +15 exmoor; -1 and +3 cows; -1 pig; filtering for red and fallow deer
-        # if self.schedule.time == 181:
-        #     self.add_herbivores(exmoorPony, 15)
-        #     self.add_herbivores(longhornCattle, 2)
-        #     self.remove_herbivores(tamworthPigs, 1)
+        # # # # # 2020 # # # # # #
+        # March & April 2020: +15 exmoor; -1 and +3 cows; -1 pig; filtering for red and fallow deer
+        if self.schedule.time == 181:
+            self.add_herbivores(exmoorPony, 15)
+            self.add_herbivores(longhornCattle, 2)
+            self.remove_herbivores(tamworthPigs, 1)
         
         # stop running it in May 2021
-        if self.schedule.time == 50:
+        if self.schedule.time == 184:
             self.running = False 
-
-
 
 
     def run_model(self): 
         # run it for 184 steps
-        for i in range(50):
+        for i in range(184):
             self.step()
             # print(i)
-            # results_step = self.datacollector.get_model_vars_dataframe()
-            # with pd.option_context('display.max_columns',None):
-            #     print(results_step)
         results = self.datacollector.get_model_vars_dataframe()
-        # with pd.option_context('display.max_columns',None, 'display.max_rows',None):
-        #     print(results)
         return results
