@@ -114,15 +114,251 @@ def graph_runs():
     axes[8].set_title("Thorny scrub")
     axes[9].set_title("Bare ground")
     # add filter lines
-    r.axes[0].vlines(x=50,ymin=6,ymax=40, color='r')
-    r.axes[6].vlines(x=50,ymin=49,ymax=90, color='r')
-    r.axes[7].vlines(x=50,ymin=1,ymax=21, color='r')
-    r.axes[8].vlines(x=50,ymin=7,ymax=27, color='r')
+    g.axes[0].vlines(x=50,ymin=6,ymax=40, color='r')
+    g.axes[6].vlines(x=50,ymin=49,ymax=90, color='r')
+    g.axes[7].vlines(x=50,ymin=7,ymax=27, color='r')
+    g.axes[8].vlines(x=50,ymin=1,ymax=21, color='r')
+    # plot post-reintro lines: April 2015
+    g.axes[1].vlines(x=123,ymin=9,ymax=11, color='r')
+    g.axes[3].vlines(x=123,ymin=104,ymax=127, color='r')
+    g.axes[5].vlines(x=123,ymin=20,ymax=24, color='r')
+    # May 2015
+    g.axes[3].vlines(x=124,ymin=116,ymax=142, color='r')
+    g.axes[5].vlines(x=124,ymin=13,ymax=15, color='r')
+    g.axes[1].vlines(x=124,ymin=9,ymax=11, color='r')
+    # June 2015
+    g.axes[3].vlines(x=125,ymin=116,ymax=142, color='r')
+    g.axes[1].vlines(x=125,ymin=9,ymax=11, color='r')
+    g.axes[5].vlines(x=125,ymin=13,ymax=15, color='r')
+    # July 2015
+    g.axes[3].vlines(x=126,ymin=116,ymax=142, color='r')
+    g.axes[1].vlines(x=126,ymin=9,ymax=11, color='r')
+    g.axes[5].vlines(x=126,ymin=13,ymax=15, color='r')
+    # Aug 2015
+    g.axes[3].vlines(x=127,ymin=116,ymax=142, color='r')
+    g.axes[1].vlines(x=127,ymin=9,ymax=11, color='r')
+    g.axes[5].vlines(x=127,ymin=13,ymax=15, color='r')
+    # Sept 2015
+    g.axes[3].vlines(x=128,ymin=117,ymax=143, color='r')
+    g.axes[1].vlines(x=128,ymin=9,ymax=11, color='r')
+    g.axes[5].vlines(x=128,ymin=13,ymax=15, color='r')
+    # Oct 2015
+    g.axes[3].vlines(x=129,ymin=82,ymax=100, color='r')
+    g.axes[1].vlines(x=129,ymin=9,ymax=11, color='r')
+    g.axes[5].vlines(x=129,ymin=13,ymax=15, color='r')
+    # Nov 2015
+    g.axes[3].vlines(x=130,ymin=82,ymax=100, color='r')
+    g.axes[1].vlines(x=130,ymin=9,ymax=11, color='r')
+    g.axes[5].vlines(x=130,ymin=12,ymax=14, color='r')
+    # Dec 2015
+    g.axes[3].vlines(x=131,ymin=77,ymax=94, color='r')
+    g.axes[1].vlines(x=131,ymin=9,ymax=11, color='r')
+    g.axes[5].vlines(x=131,ymin=12,ymax=14, color='r')
+    # Jan 2016
+    g.axes[3].vlines(x=132,ymin=77,ymax=94, color='r')
+    g.axes[1].vlines(x=132,ymin=9,ymax=11, color='r')
+    g.axes[5].vlines(x=132,ymin=9,ymax=11, color='r')
+    # Feb 2016
+    g.axes[1].vlines(x=133,ymin=9,ymax=11, color='r')
+    g.axes[3].vlines(x=133,ymin=77,ymax=94, color='r')
+    g.axes[5].vlines(x=133,ymin=7,ymax=9, color='r')
+    # March 2016
+    g.axes[1].vlines(x=134,ymin=10,ymax=12, color='r')
+    g.axes[3].vlines(x=134,ymin=77,ymax=94, color='r')
+    g.axes[2].vlines(x=134,ymin=126,ymax=154, color='r')
+    g.axes[4].vlines(x=134,ymin=23,ymax=29, color='r')
+    g.axes[5].vlines(x=134,ymin=8,ymax=10, color='r')
+    # April 2016
+    g.axes[1].vlines(x=135,ymin=10,ymax=12, color='r')
+    g.axes[3].vlines(x=135,ymin=93,ymax=113, color='r')
+    g.axes[5].vlines(x=135,ymin=8,ymax=10, color='r')
+    # May 2016
+    g.axes[1].vlines(x=136,ymin=10,ymax=12, color='r')
+    g.axes[3].vlines(x=136,ymin=97,ymax=119, color='r')
+    g.axes[5].vlines(x=136,ymin=15,ymax=19, color='r')
+    # June 2016
+    g.axes[1].vlines(x=137,ymin=10,ymax=12, color='r')
+    g.axes[3].vlines(x=137,ymin=80,ymax=98, color='r')
+    g.axes[5].vlines(x=137,ymin=15,ymax=19, color='r')
+    # July 2016
+    g.axes[1].vlines(x=138,ymin=10,ymax=12, color='r')
+    g.axes[3].vlines(x=138,ymin=78,ymax=96, color='r')
+    g.axes[5].vlines(x=138,ymin=15,ymax=19, color='r')
+    # Aug 2016
+    g.axes[1].vlines(x=139,ymin=10,ymax=12, color='r')
+    g.axes[3].vlines(x=139,ymin=78,ymax=96, color='r')
+    g.axes[5].vlines(x=139,ymin=15,ymax=19, color='r')
+    # Sept 2016
+    g.axes[1].vlines(x=140,ymin=10,ymax=12, color='r')
+    g.axes[3].vlines(x=140,ymin=87,ymax=107, color='r')
+    g.axes[5].vlines(x=140,ymin=15,ymax=19, color='r')
+    # Oct 2016
+    g.axes[1].vlines(x=141,ymin=10,ymax=12, color='r')
+    g.axes[3].vlines(x=141,ymin=87,ymax=107, color='r')
+    g.axes[5].vlines(x=141,ymin=15,ymax=19, color='r')
+    # Nov 2016
+    g.axes[1].vlines(x=142,ymin=10,ymax=12, color='r')
+    g.axes[3].vlines(x=142,ymin=83,ymax=101, color='r')
+    g.axes[5].vlines(x=142,ymin=15,ymax=19, color='r')
+    # Dec 2016
+    g.axes[1].vlines(x=143,ymin=10,ymax=12, color='r')
+    g.axes[3].vlines(x=143,ymin=71,ymax=87, color='r')
+    g.axes[5].vlines(x=143,ymin=12,ymax=14, color='r')
+    # Jan 2017
+    g.axes[1].vlines(x=144,ymin=10,ymax=12, color='r')
+    g.axes[3].vlines(x=144,ymin=71,ymax=87, color='r')
+    g.axes[5].vlines(x=144,ymin=8,ymax=10, color='r')
+    # Feb 2017
+    g.axes[1].vlines(x=145,ymin=10,ymax=12, color='r')
+    g.axes[3].vlines(x=145,ymin=71,ymax=87, color='r')
+    g.axes[5].vlines(x=145,ymin=6,ymax=8, color='r')
+    # March 2017
+    g.axes[1].vlines(x=146,ymin=9,ymax=11, color='r')
+    g.axes[2].vlines(x=146,ymin=149,ymax=182, color='r')
+    g.axes[3].vlines(x=146,ymin=71,ymax=87, color='r')
+    g.axes[5].vlines(x=146,ymin=6,ymax=8, color='r')
+    # April 2017
+    g.axes[1].vlines(x=147,ymin=9,ymax=11, color='r')
+    g.axes[3].vlines(x=147,ymin=90,ymax=110, color='r')
+    g.axes[5].vlines(x=147,ymin=20,ymax=24, color='r')
+    # May 2017
+    g.axes[1].vlines(x=148,ymin=9,ymax=11, color='r')
+    g.axes[3].vlines(x=148,ymin=98,ymax=120, color='r')
+    g.axes[5].vlines(x=148,ymin=20,ymax=24, color='r')
+    # June 2017
+    g.axes[1].vlines(x=149,ymin=9,ymax=11, color='r')
+    g.axes[3].vlines(x=149,ymin=85,ymax=103, color='r')
+    g.axes[5].vlines(x=149,ymin=20,ymax=24, color='r')
+    # July 2017
+    g.axes[1].vlines(x=150,ymin=9,ymax=11, color='r')
+    g.axes[3].vlines(x=150,ymin=85,ymax=103, color='r')
+    g.axes[5].vlines(x=150,ymin=20,ymax=24, color='r')
+    # Aug 2017
+    g.axes[1].vlines(x=151,ymin=9,ymax=11, color='r')
+    g.axes[3].vlines(x=151,ymin=85,ymax=103, color='r')
+    g.axes[5].vlines(x=151,ymin=20,ymax=24, color='r')
+    # Sept 2017
+    g.axes[1].vlines(x=152,ymin=9,ymax=11, color='r')
+    g.axes[3].vlines(x=152,ymin=81,ymax=99, color='r')
+    g.axes[5].vlines(x=152,ymin=20,ymax=24, color='r')
+    # Oct 2017
+    g.axes[1].vlines(x=153,ymin=9,ymax=11, color='r')
+    g.axes[3].vlines(x=153,ymin=79,ymax=97, color='r')
+    g.axes[5].vlines(x=153,ymin=20,ymax=24, color='r')
+    # Nov 2017
+    g.axes[1].vlines(x=154,ymin=9,ymax=11, color='r')
+    g.axes[3].vlines(x=154,ymin=79,ymax=97, color='r')
+    g.axes[5].vlines(x=154,ymin=20,ymax=24, color='r')
+    # Dec 2017
+    g.axes[1].vlines(x=155,ymin=9,ymax=11, color='r')
+    g.axes[3].vlines(x=155,ymin=79,ymax=97, color='r')
+    g.axes[5].vlines(x=155,ymin=16,ymax=20, color='r')
+    # Jan 2018
+    g.axes[1].vlines(x=156,ymin=9,ymax=11, color='r')
+    g.axes[3].vlines(x=156,ymin=79,ymax=97, color='r')
+    g.axes[5].vlines(x=156,ymin=10,ymax=12, color='r')
+    # Feb 2018
+    g.axes[1].vlines(x=157,ymin=9,ymax=11, color='r')
+    g.axes[3].vlines(x=157,ymin=79,ymax=97, color='r')
+    g.axes[5].vlines(x=157,ymin=14,ymax=18, color='r')
+    # March 2018
+    g.axes[1].vlines(x=158,ymin=8,ymax=10, color='r')
+    g.axes[2].vlines(x=158,ymin=226,ymax=276, color='r')
+    g.axes[3].vlines(x=158,ymin=79,ymax=97, color='r')
+    g.axes[4].vlines(x=158,ymin=22,ymax=26, color='r')
+    g.axes[5].vlines(x=158,ymin=14,ymax=18, color='r')
+    # April 2018
+    g.axes[1].vlines(x=159,ymin=8,ymax=10, color='r')
+    g.axes[3].vlines(x=159,ymin=91,ymax=111, color='r')
+    g.axes[5].vlines(x=159,ymin=14,ymax=18, color='r')
+    # May 2018
+    g.axes[1].vlines(x=160,ymin=8,ymax=10, color='r')
+    g.axes[3].vlines(x=160,ymin=105,ymax=129, color='r')
+    g.axes[5].vlines(x=160,ymin=21,ymax=25, color='r')
+    # June 2018
+    g.axes[1].vlines(x=161,ymin=8,ymax=10, color='r')
+    g.axes[3].vlines(x=161,ymin=93,ymax=113, color='r')
+    g.axes[5].vlines(x=161,ymin=21,ymax=25, color='r')
+    # July 2018
+    g.axes[1].vlines(x=162,ymin=8,ymax=10, color='r')
+    g.axes[3].vlines(x=162,ymin=93,ymax=113, color='r')
+    g.axes[5].vlines(x=162,ymin=20,ymax=24, color='r')
+    # Aug 2018
+    g.axes[3].vlines(x=163,ymin=92,ymax=112, color='r')
+    g.axes[5].vlines(x=163,ymin=20,ymax=24, color='r')
+    # Sept 2018
+    g.axes[3].vlines(x=164,ymin=95,ymax=117, color='r')
+    g.axes[5].vlines(x=164,ymin=20,ymax=24, color='r')
+    # Oct 2018
+    g.axes[3].vlines(x=165,ymin=91,ymax=111, color='r')
+    g.axes[5].vlines(x=165,ymin=19,ymax=23, color='r')
+    # Nov 2018
+    g.axes[3].vlines(x=166,ymin=84,ymax=102, color='r')
+    g.axes[5].vlines(x=166,ymin=8,ymax=10, color='r')
+    # Dec 2018
+    g.axes[3].vlines(x=167,ymin=80,ymax=98, color='r')
+    g.axes[5].vlines(x=167,ymin=8,ymax=10, color='r')
+    # Jan 2019
+    g.axes[3].vlines(x=168,ymin=80,ymax=98, color='r')
+    g.axes[5].vlines(x=168,ymin=8,ymax=10, color='r')
+    # Feb 2019
+    g.axes[3].vlines(x=169,ymin=78,ymax=96, color='r')
+    g.axes[5].vlines(x=169,ymin=9,ymax=11, color='r')
+    # March 2019
+    g.axes[2].vlines(x=170,ymin=250,ymax=306, color='r')
+    g.axes[3].vlines(x=170,ymin=78,ymax=96, color='r')
+    g.axes[4].vlines(x=170,ymin=33,ymax=41, color='r')
+    g.axes[5].vlines(x=170,ymin=8,ymax=10, color='r')
+    # April 2019
+    g.axes[3].vlines(x=171,ymin=91,ymax=111, color='r')
+    g.axes[5].vlines(x=171,ymin=7,ymax=9, color='r')
+    # May 2019
+    g.axes[3].vlines(x=172,ymin=99,ymax=121, color='r')
+    g.axes[5].vlines(x=172,ymin=7,ymax=9, color='r')
+    # June 2019
+    g.axes[3].vlines(x=173,ymin=80,ymax=98, color='r')
+    g.axes[5].vlines(x=173,ymin=7,ymax=9, color='r')
+    # July 2019
+    g.axes[3].vlines(x=174,ymin=82,ymax=100, color='r')
+    g.axes[5].vlines(x=174,ymin=8,ymax=10, color='r')
+    # Aug 2019
+    g.axes[3].vlines(x=175,ymin=82,ymax=100, color='r')
+    g.axes[5].vlines(x=175,ymin=8,ymax=10, color='r')  
+    # Sept 2019
+    g.axes[3].vlines(x=176,ymin=84,ymax=102, color='r')
+    g.axes[5].vlines(x=176,ymin=8,ymax=10, color='r')
+    # Oct 2019
+    g.axes[3].vlines(x=177,ymin=79,ymax=97, color='r')
+    g.axes[5].vlines(x=177,ymin=8,ymax=10, color='r')
+    # Nov 2019
+    g.axes[3].vlines(x=178,ymin=78,ymax=96, color='r')
+    g.axes[5].vlines(x=178,ymin=8,ymax=10, color='r')
+    # Dec 2019
+    g.axes[3].vlines(x=179,ymin=72,ymax=88, color='r')
+    g.axes[5].vlines(x=179,ymin=9,ymax=11, color='r')
+    # Jan 2020
+    g.axes[3].vlines(x=180,ymin=72,ymax=88, color='r')
+    g.axes[5].vlines(x=180,ymin=9,ymax=11, color='r')
+    # Feb 2020
+    g.axes[3].vlines(x=181,ymin=71,ymax=87, color='r')
+    g.axes[5].vlines(x=181,ymin=7,ymax=9, color='r')
+    # March 2020
+    g.axes[2].vlines(x=182,ymin=222,ymax=272, color='r')
+    g.axes[4].vlines(x=182,ymin=32,ymax=39, color='r')
+    g.axes[3].vlines(x=182,ymin=73,ymax=89, color='r')
+    g.axes[5].vlines(x=182,ymin=6,ymax=8, color='r')
+    # April 2020
+    g.axes[1].vlines(x=183,ymin=14,ymax=17, color='r')
+    g.axes[3].vlines(x=183,ymin=73,ymax=89, color='r')
+    g.axes[5].vlines(x=183,ymin=6,ymax=8, color='r')
     # plot next set of filter lines
-    r.axes[0].vlines(x=184,ymin=20,ymax=40, color='r')
-    r.axes[6].vlines(x=184,ymin=49,ymax=69, color='r')
-    r.axes[7].vlines(x=184,ymin=9,ymax=29, color='r')
-    r.axes[8].vlines(x=184,ymin=21,ymax=35, color='r')
+    g.axes[0].vlines(x=184,ymin=20,ymax=40, color='r')
+    g.axes[1].vlines(x=184,ymin=14,ymax=17, color='r')
+    g.axes[3].vlines(x=184,ymin=73,ymax=89, color='r')
+    g.axes[5].vlines(x=184,ymin=17,ymax=21, color='r')
+    g.axes[6].vlines(x=184,ymin=49,ymax=69, color='r')
+    g.axes[7].vlines(x=184,ymin=9,ymax=29, color='r')
+    g.axes[8].vlines(x=184,ymin=21,ymax=35, color='r')
     # stop the plots from overlapping
     plt.tight_layout()
     plt.legend(labels=['Rejected Runs', 'Accepted Runs'],bbox_to_anchor=(2.2, 0), loc='lower right', fontsize=12)
