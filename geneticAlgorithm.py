@@ -459,8 +459,8 @@ def run_optimizer():
         [6,9],[10,14],[15,30],[15,30],[20,30]
     ])
 
-    algorithm_param = {'max_num_iteration': 1,\
-                    'population_size':1,\
+    algorithm_param = {'max_num_iteration': 10,\
+                    'population_size':10,\
                     'mutation_probability':0.1,\
                     'elit_ratio': 0.01,\
                     'crossover_probability': 0.5,\

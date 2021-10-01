@@ -561,7 +561,7 @@ def optimizer_fails():
 
     # stop the plots from overlapping
     plt.tight_layout()
-    plt.savefig('optimizerFails.png')
+    plt.savefig('optimizerFails_extended.png')
     plt.show()
 
 
@@ -569,11 +569,12 @@ def optimizer_fails():
     sensitivity_results_list = []
     sensitivity_parameters = []
     run_number  = 0
-    # choose my percent above/below number
-    perc_aboveBelow = [-0.05, 0.05, 0]
+    # choose my percent above/below number - repeat each one 10 times?
+
+    perc_aboveBelow = np.repeat([-0.05, 0.05], 3)
     # choose my percent above/below number
     final_parameters = final_parameters.iloc[0,1:78]
-    # organized = final_parameters.iloc[0:5]
+    # organized = final_parameters.iloc[0:3]
     # loop through each one, changing one cell at a time
     for index, row in final_parameters.iteritems():
         for perc_number in perc_aboveBelow:
@@ -582,8 +583,8 @@ def optimizer_fails():
             # make sure they're ints where applicable
             if ifor_val > 1:
                 ifor_val = round(ifor_val)
-            print(run_number, final_parameters.at[index])
             final_parameters.at[index] = ifor_val
+            print(run_number, final_parameters.at[index])
             # choose my parameters 
             chance_reproduceSapling = final_parameters.values[0]
             chance_reproduceYoungScrub = final_parameters.values[1]
@@ -712,8 +713,8 @@ def optimizer_fails():
     final_sensitivity_results = final_sensitivity_results[(final_sensitivity_results["Time"] == 184)]
     final_sensitivity_results = final_sensitivity_results.reset_index(drop=True)
     merged_dfs = pd.concat([final_sensitivity_parameters, final_sensitivity_results], axis=1)
+    print("merged", merged_dfs)
 
-    # print(merged_dfs) 3 * paraneters x 88 cols
 
     # ROE DEER
     roe_gradients = []
@@ -727,14 +728,16 @@ def optimizer_fails():
         res = linregress(merged_dfs[column], merged_dfs["Roe deer"])
         roe_gradient = [column, res.slope]
         roe_gradients.append(roe_gradient)
-        # append column name & values, populations and gradients 
-        column_names.append([column]*3*77)
-         #  print("column names", [column]*3) len = 3
+        column_names.append([column]*6*77)
         column_values.append(merged_dfs[column].to_list())
-        #  print("values", merged_dfs[column].to_list()) len = 3 * parameters
         populations.append(merged_dfs["Roe deer"].to_list())
-        #  print('pop', merged_dfs["Roe deer"].to_list()) len = 3 x parameters 
-        gradients.append([res.slope]*3*77)
+        gradients.append([res.slope]*6*77)
+    
+    print(roe_gradients, len(roe_gradients))
+    print(column_names, len(column_names))
+    print(column_values, len(column_values))
+    print(populations, len(populations))
+    print(gradients, len(gradients))
 
     # organize the data
     roe_gradients = pd.DataFrame(data=roe_gradients, columns = ['Parameter name', 'Gradient'])
@@ -755,12 +758,12 @@ def optimizer_fails():
     top_ten_combined = all_values_roe.where(all_values_roe.Parameter_names.isin(top_ten['Parameter name']))
     top_ten_combined = top_ten_combined[top_ten_combined['Parameter_names'].notna()]
     print(top_ten_combined)
-    top_ten_combined.to_excel("final_df_gradients_roeDeer.xlsx")
+    top_ten_combined.to_excel("final_df_gradients_roeDeer_extended.xlsx")
     # graph it
     ro = sns.relplot(data=top_ten_combined, x='Parameter_values', y='Population', col='Parameter_names', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
     ro.fig.suptitle('Roe deer gradients')
     plt.tight_layout()
-    plt.savefig('sensitivity_roe.png')
+    plt.savefig('sensitivity_roe_extended.png')
     plt.show()
 
 
@@ -777,10 +780,10 @@ def optimizer_fails():
         fallow_gradient = [column, res.slope]
         fallow_gradients.append(fallow_gradient)
         # append column name & values, populations and gradients 
-        column_names_fallow.append([column]*3*77)
+        column_names_fallow.append([column]*6*77)
         column_values_fallow.append(merged_dfs[column].to_list())
         populations_fallow.append(merged_dfs["Fallow deer"].to_list())
-        gradients_fallow.append([res.slope]*3*77)
+        gradients_fallow.append([res.slope]*6*77)
 
     # organize the data
     fallow_gradients = pd.DataFrame(data=fallow_gradients, columns = ['Parameter name', 'Gradient'])
@@ -801,12 +804,12 @@ def optimizer_fails():
     top_ten_combined_fallow = all_values_fallow.where(all_values_fallow.Parameter_names.isin(top_ten_fallow['Parameter name']))
     top_ten_combined_fallow = top_ten_combined_fallow[top_ten_combined_fallow['Parameter_names'].notna()]
     print(top_ten_combined_fallow)
-    top_ten_combined_fallow.to_excel("final_df_gradients_fallowDeer.xlsx")
+    top_ten_combined_fallow.to_excel("final_df_gradients_fallowDeer_extended.xlsx")
     # graph it
     f = sns.relplot(data=top_ten_combined_fallow, x='Parameter_values', y='Population', col='Parameter_names', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
     f.fig.suptitle('Fallow deer gradients')
     plt.tight_layout()
-    plt.savefig('sensitivity_fallow.png')
+    plt.savefig('sensitivity_fallow_extended.png')
     plt.show()
 
 
@@ -823,10 +826,10 @@ def optimizer_fails():
         red_gradient = [column, res.slope]
         red_gradients.append(red_gradient)
         # append column name & values, populations and gradients 
-        column_names_red.append([column]*3*77)
+        column_names_red.append([column]*6*77)
         column_values_red.append(merged_dfs[column].to_list())
         populations_red.append(merged_dfs["Red deer"].to_list())
-        gradients_red.append([res.slope]*3*77)
+        gradients_red.append([res.slope]*6*77)
 
     # organize the data
     red_gradients = pd.DataFrame(data=red_gradients, columns = ['Parameter name', 'Gradient'])
@@ -847,12 +850,12 @@ def optimizer_fails():
     top_ten_combined_red = all_values_red.where(all_values_red.Parameter_names.isin(top_ten_red['Parameter name']))
     top_ten_combined_red = top_ten_combined_red[top_ten_combined_red['Parameter_names'].notna()]
     print(top_ten_combined_red)
-    top_ten_combined_red.to_excel("final_df_gradients_redDeer.xlsx")
+    top_ten_combined_red.to_excel("final_df_gradients_redDeer_extended.xlsx")
     # graph it
     r = sns.relplot(data=top_ten_combined_red, x='Parameter_values', y='Population', col='Parameter_names', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
     r.fig.suptitle('Red deer gradients')
     plt.tight_layout()
-    plt.savefig('sensitivity_red.png')
+    plt.savefig('sensitivity_red_extended.png')
     plt.show()
 
 
@@ -870,10 +873,10 @@ def optimizer_fails():
         cattle_gradient = [column, res.slope]
         cattle_gradients.append(cattle_gradient)
         # append column name & values, populations and gradients 
-        column_names_cattle.append([column]*3*77)
+        column_names_cattle.append([column]*6*77)
         column_values_cattle.append(merged_dfs[column].to_list())
         populations_cattle.append(merged_dfs["Longhorn cattle"].to_list())
-        gradients_cattle.append([res.slope]*3*77)
+        gradients_cattle.append([res.slope]*6*77)
 
     # organize the data
     cattle_gradients = pd.DataFrame(data=cattle_gradients, columns = ['Parameter name', 'Gradient'])
@@ -894,12 +897,12 @@ def optimizer_fails():
     top_ten_combined_cattle = all_values_cattle.where(all_values_cattle.Parameter_names.isin(top_ten_cattle['Parameter name']))
     top_ten_combined_cattle = top_ten_combined_cattle[top_ten_combined_cattle['Parameter_names'].notna()]
     print(top_ten_combined_cattle)
-    top_ten_combined_cattle.to_excel("final_df_gradients_cattle.xlsx")
+    top_ten_combined_cattle.to_excel("final_df_gradients_cattle_extended.xlsx")
     # graph it
     l = sns.relplot(data=top_ten_combined_cattle, x='Parameter_values', y='Population', col='Parameter_names', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
     l.fig.suptitle('Longhorn cattle gradients')
     plt.tight_layout()
-    plt.savefig('sensitivity_cattle.png')
+    plt.savefig('sensitivity_cattle_extended.png')
     plt.show()
 
 
@@ -916,10 +919,10 @@ def optimizer_fails():
         pig_gradient = [column, res.slope]
         pig_gradients.append(pig_gradient)
         # append column name & values, populations and gradients 
-        column_names_pig.append([column]*3*77)
+        column_names_pig.append([column]*6*77)
         column_values_pig.append(merged_dfs[column].to_list())
         populations_pig.append(merged_dfs["Tamworth pigs"].to_list())
-        gradients_pig.append([res.slope]*3*77)
+        gradients_pig.append([res.slope]*6*77)
 
     # organize the data
     pig_gradients = pd.DataFrame(data=pig_gradients, columns = ['Parameter name', 'Gradient'])
@@ -940,12 +943,12 @@ def optimizer_fails():
     top_ten_combined_pig = all_values_pig.where(all_values_pig.Parameter_names.isin(top_ten_pig['Parameter name']))
     top_ten_combined_pig = top_ten_combined_pig[top_ten_combined_pig['Parameter_names'].notna()]
     print(top_ten_combined_pig)
-    top_ten_combined_pig.to_excel("final_df_gradients_pig.xlsx")
+    top_ten_combined_pig.to_excel("final_df_gradients_pig_extended.xlsx")
     # graph it
     t = sns.relplot(data=top_ten_combined_pig, x='Parameter_values', y='Population', col='Parameter_names', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
     t.fig.suptitle('Tamworth pig gradients')
     plt.tight_layout()
-    plt.savefig('sensitivity_pigs.png')
+    plt.savefig('sensitivity_pigs_extended.png')
     plt.show()
 
 
@@ -962,10 +965,10 @@ def optimizer_fails():
         pony_gradient = [column, res.slope]
         pony_gradients.append(pony_gradient)
         # append column name & values, populations and gradients 
-        column_names_pony.append([column]*3*77)
+        column_names_pony.append([column]*6*77)
         column_values_pony.append(merged_dfs[column].to_list())
         populations_pony.append(merged_dfs["Exmoor pony"].to_list())
-        gradients_pony.append([res.slope]*3*77)
+        gradients_pony.append([res.slope]*6*77)
 
     # organize the data
     pony_gradients = pd.DataFrame(data=pony_gradients, columns = ['Parameter name', 'Gradient'])
@@ -986,12 +989,12 @@ def optimizer_fails():
     top_ten_combined_pony = all_values_pony.where(all_values_pony.Parameter_names.isin(top_ten_pony['Parameter name']))
     top_ten_combined_pony = top_ten_combined_pony[top_ten_combined_pony['Parameter_names'].notna()]
     print(top_ten_combined_pony)
-    top_ten_combined_pony.to_excel("final_df_gradients_pony.xlsx")
+    top_ten_combined_pony.to_excel("final_df_gradients_pony_extended.xlsx")
     # graph it
     p = sns.relplot(data=top_ten_combined_pony, x='Parameter_values', y='Population', col='Parameter_names', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
     p.fig.suptitle('Exmoor pony gradients')
     plt.tight_layout()
-    plt.savefig('sensitivity_pony.png')
+    plt.savefig('sensitivity_pony_extended.png')
     plt.show()
 
 
@@ -1009,10 +1012,10 @@ def optimizer_fails():
         grassland_gradient = [column, res.slope]
         grassland_gradients.append(grassland_gradient)
         # append column name & values, populations and gradients 
-        column_names_grassland.append([column]*3*77)
+        column_names_grassland.append([column]*6*77)
         column_values_grassland.append(merged_dfs[column].to_list())
         populations_grassland.append(merged_dfs["Grassland"].to_list())
-        gradients_grassland.append([res.slope]*3*77)
+        gradients_grassland.append([res.slope]*6*77)
 
     # organize the data
     grassland_gradients = pd.DataFrame(data=grassland_gradients, columns = ['Parameter name', 'Gradient'])
@@ -1033,12 +1036,12 @@ def optimizer_fails():
     top_ten_combined_grassland = all_values_grassland.where(all_values_grassland.Parameter_names.isin(top_ten_grassland['Parameter name']))
     top_ten_combined_grassland = top_ten_combined_grassland[top_ten_combined_grassland['Parameter_names'].notna()]
     print(top_ten_combined_grassland)
-    top_ten_combined_grassland.to_excel("final_df_gradients_grassland.xlsx")
+    top_ten_combined_grassland.to_excel("final_df_gradients_grassland_extended.xlsx")
     # graph it
     g = sns.relplot(data=top_ten_combined_grassland, x='Parameter_values', y='Population', col='Parameter_names', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
     g.fig.suptitle('Grassland gradients')
     plt.tight_layout()
-    plt.savefig('sensitivity_grass.png')
+    plt.savefig('sensitivity_grass_extended.png')
     plt.show()
 
 
@@ -1055,10 +1058,10 @@ def optimizer_fails():
         scrub_gradient = [column, res.slope]
         scrub_gradients.append(scrub_gradient)
         # append column name & values, populations and gradients 
-        column_names_scrub.append([column]*3*77)
+        column_names_scrub.append([column]*6*77)
         column_values_scrub.append(merged_dfs[column].to_list())
         populations_scrub.append(merged_dfs["Thorny Scrub"].to_list())
-        gradients_scrub.append([res.slope]*3*77)
+        gradients_scrub.append([res.slope]*6*77)
 
     # organize the data
     scrub_gradients = pd.DataFrame(data=scrub_gradients, columns = ['Parameter name', 'Gradient'])
@@ -1079,12 +1082,12 @@ def optimizer_fails():
     top_ten_combined_scrub = all_values_scrub.where(all_values_scrub.Parameter_names.isin(top_ten_scrub['Parameter name']))
     top_ten_combined_scrub = top_ten_combined_scrub[top_ten_combined_scrub['Parameter_names'].notna()]
     print(top_ten_combined_scrub)
-    top_ten_combined_scrub.to_excel("final_df_gradients_scrub.xlsx")
+    top_ten_combined_scrub.to_excel("final_df_gradients_scrub_extended.xlsx")
     # graph it
     s = sns.relplot(data=top_ten_combined_scrub, x='Parameter_values', y='Population', col='Parameter_names', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
     s.fig.suptitle('Thorny scrub gradients')
     plt.tight_layout()
-    plt.savefig('sensitivity_scrub.png')
+    plt.savefig('sensitivity_scrub_extended.png')
     plt.show()
 
 
@@ -1102,10 +1105,10 @@ def optimizer_fails():
         woodland_gradient = [column, res.slope]
         woodland_gradients.append(woodland_gradient)
         # append column name & values, populations and gradients 
-        column_names_woodland.append([column]*3*77)
+        column_names_woodland.append([column]*6*77)
         column_values_woodland.append(merged_dfs[column].to_list())
         populations_woodland.append(merged_dfs["Woodland"].to_list())
-        gradients_woodland.append([res.slope]*3*77)
+        gradients_woodland.append([res.slope]*6*77)
 
     # organize the data
     woodland_gradients = pd.DataFrame(data=woodland_gradients, columns = ['Parameter name', 'Gradient'])
@@ -1126,12 +1129,12 @@ def optimizer_fails():
     top_ten_combined_woodland= all_values_woodland.where(all_values_woodland.Parameter_names.isin(top_ten_woodland['Parameter name']))
     top_ten_combined_woodland= top_ten_combined_woodland[top_ten_combined_woodland['Parameter_names'].notna()]
     print(top_ten_combined_woodland)
-    top_ten_combined_woodland.to_excel("final_df_gradients_woodland.xlsx")
+    top_ten_combined_woodland.to_excel("final_df_gradients_woodland_extended.xlsx")
     # graph it
     w = sns.relplot(data=top_ten_combined_woodland, x='Parameter_values', y='Population', col='Parameter_names', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
     w.fig.suptitle('Woodland gradients')
     plt.tight_layout()
-    plt.savefig('sensitivity_woodland.png')
+    plt.savefig('sensitivity_woodland_extended.png')
     plt.show()
 
 
