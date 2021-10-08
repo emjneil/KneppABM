@@ -95,29 +95,6 @@ class habitatAgent (Agent):
         self.trees_here += number_saplings_maturing
         self.saplings_here -= number_saplings_maturing
 
-        # random.multinomial(n=self.perc_grass_here, probability = [outcompeted_by_tree,outcompeted_by_scrub,1-thosetwoprobabilities])
-        #  chance of habitat being outcompeted by mature trees
-        # for _ in range(self.perc_grass_here):
-        #     if random.random() < self.trees_here/300*self.model.chance_grassOutcompetedByTree:
-        #         self.perc_grass_here -= 1
-        #         self.perc_bareground_here += 1
-        #     elif random.random() < self.scrub_here/300*self.model.chance_grassOutcompetedByScrub:
-        #         self.perc_grass_here -= 1
-        #         self.perc_bareground_here += 1
-        # for _ in range(self.scrub_here):
-        #     if random.random() < self.trees_here/300*self.model.chance_scrubOutcompetedByTree:
-        #         self.scrub_here -= 1
-        # for _ in range(self.saplings_here):
-        #     if random.random() < self.trees_here/300*self.model.chance_saplingOutcompetedByTree:
-        #         self.saplings_here -= 1
-        #     elif random.random() < self.scrub_here/300*self.model.chance_saplingOutcompetedByScrub:
-        #         self.saplings_here -= 1
-        # for _ in range(self.youngscrub_here):
-        #     if random.random() < self.trees_here/300*self.model.chance_youngScrubOutcompetedByTree:
-        #         self.youngscrub_here -= 1
-        #     elif random.random() < self.scrub_here/300*self.model.chance_youngScrubOutcompetedByScrub:
-        #         self.youngscrub_here -= 1
-
         # chance of grass being outcompeted by mature trees and scrub
         combined_trees_shrubs = ((self.trees_here/300)*self.model.chance_grassOutcompetedByTree) + ((self.scrub_here/300)*self.model.chance_grassOutcompetedByScrub)
         if combined_trees_shrubs > 1: combined_trees_shrubs = 1
@@ -619,10 +596,10 @@ class KneppModel(Model):
             width, height):
 
         # set parameters
-        self.initial_roeDeer = initial_roeDeer
-        self.initial_grassland = initial_grassland
-        self.initial_woodland = initial_woodland
-        self.initial_scrubland = initial_scrubland
+        self.initial_roeDeer = round(100*initial_roeDeer)
+        self.initial_grassland = round(100*initial_grassland)
+        self.initial_woodland = round(100*initial_woodland)
+        self.initial_scrubland = round(100*initial_scrubland)
         self.chance_reproduceSapling = chance_reproduceSapling
         self.chance_reproduceYoungScrub = chance_reproduceYoungScrub
         self.chance_regrowGrass = chance_regrowGrass
@@ -642,22 +619,22 @@ class KneppModel(Model):
         self.roeDeer_gain_from_Saplings = roeDeer_gain_from_Saplings
         self.roeDeer_gain_from_YoungScrub = roeDeer_gain_from_YoungScrub
         self.roeDeer_reproduce = roeDeer_reproduce
-        self.roeDeer_treesEaten = roeDeer_treesEaten
-        self.roeDeer_scrubEaten = roeDeer_scrubEaten
-        self.roeDeer_impactGrass = roeDeer_impactGrass
-        self.roeDeer_saplingsEaten = roeDeer_saplingsEaten
-        self.roeDeer_youngScrubEaten = roeDeer_youngScrubEaten
+        self.roeDeer_treesEaten = round(300*roeDeer_treesEaten)
+        self.roeDeer_scrubEaten = round(300*roeDeer_scrubEaten)
+        self.roeDeer_impactGrass = round(100*roeDeer_impactGrass)
+        self.roeDeer_saplingsEaten = round(3000*roeDeer_saplingsEaten)
+        self.roeDeer_youngScrubEaten = round(3000*roeDeer_youngScrubEaten)
         # exmoor pony parameters
         self.ponies_gain_from_grass = ponies_gain_from_grass
         self.ponies_gain_from_Trees =ponies_gain_from_Trees
         self.ponies_gain_from_Scrub = ponies_gain_from_Scrub
         self.ponies_gain_from_Saplings = ponies_gain_from_Saplings
         self.ponies_gain_from_YoungScrub = ponies_gain_from_YoungScrub
-        self.ponies_impactGrass = ponies_impactGrass
-        self.ponies_saplingsEaten = ponies_saplingsEaten
-        self.ponies_youngScrubEaten = ponies_youngScrubEaten
-        self.ponies_treesEaten = ponies_treesEaten
-        self.ponies_scrubEaten = ponies_scrubEaten
+        self.ponies_impactGrass = round(100*ponies_impactGrass)
+        self.ponies_saplingsEaten = round(3000*ponies_saplingsEaten)
+        self.ponies_youngScrubEaten = round(3000*ponies_youngScrubEaten)
+        self.ponies_treesEaten = round(300*ponies_treesEaten)
+        self.ponies_scrubEaten = round(300*ponies_scrubEaten)
         # cow parameters
         self.cows_reproduce = cows_reproduce
         self.cows_gain_from_grass = cows_gain_from_grass
@@ -665,11 +642,11 @@ class KneppModel(Model):
         self.cows_gain_from_Scrub = cows_gain_from_Scrub
         self.cows_gain_from_Saplings = cows_gain_from_Saplings
         self.cows_gain_from_YoungScrub = cows_gain_from_YoungScrub
-        self.cows_impactGrass = cows_impactGrass
-        self.cows_saplingsEaten = cows_saplingsEaten
-        self.cows_youngScrubEaten = cows_youngScrubEaten
-        self.cows_treesEaten = cows_treesEaten
-        self.cows_scrubEaten = cows_scrubEaten
+        self.cows_impactGrass = round(100*cows_impactGrass)
+        self.cows_saplingsEaten = round(3000*cows_saplingsEaten)
+        self.cows_youngScrubEaten = round(3000*cows_youngScrubEaten)
+        self.cows_treesEaten = round(300*cows_treesEaten)
+        self.cows_scrubEaten = round(cows_scrubEaten*300)
         # fallow deer parameters
         self.fallowDeer_reproduce = fallowDeer_reproduce
         self.fallowDeer_gain_from_grass = fallowDeer_gain_from_grass
@@ -677,11 +654,11 @@ class KneppModel(Model):
         self.fallowDeer_gain_from_Scrub = fallowDeer_gain_from_Scrub
         self.fallowDeer_gain_from_Saplings = fallowDeer_gain_from_Saplings
         self.fallowDeer_gain_from_YoungScrub = fallowDeer_gain_from_YoungScrub
-        self.fallowDeer_impactGrass = fallowDeer_impactGrass
-        self.fallowDeer_saplingsEaten = fallowDeer_saplingsEaten
-        self.fallowDeer_youngScrubEaten = fallowDeer_youngScrubEaten
-        self.fallowDeer_treesEaten = fallowDeer_treesEaten
-        self.fallowDeer_scrubEaten = fallowDeer_scrubEaten
+        self.fallowDeer_impactGrass = round(fallowDeer_impactGrass*100)
+        self.fallowDeer_saplingsEaten = round(fallowDeer_saplingsEaten*3000)
+        self.fallowDeer_youngScrubEaten = round(fallowDeer_youngScrubEaten*3000)
+        self.fallowDeer_treesEaten = round(fallowDeer_treesEaten*300)
+        self.fallowDeer_scrubEaten = round(fallowDeer_scrubEaten*300)
         # red deer parameters
         self.redDeer_reproduce = redDeer_reproduce
         self.redDeer_gain_from_grass = redDeer_gain_from_grass
@@ -689,19 +666,19 @@ class KneppModel(Model):
         self.redDeer_gain_from_Scrub = redDeer_gain_from_Scrub
         self.redDeer_gain_from_Saplings = redDeer_gain_from_Saplings
         self.redDeer_gain_from_YoungScrub = redDeer_gain_from_YoungScrub
-        self.redDeer_impactGrass = redDeer_impactGrass
-        self.redDeer_saplingsEaten = redDeer_saplingsEaten
-        self.redDeer_youngScrubEaten = redDeer_youngScrubEaten
-        self.redDeer_treesEaten = redDeer_treesEaten
-        self.redDeer_scrubEaten = redDeer_scrubEaten
+        self.redDeer_impactGrass = round(redDeer_impactGrass*100)
+        self.redDeer_saplingsEaten = round(redDeer_saplingsEaten*3000)
+        self.redDeer_youngScrubEaten = round(redDeer_youngScrubEaten*3000)
+        self.redDeer_treesEaten = round(redDeer_treesEaten*300)
+        self.redDeer_scrubEaten = round(redDeer_scrubEaten*300)
         # pig parameters
         self.pigs_reproduce = pigs_reproduce
         self.pigs_gain_from_grass = pigs_gain_from_grass
         self.pigs_gain_from_Saplings = pigs_gain_from_Saplings
         self.pigs_gain_from_YoungScrub = pigs_gain_from_YoungScrub
-        self.pigs_impactGrass = pigs_impactGrass
-        self.pigs_saplingsEaten = pigs_saplingsEaten
-        self.pigs_youngScrubEaten = pigs_youngScrubEaten
+        self.pigs_impactGrass = round(pigs_impactGrass*100)
+        self.pigs_saplingsEaten = round(pigs_saplingsEaten*3000)
+        self.pigs_youngScrubEaten = round(pigs_youngScrubEaten*3000)
         # other parameters
         self.height = height
         self.width = width

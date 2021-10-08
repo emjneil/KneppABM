@@ -24,19 +24,9 @@ def optimizer_fails():
     final_parameters = []
     run_number = 0
 
-    # choose my percent above/below number
-    perc_aboveBelow = [-0.05, 0, 0.05]
-
     for _ in range(number_simulations):
         # keep track of the runs
         run_number +=1
-        print(run_number)
-        # choose my parameters 
-        initial_roeDeer = random.randint(6, 18)
-        initial_grassland = random.randint(75, 85)
-        initial_woodland = random.randint(9, 19)
-        initial_scrubland = random.randint(0, 6)
-
         # habitats
         chance_reproduceSapling = output_parameters["variable"][0]
         chance_reproduceYoungScrub = output_parameters["variable"][1]
@@ -50,78 +40,83 @@ def optimizer_fails():
         chance_saplingOutcompetedByScrub = output_parameters["variable"][9]
         chance_youngScrubOutcompetedByScrub = output_parameters["variable"][10]
         chance_youngScrubOutcompetedByTree = output_parameters["variable"][11]
+        # initial values
+        initial_roeDeer = output_parameters["variable"][12]
+        initial_grassland = output_parameters["variable"][13]
+        initial_woodland = output_parameters["variable"][14]
+        initial_scrubland = output_parameters["variable"][15]
         # roe deer
-        roeDeer_reproduce = output_parameters["variable"][12]
-        roeDeer_gain_from_grass = output_parameters["variable"][13]
-        roeDeer_gain_from_Trees = output_parameters["variable"][14]
-        roeDeer_gain_from_Scrub = output_parameters["variable"][15]
-        roeDeer_gain_from_Saplings = output_parameters["variable"][16]
-        roeDeer_gain_from_YoungScrub = output_parameters["variable"][17]
+        roeDeer_reproduce = output_parameters["variable"][16]
+        roeDeer_gain_from_grass = output_parameters["variable"][17]
+        roeDeer_gain_from_Trees = output_parameters["variable"][18]
+        roeDeer_gain_from_Scrub = output_parameters["variable"][19]
+        roeDeer_gain_from_Saplings = output_parameters["variable"][20]
+        roeDeer_gain_from_YoungScrub = output_parameters["variable"][21]
         # Fallow deer
-        fallowDeer_reproduce = output_parameters["variable"][18]
-        fallowDeer_gain_from_grass = output_parameters["variable"][19]
-        fallowDeer_gain_from_Trees = output_parameters["variable"][20]
-        fallowDeer_gain_from_Scrub = output_parameters["variable"][21]
-        fallowDeer_gain_from_Saplings = output_parameters["variable"][22]
-        fallowDeer_gain_from_YoungScrub = output_parameters["variable"][23]
+        fallowDeer_reproduce = output_parameters["variable"][22]
+        fallowDeer_gain_from_grass = output_parameters["variable"][23]
+        fallowDeer_gain_from_Trees = output_parameters["variable"][24]
+        fallowDeer_gain_from_Scrub = output_parameters["variable"][25]
+        fallowDeer_gain_from_Saplings = output_parameters["variable"][26]
+        fallowDeer_gain_from_YoungScrub = output_parameters["variable"][27]
          # Red deer
-        redDeer_reproduce = output_parameters["variable"][24]
-        redDeer_gain_from_grass = output_parameters["variable"][25]
-        redDeer_gain_from_Trees = output_parameters["variable"][26]
-        redDeer_gain_from_Scrub = output_parameters["variable"][27]
-        redDeer_gain_from_Saplings = output_parameters["variable"][28]
-        redDeer_gain_from_YoungScrub = output_parameters["variable"][29]
+        redDeer_reproduce = output_parameters["variable"][28]
+        redDeer_gain_from_grass = output_parameters["variable"][29]
+        redDeer_gain_from_Trees = output_parameters["variable"][30]
+        redDeer_gain_from_Scrub = output_parameters["variable"][31]
+        redDeer_gain_from_Saplings = output_parameters["variable"][32]
+        redDeer_gain_from_YoungScrub = output_parameters["variable"][33]
         # Exmoor ponies
-        ponies_gain_from_grass = output_parameters["variable"][30]
-        ponies_gain_from_Trees = output_parameters["variable"][31]
-        ponies_gain_from_Scrub = output_parameters["variable"][32]
-        ponies_gain_from_Saplings = output_parameters["variable"][33]
-        ponies_gain_from_YoungScrub = output_parameters["variable"][34]
+        ponies_gain_from_grass = output_parameters["variable"][34]
+        ponies_gain_from_Trees = output_parameters["variable"][35]
+        ponies_gain_from_Scrub = output_parameters["variable"][36]
+        ponies_gain_from_Saplings = output_parameters["variable"][37]
+        ponies_gain_from_YoungScrub = output_parameters["variable"][38]
         # Longhorn cattle
-        cows_reproduce = output_parameters["variable"][35]
-        cows_gain_from_grass = output_parameters["variable"][36]
-        cows_gain_from_Trees = output_parameters["variable"][37]
-        cows_gain_from_Scrub = output_parameters["variable"][38]
-        cows_gain_from_Saplings = output_parameters["variable"][39]
-        cows_gain_from_YoungScrub = output_parameters["variable"][40]
+        cows_reproduce = output_parameters["variable"][39]
+        cows_gain_from_grass = output_parameters["variable"][40]
+        cows_gain_from_Trees = output_parameters["variable"][41]
+        cows_gain_from_Scrub = output_parameters["variable"][42]
+        cows_gain_from_Saplings = output_parameters["variable"][43]
+        cows_gain_from_YoungScrub = output_parameters["variable"][44]
         # Tamworth pigs
-        pigs_reproduce = output_parameters["variable"][41]
-        pigs_gain_from_grass = output_parameters["variable"][42]
-        pigs_gain_from_Saplings = output_parameters["variable"][43]
-        pigs_gain_from_YoungScrub = output_parameters["variable"][44]
+        pigs_reproduce = output_parameters["variable"][45]
+        pigs_gain_from_grass = output_parameters["variable"][46]
+        pigs_gain_from_Saplings = output_parameters["variable"][47]
+        pigs_gain_from_YoungScrub = output_parameters["variable"][48]
         # impact grass
-        roeDeer_impactGrass = round(output_parameters["variable"][45])
-        fallowDeer_impactGrass = round(output_parameters["variable"][46])
-        redDeer_impactGrass = round(output_parameters["variable"][47])
-        ponies_impactGrass = round(output_parameters["variable"][48])
-        cows_impactGrass = round(output_parameters["variable"][49])
-        pigs_impactGrass = round(output_parameters["variable"][50])
+        roeDeer_impactGrass = round(output_parameters["variable"][49])
+        fallowDeer_impactGrass = round(output_parameters["variable"][50])
+        redDeer_impactGrass = round(output_parameters["variable"][51])
+        ponies_impactGrass = round(output_parameters["variable"][52])
+        cows_impactGrass = round(output_parameters["variable"][53])
+        pigs_impactGrass = round(output_parameters["variable"][54])
         # impact saplings
-        roeDeer_saplingsEaten = round(output_parameters["variable"][51])
-        fallowDeer_saplingsEaten = round(output_parameters["variable"][52])
-        redDeer_saplingsEaten = round(output_parameters["variable"][53])
-        ponies_saplingsEaten = round(output_parameters["variable"][54])
-        cows_saplingsEaten =  round(output_parameters["variable"][55])
-        pigs_saplingsEaten = round(output_parameters["variable"][56])
+        roeDeer_saplingsEaten = round(output_parameters["variable"][55])
+        fallowDeer_saplingsEaten = round(output_parameters["variable"][56])
+        redDeer_saplingsEaten = round(output_parameters["variable"][57])
+        ponies_saplingsEaten = round(output_parameters["variable"][58])
+        cows_saplingsEaten =  round(output_parameters["variable"][59])
+        pigs_saplingsEaten = round(output_parameters["variable"][60])
         # impact young scrub
-        roeDeer_youngScrubEaten = round(output_parameters["variable"][57])
-        fallowDeer_youngScrubEaten = round(output_parameters["variable"][58])
-        redDeer_youngScrubEaten = round(output_parameters["variable"][59])
-        ponies_youngScrubEaten = round(output_parameters["variable"][60])
-        cows_youngScrubEaten = round(output_parameters["variable"][61])
-        pigs_youngScrubEaten = round(output_parameters["variable"][62])
+        roeDeer_youngScrubEaten = round(output_parameters["variable"][61])
+        fallowDeer_youngScrubEaten = round(output_parameters["variable"][62])
+        redDeer_youngScrubEaten = round(output_parameters["variable"][63])
+        ponies_youngScrubEaten = round(output_parameters["variable"][64])
+        cows_youngScrubEaten = round(output_parameters["variable"][65])
+        pigs_youngScrubEaten = round(output_parameters["variable"][66])
         # impact scrub
-        roeDeer_scrubEaten = round(output_parameters["variable"][63])
-        fallowDeer_scrubEaten = round(output_parameters["variable"][64])
-        redDeer_scrubEaten = round(output_parameters["variable"][65])
-        ponies_scrubEaten = round(output_parameters["variable"][66])
-        cows_scrubEaten = round(output_parameters["variable"][67])
+        roeDeer_scrubEaten = round(output_parameters["variable"][67])
+        fallowDeer_scrubEaten = round(output_parameters["variable"][68])
+        redDeer_scrubEaten = round(output_parameters["variable"][69])
+        ponies_scrubEaten = round(output_parameters["variable"][70])
+        cows_scrubEaten = round(output_parameters["variable"][71])
         # impact trees
-        roeDeer_treesEaten = round(output_parameters["variable"][68])
-        fallowDeer_treesEaten = round(output_parameters["variable"][69])
-        redDeer_treesEaten = round(output_parameters["variable"][70])
-        ponies_treesEaten = round(output_parameters["variable"][71])
-        cows_treesEaten =  round(output_parameters["variable"][72])
+        roeDeer_treesEaten = round(output_parameters["variable"][72])
+        fallowDeer_treesEaten = round(output_parameters["variable"][73])
+        redDeer_treesEaten = round(output_parameters["variable"][74])
+        ponies_treesEaten = round(output_parameters["variable"][75])
+        cows_treesEaten =  round(output_parameters["variable"][76])
 
         
         # keep track of my parameters
@@ -569,116 +564,99 @@ def optimizer_fails():
     sensitivity_results_list = []
     sensitivity_parameters = []
     run_number  = 0
-    # choose my percent above/below number - repeat each one 10 times?
-
-    perc_aboveBelow = np.repeat([-0.05, 0.05], 3)
     # choose my percent above/below number
+    perc_aboveBelow = [-0.25, -0.1,-0.05, 0, 0.05, 0.1, 0.25]
     final_parameters = final_parameters.iloc[0,1:78]
-    # organized = final_parameters.iloc[0:3]
+    # organized = final_parameters.iloc[0:1]
     # loop through each one, changing one cell at a time
     for index, row in final_parameters.iteritems():
         for perc_number in perc_aboveBelow:
+            final_parameters_temp = final_parameters
             run_number += 1
             ifor_val = row + (row*perc_number)
             # make sure they're ints where applicable
             if ifor_val > 1:
                 ifor_val = round(ifor_val)
-            final_parameters.at[index] = ifor_val
-            print(run_number, final_parameters.at[index])
+            final_parameters_temp.at[index] = ifor_val
+            print(run_number)
             # choose my parameters 
-            chance_reproduceSapling = final_parameters.values[0]
-            chance_reproduceYoungScrub = final_parameters.values[1]
-            chance_regrowGrass = final_parameters.values[2]
-            chance_saplingBecomingTree = final_parameters.values[3]
-            chance_youngScrubMatures = final_parameters.values[4]
-            chance_scrubOutcompetedByTree = final_parameters.values[5]
-            chance_grassOutcompetedByTree = final_parameters.values[6]
-            chance_grassOutcompetedByScrub = final_parameters.values[7]
-            chance_saplingOutcompetedByTree = final_parameters.values[8]
-            chance_saplingOutcompetedByScrub = final_parameters.values[9]
-            chance_youngScrubOutcompetedByScrub = final_parameters.values[10]
-            chance_youngScrubOutcompetedByTree = final_parameters.values[11]
-            initial_roeDeer = int(final_parameters.values[12])
-            initial_grassland = int(final_parameters.values[13])
-            initial_woodland = int(final_parameters.values[14])
-            initial_scrubland = int(final_parameters.values[15])
-            roeDeer_reproduce = final_parameters.values[16]
-            roeDeer_gain_from_grass = final_parameters.values[17]
-            roeDeer_gain_from_Trees = final_parameters.values[18]
-            roeDeer_gain_from_Scrub = final_parameters.values[19]
-            roeDeer_gain_from_Saplings = final_parameters.values[20]
-            roeDeer_gain_from_YoungScrub = final_parameters.values[21]
-            roeDeer_impactGrass = final_parameters.values[22]
-            roeDeer_saplingsEaten = final_parameters.values[23]
-            roeDeer_youngScrubEaten = final_parameters.values[24]
-            roeDeer_treesEaten = final_parameters.values[25]
-            roeDeer_scrubEaten = final_parameters.values[26]
-            ponies_gain_from_grass = final_parameters.values[27]
-            ponies_gain_from_Trees = final_parameters.values[28]
-            ponies_gain_from_Scrub = final_parameters.values[29]
-            ponies_gain_from_Saplings = final_parameters.values[30]
-            ponies_gain_from_YoungScrub = final_parameters.values[31]
-            ponies_impactGrass = final_parameters.values[32]
-            ponies_saplingsEaten = final_parameters.values[33]
-            ponies_youngScrubEaten = final_parameters.values[34]
-            ponies_treesEaten = final_parameters.values[35]
-            ponies_scrubEaten = final_parameters.values[36]
-            cows_reproduce = final_parameters.values[37]
-            cows_gain_from_grass = final_parameters.values[38]
-            cows_gain_from_Trees = final_parameters.values[39]
-            cows_gain_from_Scrub = final_parameters.values[40]
-            cows_gain_from_Saplings = final_parameters.values[41]
-            cows_gain_from_YoungScrub = final_parameters.values[42]
-            cows_impactGrass = final_parameters.values[43]
-            cows_saplingsEaten = final_parameters.values[44]
-            cows_youngScrubEaten = final_parameters.values[45]
-            cows_treesEaten = final_parameters.values[46]
-            cows_scrubEaten = final_parameters.values[47]
-            fallowDeer_reproduce = final_parameters.values[48]
-            fallowDeer_gain_from_grass = final_parameters.values[49]
-            fallowDeer_gain_from_Trees = final_parameters.values[50]
-            fallowDeer_gain_from_Scrub = final_parameters.values[51]
-            fallowDeer_gain_from_Saplings = final_parameters.values[52]
-            fallowDeer_gain_from_YoungScrub = final_parameters.values[53]
-            fallowDeer_impactGrass = final_parameters.values[54]
-            fallowDeer_saplingsEaten = final_parameters.values[55]
-            fallowDeer_youngScrubEaten = final_parameters.values[56]
-            fallowDeer_treesEaten = final_parameters.values[57]
-            fallowDeer_scrubEaten = final_parameters.values[58]
-            redDeer_reproduce = final_parameters.values[59]
-            redDeer_gain_from_grass = final_parameters.values[60]
-            redDeer_gain_from_Trees = final_parameters.values[61]
-            redDeer_gain_from_Scrub = final_parameters.values[62]
-            redDeer_gain_from_Saplings = final_parameters.values[63]
-            redDeer_gain_from_YoungScrub = final_parameters.values[64]
-            redDeer_impactGrass = final_parameters.values[65]
-            redDeer_saplingsEaten = final_parameters.values[66]
-            redDeer_youngScrubEaten = final_parameters.values[67]
-            redDeer_treesEaten = final_parameters.values[68]
-            redDeer_scrubEaten = final_parameters.values[69]
-            pigs_reproduce = final_parameters.values[70]
-            pigs_gain_from_grass = final_parameters.values[71]
-            pigs_gain_from_Saplings = final_parameters.values[72]
-            pigs_gain_from_YoungScrub = final_parameters.values[73]
-            pigs_impactGrass = final_parameters.values[74]
-            pigs_saplingsEaten = final_parameters.values[75]
-            pigs_youngScrubEaten = final_parameters.values[76]
-
-            my_parameters = [chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
-            chance_scrubOutcompetedByTree, chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
-            initial_roeDeer, initial_grassland, initial_woodland, initial_scrubland, 
-            roeDeer_reproduce, roeDeer_gain_from_grass, roeDeer_gain_from_Trees, roeDeer_gain_from_Scrub, roeDeer_gain_from_Saplings, roeDeer_gain_from_YoungScrub,
-            roeDeer_impactGrass, roeDeer_saplingsEaten, roeDeer_youngScrubEaten, roeDeer_treesEaten, roeDeer_scrubEaten,
-            ponies_gain_from_grass, ponies_gain_from_Trees, ponies_gain_from_Scrub, ponies_gain_from_Saplings, ponies_gain_from_YoungScrub, 
-            ponies_impactGrass, ponies_saplingsEaten, ponies_youngScrubEaten, ponies_treesEaten, ponies_scrubEaten, 
-            cows_reproduce, cows_gain_from_grass, cows_gain_from_Trees, cows_gain_from_Scrub, cows_gain_from_Saplings, cows_gain_from_YoungScrub, 
-            cows_impactGrass, cows_saplingsEaten, cows_youngScrubEaten, cows_treesEaten, cows_scrubEaten, 
-            fallowDeer_reproduce, fallowDeer_gain_from_grass, fallowDeer_gain_from_Trees, fallowDeer_gain_from_Scrub, fallowDeer_gain_from_Saplings, fallowDeer_gain_from_YoungScrub, 
-            fallowDeer_impactGrass, fallowDeer_saplingsEaten, fallowDeer_youngScrubEaten, fallowDeer_treesEaten, fallowDeer_scrubEaten,
-            redDeer_reproduce, redDeer_gain_from_grass, redDeer_gain_from_Trees, redDeer_gain_from_Scrub, redDeer_gain_from_Saplings, redDeer_gain_from_YoungScrub, 
-            redDeer_impactGrass, redDeer_saplingsEaten, redDeer_youngScrubEaten, redDeer_treesEaten, redDeer_scrubEaten, 
-            pigs_reproduce, pigs_gain_from_grass, pigs_gain_from_Saplings, pigs_gain_from_YoungScrub, 
-            pigs_impactGrass, pigs_saplingsEaten, pigs_youngScrubEaten]
+            chance_reproduceSapling = final_parameters_temp.values[0]
+            chance_reproduceYoungScrub = final_parameters_temp.values[1]
+            chance_regrowGrass = final_parameters_temp.values[2]
+            chance_saplingBecomingTree = final_parameters_temp.values[3]
+            chance_youngScrubMatures = final_parameters_temp.values[4]
+            chance_scrubOutcompetedByTree = final_parameters_temp.values[5]
+            chance_grassOutcompetedByTree = final_parameters_temp.values[6]
+            chance_grassOutcompetedByScrub = final_parameters_temp.values[7]
+            chance_saplingOutcompetedByTree = final_parameters_temp.values[8]
+            chance_saplingOutcompetedByScrub = final_parameters_temp.values[9]
+            chance_youngScrubOutcompetedByScrub = final_parameters_temp.values[10]
+            chance_youngScrubOutcompetedByTree = final_parameters_temp.values[11]
+            initial_roeDeer = final_parameters_temp.values[12]
+            initial_grassland = final_parameters_temp.values[13]
+            initial_woodland = final_parameters_temp.values[14]
+            initial_scrubland = final_parameters_temp.values[15]
+            roeDeer_reproduce = final_parameters_temp.values[16]
+            roeDeer_gain_from_grass = final_parameters_temp.values[17]
+            roeDeer_gain_from_Trees = final_parameters_temp.values[18]
+            roeDeer_gain_from_Scrub = final_parameters_temp.values[19]
+            roeDeer_gain_from_Saplings = final_parameters_temp.values[20]
+            roeDeer_gain_from_YoungScrub = final_parameters_temp.values[21]
+            roeDeer_impactGrass = final_parameters_temp.values[22]
+            roeDeer_saplingsEaten = final_parameters_temp.values[23]
+            roeDeer_youngScrubEaten = final_parameters_temp.values[24]
+            roeDeer_treesEaten = final_parameters_temp.values[25]
+            roeDeer_scrubEaten = final_parameters_temp.values[26]
+            ponies_gain_from_grass = final_parameters_temp.values[27]
+            ponies_gain_from_Trees = final_parameters_temp.values[28]
+            ponies_gain_from_Scrub = final_parameters_temp.values[29]
+            ponies_gain_from_Saplings = final_parameters_temp.values[30]
+            ponies_gain_from_YoungScrub = final_parameters_temp.values[31]
+            ponies_impactGrass = final_parameters_temp.values[32]
+            ponies_saplingsEaten = final_parameters_temp.values[33]
+            ponies_youngScrubEaten = final_parameters_temp.values[34]
+            ponies_treesEaten = final_parameters_temp.values[35]
+            ponies_scrubEaten = final_parameters_temp.values[36]
+            cows_reproduce = final_parameters_temp.values[37]
+            cows_gain_from_grass = final_parameters_temp.values[38]
+            cows_gain_from_Trees = final_parameters_temp.values[39]
+            cows_gain_from_Scrub = final_parameters_temp.values[40]
+            cows_gain_from_Saplings = final_parameters_temp.values[41]
+            cows_gain_from_YoungScrub = final_parameters_temp.values[42]
+            cows_impactGrass = final_parameters_temp.values[43]
+            cows_saplingsEaten = final_parameters_temp.values[44]
+            cows_youngScrubEaten = final_parameters_temp.values[45]
+            cows_treesEaten = final_parameters_temp.values[46]
+            cows_scrubEaten = final_parameters_temp.values[47]
+            fallowDeer_reproduce = final_parameters_temp.values[48]
+            fallowDeer_gain_from_grass = final_parameters_temp.values[49]
+            fallowDeer_gain_from_Trees = final_parameters_temp.values[50]
+            fallowDeer_gain_from_Scrub = final_parameters_temp.values[51]
+            fallowDeer_gain_from_Saplings = final_parameters_temp.values[52]
+            fallowDeer_gain_from_YoungScrub = final_parameters_temp.values[53]
+            fallowDeer_impactGrass = final_parameters_temp.values[54]
+            fallowDeer_saplingsEaten = final_parameters_temp.values[55]
+            fallowDeer_youngScrubEaten = final_parameters_temp.values[56]
+            fallowDeer_treesEaten = final_parameters_temp.values[57]
+            fallowDeer_scrubEaten = final_parameters_temp.values[58]
+            redDeer_reproduce = final_parameters_temp.values[59]
+            redDeer_gain_from_grass = final_parameters_temp.values[60]
+            redDeer_gain_from_Trees = final_parameters_temp.values[61]
+            redDeer_gain_from_Scrub = final_parameters_temp.values[62]
+            redDeer_gain_from_Saplings = final_parameters_temp.values[63]
+            redDeer_gain_from_YoungScrub = final_parameters_temp.values[64]
+            redDeer_impactGrass = final_parameters_temp.values[65]
+            redDeer_saplingsEaten = final_parameters_temp.values[66]
+            redDeer_youngScrubEaten = final_parameters_temp.values[67]
+            redDeer_treesEaten = final_parameters_temp.values[68]
+            redDeer_scrubEaten = final_parameters_temp.values[69]
+            pigs_reproduce = final_parameters_temp.values[70]
+            pigs_gain_from_grass = final_parameters_temp.values[71]
+            pigs_gain_from_Saplings = final_parameters_temp.values[72]
+            pigs_gain_from_YoungScrub = final_parameters_temp.values[73]
+            pigs_impactGrass = final_parameters_temp.values[74]
+            pigs_saplingsEaten = final_parameters_temp.values[75]
+            pigs_youngScrubEaten = final_parameters_temp.values[76]
 
             # run model
             model_2 = KneppModel(
@@ -701,440 +679,232 @@ def optimizer_fails():
             model_2.run_model()
 
             # remember the results of the model (dominant conditions, # of agents)
-            sensitivity_results = model_2.datacollector.get_model_vars_dataframe()
+            sensitivity_results_unfiltered = model_2.datacollector.get_model_vars_dataframe()
+            sensitivity_results = sensitivity_results_unfiltered[(sensitivity_results_unfiltered["Time"] == 184)]
             sensitivity_results_list.append(sensitivity_results)
-            # and the parameters used
-            sensitivity_parameters.append(my_parameters)
+            # and the parameter changed
+            sensitivity_parameters.append([index, final_parameters_temp.at[index]])
 
     # append to dataframe
     final_sensitivity_results = pd.concat(sensitivity_results_list)
-    final_sensitivity_parameters = pd.DataFrame(data=sensitivity_parameters, columns=variables[1:78])
-    print("params", final_sensitivity_parameters)
-    final_sensitivity_results = final_sensitivity_results[(final_sensitivity_results["Time"] == 184)]
+    final_sensitivity_parameters = pd.DataFrame(sensitivity_parameters)
+    final_sensitivity_parameters.columns = ['Parameter_Changes', 'Parameter_Value']
     final_sensitivity_results = final_sensitivity_results.reset_index(drop=True)
     merged_dfs = pd.concat([final_sensitivity_parameters, final_sensitivity_results], axis=1)
-    print("merged", merged_dfs)
+    merged_dfs = merged_dfs.drop('Time', 1)
+    # print("merged", merged_dfs)
+    merged_dfs.to_excel("all_parameter_changes.xlsx")
+
+    # group them by variable name
+    grouped_dfs = merged_dfs.groupby("Parameter_Changes")
 
 
     # ROE DEER
     roe_gradients = []
-    column_names = []
-    column_values = []
-    populations = []
-    gradients = []
-    
     # find the gradient
-    for column in merged_dfs.iloc[:,0:77]:
-        res = linregress(merged_dfs[column], merged_dfs["Roe deer"])
-        roe_gradient = [column, res.slope]
+    for grouped_name, grouped_data in grouped_dfs:
+        res = linregress(grouped_data["Parameter_Value"], grouped_data["Roe deer"])
+        roe_gradient = [grouped_name, res.slope]
         roe_gradients.append(roe_gradient)
-        column_names.append([column]*6*77)
-        column_values.append(merged_dfs[column].to_list())
-        populations.append(merged_dfs["Roe deer"].to_list())
-        gradients.append([res.slope]*6*77)
-    
-    print(roe_gradients, len(roe_gradients))
-    print(column_names, len(column_names))
-    print(column_values, len(column_values))
-    print(populations, len(populations))
-    print(gradients, len(gradients))
-
-    # organize the data
-    roe_gradients = pd.DataFrame(data=roe_gradients, columns = ['Parameter name', 'Gradient'])
-    all_values_roe = pd.DataFrame()
-    flat_column_names = [item for sublist in column_names for item in sublist]
-    flat_column_values = [item for sublist in column_values for item in sublist]
-    flat_populations = [item for sublist in populations for item in sublist]
-    flat_gradients = [item for sublist in gradients for item in sublist]
-    all_values_roe['Parameter_names'] = flat_column_names
-    all_values_roe['Parameter_values'] = flat_column_values
-    all_values_roe['Population'] = flat_populations
-    all_values_roe['Gradient'] = flat_gradients
+    roe_gradients = pd.DataFrame(roe_gradients)
+    roe_gradients.columns = ['Parameter_names', 'Gradient']
     # take the top 10 most important ones; make sure to turn the negative ones positive when organizing them
     roe_gradients['Gradient'] = roe_gradients['Gradient'].abs()
     roe_gradients = roe_gradients.sort_values(['Gradient'], ascending=[False])
     top_ten = roe_gradients.iloc[0:10,:]
-    print(top_ten)
-    top_ten_combined = all_values_roe.where(all_values_roe.Parameter_names.isin(top_ten['Parameter name']))
-    top_ten_combined = top_ten_combined[top_ten_combined['Parameter_names'].notna()]
-    print(top_ten_combined)
-    top_ten_combined.to_excel("final_df_gradients_roeDeer_extended.xlsx")
-    # graph it
-    ro = sns.relplot(data=top_ten_combined, x='Parameter_values', y='Population', col='Parameter_names', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
+    top_ten.to_excel("final_df_gradients_roeDeer.xlsx")
+    # plot those
+    top_ten_roe = merged_dfs[merged_dfs['Parameter_Changes'].isin(top_ten['Parameter_names'])]
+    ro = sns.relplot(data=top_ten_roe, x='Parameter_Value', y='Roe deer', col='Parameter_Changes', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
     ro.fig.suptitle('Roe deer gradients')
     plt.tight_layout()
-    plt.savefig('sensitivity_roe_extended.png')
+    plt.savefig('sensitivity_roe.png')
     plt.show()
+
 
 
     # # FALLOW DEER
     fallow_gradients = []
-    column_names_fallow = []
-    column_values_fallow = []
-    populations_fallow = []
-    gradients_fallow = []
-    
     # find the gradient
-    for column in merged_dfs.iloc[:,0:77]:
-        res = linregress(merged_dfs[column], merged_dfs["Fallow deer"])
-        fallow_gradient = [column, res.slope]
+    for grouped_name, grouped_data in grouped_dfs:
+        res = linregress(grouped_data["Parameter_Value"], grouped_data["Fallow deer"])
+        fallow_gradient = [grouped_name, res.slope]
         fallow_gradients.append(fallow_gradient)
-        # append column name & values, populations and gradients 
-        column_names_fallow.append([column]*6*77)
-        column_values_fallow.append(merged_dfs[column].to_list())
-        populations_fallow.append(merged_dfs["Fallow deer"].to_list())
-        gradients_fallow.append([res.slope]*6*77)
-
-    # organize the data
-    fallow_gradients = pd.DataFrame(data=fallow_gradients, columns = ['Parameter name', 'Gradient'])
-    all_values_fallow = pd.DataFrame()
-    flat_column_names_fallow = [item for sublist in column_names_fallow for item in sublist]
-    flat_column_values_fallow = [item for sublist in column_values_fallow for item in sublist]
-    flat_populations_fallow = [item for sublist in populations_fallow for item in sublist]
-    flat_gradients_fallow = [item for sublist in gradients_fallow for item in sublist]
-    all_values_fallow['Parameter_names'] = flat_column_names_fallow
-    all_values_fallow['Parameter_values'] = flat_column_values_fallow
-    all_values_fallow['Population'] = flat_populations_fallow
-    all_values_fallow['Gradient'] = flat_gradients_fallow
+    fallow_gradients = pd.DataFrame(fallow_gradients)
+    fallow_gradients.columns = ['Parameter_names', 'Gradient']
     # take the top 10 most important ones; make sure to turn the negative ones positive when organizing them
     fallow_gradients['Gradient'] = fallow_gradients['Gradient'].abs()
     fallow_gradients = fallow_gradients.sort_values(['Gradient'], ascending=[False])
-    top_ten_fallow = fallow_gradients.iloc[0:10,:]
-    print(top_ten_fallow)
-    top_ten_combined_fallow = all_values_fallow.where(all_values_fallow.Parameter_names.isin(top_ten_fallow['Parameter name']))
-    top_ten_combined_fallow = top_ten_combined_fallow[top_ten_combined_fallow['Parameter_names'].notna()]
-    print(top_ten_combined_fallow)
-    top_ten_combined_fallow.to_excel("final_df_gradients_fallowDeer_extended.xlsx")
-    # graph it
-    f = sns.relplot(data=top_ten_combined_fallow, x='Parameter_values', y='Population', col='Parameter_names', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
-    f.fig.suptitle('Fallow deer gradients')
+    top_ten = fallow_gradients.iloc[0:10,:]
+    top_ten.to_excel("final_df_gradients_fallowDeer.xlsx")
+    # plot those
+    top_ten_fallow = merged_dfs[merged_dfs['Parameter_Changes'].isin(top_ten['Parameter_names'])]
+    ro = sns.relplot(data=top_ten_fallow, x='Parameter_Value', y='Fallow deer', col='Parameter_Changes', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
+    ro.fig.suptitle('Fallow deer gradients')
     plt.tight_layout()
-    plt.savefig('sensitivity_fallow_extended.png')
+    plt.savefig('sensitivity_fallow.png')
     plt.show()
-
 
     # # RED DEER
     red_gradients = []
-    column_names_red = []
-    column_values_red = []
-    populations_red = []
-    gradients_red = []
-    
     # find the gradient
-    for column in merged_dfs.iloc[:,0:77]:
-        res = linregress(merged_dfs[column], merged_dfs["Red deer"])
-        red_gradient = [column, res.slope]
+    for grouped_name, grouped_data in grouped_dfs:
+        res = linregress(grouped_data["Parameter_Value"], grouped_data["Red deer"])
+        red_gradient = [grouped_name, res.slope]
         red_gradients.append(red_gradient)
-        # append column name & values, populations and gradients 
-        column_names_red.append([column]*6*77)
-        column_values_red.append(merged_dfs[column].to_list())
-        populations_red.append(merged_dfs["Red deer"].to_list())
-        gradients_red.append([res.slope]*6*77)
-
-    # organize the data
-    red_gradients = pd.DataFrame(data=red_gradients, columns = ['Parameter name', 'Gradient'])
-    all_values_red = pd.DataFrame()
-    flat_column_names_red = [item for sublist in column_names_red for item in sublist]
-    flat_column_values_red = [item for sublist in column_values_red for item in sublist]
-    flat_populations_red = [item for sublist in populations_red for item in sublist]
-    flat_gradients_red = [item for sublist in gradients_red for item in sublist]
-    all_values_red['Parameter_names'] = flat_column_names_red
-    all_values_red['Parameter_values'] = flat_column_values_red
-    all_values_red['Population'] = flat_populations_red
-    all_values_red['Gradient'] = flat_gradients_red
+    red_gradients = pd.DataFrame(red_gradients)
+    red_gradients.columns = ['Parameter_names', 'Gradient']
     # take the top 10 most important ones; make sure to turn the negative ones positive when organizing them
     red_gradients['Gradient'] = red_gradients['Gradient'].abs()
     red_gradients = red_gradients.sort_values(['Gradient'], ascending=[False])
-    top_ten_red = red_gradients.iloc[0:10,:]
-    print(top_ten_red)
-    top_ten_combined_red = all_values_red.where(all_values_red.Parameter_names.isin(top_ten_red['Parameter name']))
-    top_ten_combined_red = top_ten_combined_red[top_ten_combined_red['Parameter_names'].notna()]
-    print(top_ten_combined_red)
-    top_ten_combined_red.to_excel("final_df_gradients_redDeer_extended.xlsx")
-    # graph it
-    r = sns.relplot(data=top_ten_combined_red, x='Parameter_values', y='Population', col='Parameter_names', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
-    r.fig.suptitle('Red deer gradients')
+    top_ten = red_gradients.iloc[0:10,:]
+    top_ten.to_excel("final_df_gradients_redDeer.xlsx")
+    # plot those
+    top_ten_red = merged_dfs[merged_dfs['Parameter_Changes'].isin(top_ten['Parameter_names'])]
+    ro = sns.relplot(data=top_ten_roe, x='Parameter_Value', y='Red deer', col='Parameter_Changes', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
+    ro.fig.suptitle('Red deer gradients')
     plt.tight_layout()
-    plt.savefig('sensitivity_red_extended.png')
+    plt.savefig('sensitivity_red.png')
     plt.show()
 
 
 
     # # LONGHORN CATTLE
     cattle_gradients = []
-    column_names_cattle = []
-    column_values_cattle= []
-    populations_cattle = []
-    gradients_cattle = []
-    
     # find the gradient
-    for column in merged_dfs.iloc[:,0:77]:
-        res = linregress(merged_dfs[column], merged_dfs["Longhorn cattle"])
-        cattle_gradient = [column, res.slope]
+    for grouped_name, grouped_data in grouped_dfs:
+        res = linregress(grouped_data["Parameter_Value"], grouped_data["Longhorn cattle"])
+        cattle_gradient = [grouped_name, res.slope]
         cattle_gradients.append(cattle_gradient)
-        # append column name & values, populations and gradients 
-        column_names_cattle.append([column]*6*77)
-        column_values_cattle.append(merged_dfs[column].to_list())
-        populations_cattle.append(merged_dfs["Longhorn cattle"].to_list())
-        gradients_cattle.append([res.slope]*6*77)
-
-    # organize the data
-    cattle_gradients = pd.DataFrame(data=cattle_gradients, columns = ['Parameter name', 'Gradient'])
-    all_values_cattle = pd.DataFrame()
-    flat_column_names_cattle = [item for sublist in column_names_cattle for item in sublist]
-    flat_column_values_cattle= [item for sublist in column_values_cattle for item in sublist]
-    flat_populations_cattle = [item for sublist in populations_cattle for item in sublist]
-    flat_gradients_cattle = [item for sublist in gradients_cattle for item in sublist]
-    all_values_cattle['Parameter_names'] = flat_column_names_cattle
-    all_values_cattle['Parameter_values'] = flat_column_values_cattle
-    all_values_cattle['Population'] = flat_populations_cattle
-    all_values_cattle['Gradient'] = flat_gradients_cattle
+    cattle_gradients = pd.DataFrame(cattle_gradients)
+    cattle_gradients.columns = ['Parameter_names', 'Gradient']
     # take the top 10 most important ones; make sure to turn the negative ones positive when organizing them
     cattle_gradients['Gradient'] = cattle_gradients['Gradient'].abs()
     cattle_gradients = cattle_gradients.sort_values(['Gradient'], ascending=[False])
-    top_ten_cattle = cattle_gradients.iloc[0:10,:]
-    print(top_ten_cattle)
-    top_ten_combined_cattle = all_values_cattle.where(all_values_cattle.Parameter_names.isin(top_ten_cattle['Parameter name']))
-    top_ten_combined_cattle = top_ten_combined_cattle[top_ten_combined_cattle['Parameter_names'].notna()]
-    print(top_ten_combined_cattle)
-    top_ten_combined_cattle.to_excel("final_df_gradients_cattle_extended.xlsx")
-    # graph it
-    l = sns.relplot(data=top_ten_combined_cattle, x='Parameter_values', y='Population', col='Parameter_names', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
-    l.fig.suptitle('Longhorn cattle gradients')
+    top_ten = cattle_gradients.iloc[0:10,:]
+    top_ten.to_excel("final_df_gradients_cattle.xlsx")
+    # plot those
+    top_ten_cattle = merged_dfs[merged_dfs['Parameter_Changes'].isin(top_ten['Parameter_names'])]
+    ro = sns.relplot(data=top_ten_cattle, x='Parameter_Value', y='Longhorn cattle', col='Parameter_Changes', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
+    ro.fig.suptitle('Cattle gradients')
     plt.tight_layout()
-    plt.savefig('sensitivity_cattle_extended.png')
+    plt.savefig('sensitivity_cattle.png')
     plt.show()
 
 
     # # TAMWORTH PIG
     pig_gradients = []
-    column_names_pig = []
-    column_values_pig= []
-    populations_pig = []
-    gradients_pig = []
-    
     # find the gradient
-    for column in merged_dfs.iloc[:,0:77]:
-        res = linregress(merged_dfs[column], merged_dfs["Tamworth pigs"])
-        pig_gradient = [column, res.slope]
+    for grouped_name, grouped_data in grouped_dfs:
+        res = linregress(grouped_data["Parameter_Value"], grouped_data["Tamworth pigs"])
+        pig_gradient = [grouped_name, res.slope]
         pig_gradients.append(pig_gradient)
-        # append column name & values, populations and gradients 
-        column_names_pig.append([column]*6*77)
-        column_values_pig.append(merged_dfs[column].to_list())
-        populations_pig.append(merged_dfs["Tamworth pigs"].to_list())
-        gradients_pig.append([res.slope]*6*77)
-
-    # organize the data
-    pig_gradients = pd.DataFrame(data=pig_gradients, columns = ['Parameter name', 'Gradient'])
-    all_values_pig = pd.DataFrame()
-    flat_column_names_pig = [item for sublist in column_names_pig for item in sublist]
-    flat_column_values_pig= [item for sublist in column_values_pig for item in sublist]
-    flat_populations_pig = [item for sublist in populations_pig for item in sublist]
-    flat_gradients_pig = [item for sublist in gradients_pig for item in sublist]
-    all_values_pig['Parameter_names'] = flat_column_names_pig
-    all_values_pig['Parameter_values'] = flat_column_values_pig
-    all_values_pig['Population'] = flat_populations_pig
-    all_values_pig['Gradient'] = flat_gradients_pig
+    pig_gradients = pd.DataFrame(pig_gradients)
+    pig_gradients.columns = ['Parameter_names', 'Gradient']
     # take the top 10 most important ones; make sure to turn the negative ones positive when organizing them
     pig_gradients['Gradient'] = pig_gradients['Gradient'].abs()
     pig_gradients = pig_gradients.sort_values(['Gradient'], ascending=[False])
-    top_ten_pig = pig_gradients.iloc[0:10,:]
-    print(top_ten_pig)
-    top_ten_combined_pig = all_values_pig.where(all_values_pig.Parameter_names.isin(top_ten_pig['Parameter name']))
-    top_ten_combined_pig = top_ten_combined_pig[top_ten_combined_pig['Parameter_names'].notna()]
-    print(top_ten_combined_pig)
-    top_ten_combined_pig.to_excel("final_df_gradients_pig_extended.xlsx")
-    # graph it
-    t = sns.relplot(data=top_ten_combined_pig, x='Parameter_values', y='Population', col='Parameter_names', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
-    t.fig.suptitle('Tamworth pig gradients')
+    top_ten = pig_gradients.iloc[0:10,:]
+    top_ten.to_excel("final_df_gradients_pig.xlsx")
+    # plot those
+    top_ten_pig = merged_dfs[merged_dfs['Parameter_Changes'].isin(top_ten['Parameter_names'])]
+    ro = sns.relplot(data=top_ten_pig, x='Parameter_Value', y='Tamworth pigs', col='Parameter_Changes', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
+    ro.fig.suptitle('Tamworth pig gradients')
     plt.tight_layout()
-    plt.savefig('sensitivity_pigs_extended.png')
+    plt.savefig('sensitivity_pig.png')
     plt.show()
-
 
     # # EXMOOR PONY
     pony_gradients = []
-    column_names_pony = []
-    column_values_pony= []
-    populations_pony= []
-    gradients_pony = []
-    
     # find the gradient
-    for column in merged_dfs.iloc[:,0:77]:
-        res = linregress(merged_dfs[column], merged_dfs["Exmoor pony"])
-        pony_gradient = [column, res.slope]
+    for grouped_name, grouped_data in grouped_dfs:
+        res = linregress(grouped_data["Parameter_Value"], grouped_data["Exmoor pony"])
+        pony_gradient = [grouped_name, res.slope]
         pony_gradients.append(pony_gradient)
-        # append column name & values, populations and gradients 
-        column_names_pony.append([column]*6*77)
-        column_values_pony.append(merged_dfs[column].to_list())
-        populations_pony.append(merged_dfs["Exmoor pony"].to_list())
-        gradients_pony.append([res.slope]*6*77)
-
-    # organize the data
-    pony_gradients = pd.DataFrame(data=pony_gradients, columns = ['Parameter name', 'Gradient'])
-    all_values_pony = pd.DataFrame()
-    flat_column_names_pony = [item for sublist in column_names_pony for item in sublist]
-    flat_column_values_pony= [item for sublist in column_values_pony for item in sublist]
-    flat_populations_pony = [item for sublist in populations_pony for item in sublist]
-    flat_gradients_pony = [item for sublist in gradients_pony for item in sublist]
-    all_values_pony['Parameter_names'] = flat_column_names_pony
-    all_values_pony['Parameter_values'] = flat_column_values_pony
-    all_values_pony['Population'] = flat_populations_pony
-    all_values_pony['Gradient'] = flat_gradients_pony
+    pony_gradients = pd.DataFrame(pony_gradients)
+    pony_gradients.columns = ['Parameter_names', 'Gradient']
     # take the top 10 most important ones; make sure to turn the negative ones positive when organizing them
     pony_gradients['Gradient'] = pony_gradients['Gradient'].abs()
     pony_gradients = pony_gradients.sort_values(['Gradient'], ascending=[False])
-    top_ten_pony = pony_gradients.iloc[0:10,:]
-    print(top_ten_pony)
-    top_ten_combined_pony = all_values_pony.where(all_values_pony.Parameter_names.isin(top_ten_pony['Parameter name']))
-    top_ten_combined_pony = top_ten_combined_pony[top_ten_combined_pony['Parameter_names'].notna()]
-    print(top_ten_combined_pony)
-    top_ten_combined_pony.to_excel("final_df_gradients_pony_extended.xlsx")
-    # graph it
-    p = sns.relplot(data=top_ten_combined_pony, x='Parameter_values', y='Population', col='Parameter_names', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
-    p.fig.suptitle('Exmoor pony gradients')
+    top_ten = pony_gradients.iloc[0:10,:]
+    top_ten.to_excel("final_df_gradients_pony.xlsx")
+    # plot those
+    top_ten_pony = merged_dfs[merged_dfs['Parameter_Changes'].isin(top_ten['Parameter_names'])]
+    ro = sns.relplot(data=top_ten_pony, x='Parameter_Value', y='Exmoor pony', col='Parameter_Changes', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
+    ro.fig.suptitle('Exmoor pony gradients')
     plt.tight_layout()
-    plt.savefig('sensitivity_pony_extended.png')
+    plt.savefig('sensitivity_pony.png')
     plt.show()
 
 
 
     # # GRASSLAND
-    grassland_gradients = []
-    column_names_grassland = []
-    column_values_grassland= []
-    populations_grassland= []
-    gradients_grassland= []
-    
+    grass_gradients = []
     # find the gradient
-    for column in merged_dfs.iloc[:,0:77]:
-        res = linregress(merged_dfs[column], merged_dfs["Grassland"])
-        grassland_gradient = [column, res.slope]
-        grassland_gradients.append(grassland_gradient)
-        # append column name & values, populations and gradients 
-        column_names_grassland.append([column]*6*77)
-        column_values_grassland.append(merged_dfs[column].to_list())
-        populations_grassland.append(merged_dfs["Grassland"].to_list())
-        gradients_grassland.append([res.slope]*6*77)
-
-    # organize the data
-    grassland_gradients = pd.DataFrame(data=grassland_gradients, columns = ['Parameter name', 'Gradient'])
-    all_values_grassland = pd.DataFrame()
-    flat_column_names_grassland = [item for sublist in column_names_grassland for item in sublist]
-    flat_column_values_grassland= [item for sublist in column_values_grassland for item in sublist]
-    flat_populations_grassland = [item for sublist in populations_grassland for item in sublist]
-    flat_gradients_grassland = [item for sublist in gradients_grassland for item in sublist]
-    all_values_grassland['Parameter_names'] = flat_column_names_grassland
-    all_values_grassland['Parameter_values'] = flat_column_values_grassland
-    all_values_grassland['Population'] = flat_populations_grassland
-    all_values_grassland['Gradient'] = flat_gradients_grassland
+    for grouped_name, grouped_data in grouped_dfs:
+        res = linregress(grouped_data["Parameter_Value"], grouped_data["Grassland"])
+        grass_gradient = [grouped_name, res.slope]
+        grass_gradients.append(grass_gradient)
+    grass_gradients = pd.DataFrame(grass_gradients)
+    grass_gradients.columns = ['Parameter_names', 'Gradient']
     # take the top 10 most important ones; make sure to turn the negative ones positive when organizing them
-    grassland_gradients['Gradient'] = grassland_gradients['Gradient'].abs()
-    grassland_gradients = grassland_gradients.sort_values(['Gradient'], ascending=[False])
-    top_ten_grassland = grassland_gradients.iloc[0:10,:]
-    print(top_ten_grassland)
-    top_ten_combined_grassland = all_values_grassland.where(all_values_grassland.Parameter_names.isin(top_ten_grassland['Parameter name']))
-    top_ten_combined_grassland = top_ten_combined_grassland[top_ten_combined_grassland['Parameter_names'].notna()]
-    print(top_ten_combined_grassland)
-    top_ten_combined_grassland.to_excel("final_df_gradients_grassland_extended.xlsx")
-    # graph it
-    g = sns.relplot(data=top_ten_combined_grassland, x='Parameter_values', y='Population', col='Parameter_names', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
-    g.fig.suptitle('Grassland gradients')
+    grass_gradients['Gradient'] = grass_gradients['Gradient'].abs()
+    grass_gradients = grass_gradients.sort_values(['Gradient'], ascending=[False])
+    top_ten = grass_gradients.iloc[0:10,:]
+    top_ten.to_excel("final_df_gradients_grass.xlsx")
+    # plot those
+    top_ten_grass = merged_dfs[merged_dfs['Parameter_Changes'].isin(top_ten['Parameter_names'])]
+    ro = sns.relplot(data=top_ten_grass, x='Parameter_Value', y='Grassland', col='Parameter_Changes', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
+    ro.fig.suptitle('Grassland gradients')
     plt.tight_layout()
-    plt.savefig('sensitivity_grass_extended.png')
+    plt.savefig('sensitivity_grass.png')
     plt.show()
 
 
     # # THORNY SCRUB
     scrub_gradients = []
-    column_names_scrub = []
-    column_values_scrub= []
-    populations_scrub= []
-    gradients_scrub= []
-    
     # find the gradient
-    for column in merged_dfs.iloc[:,0:77]:
-        res = linregress(merged_dfs[column], merged_dfs["Thorny Scrub"])
-        scrub_gradient = [column, res.slope]
+    for grouped_name, grouped_data in grouped_dfs:
+        res = linregress(grouped_data["Parameter_Value"], grouped_data["Thorny Scrub"])
+        scrub_gradient = [grouped_name, res.slope]
         scrub_gradients.append(scrub_gradient)
-        # append column name & values, populations and gradients 
-        column_names_scrub.append([column]*6*77)
-        column_values_scrub.append(merged_dfs[column].to_list())
-        populations_scrub.append(merged_dfs["Thorny Scrub"].to_list())
-        gradients_scrub.append([res.slope]*6*77)
-
-    # organize the data
-    scrub_gradients = pd.DataFrame(data=scrub_gradients, columns = ['Parameter name', 'Gradient'])
-    all_values_scrub = pd.DataFrame()
-    flat_column_names_scrub = [item for sublist in column_names_scrub for item in sublist]
-    flat_column_values_scrub= [item for sublist in column_values_scrub for item in sublist]
-    flat_populations_scrub = [item for sublist in populations_scrub for item in sublist]
-    flat_gradients_scrub= [item for sublist in gradients_scrub for item in sublist]
-    all_values_scrub['Parameter_names'] = flat_column_names_scrub
-    all_values_scrub['Parameter_values'] = flat_column_values_scrub
-    all_values_scrub['Population'] = flat_populations_scrub
-    all_values_scrub['Gradient'] = flat_gradients_scrub
+    scrub_gradients = pd.DataFrame(scrub_gradients)
+    scrub_gradients.columns = ['Parameter_names', 'Gradient']
     # take the top 10 most important ones; make sure to turn the negative ones positive when organizing them
     scrub_gradients['Gradient'] = scrub_gradients['Gradient'].abs()
     scrub_gradients = scrub_gradients.sort_values(['Gradient'], ascending=[False])
-    top_ten_scrub = scrub_gradients.iloc[0:10,:]
-    print(top_ten_scrub)
-    top_ten_combined_scrub = all_values_scrub.where(all_values_scrub.Parameter_names.isin(top_ten_scrub['Parameter name']))
-    top_ten_combined_scrub = top_ten_combined_scrub[top_ten_combined_scrub['Parameter_names'].notna()]
-    print(top_ten_combined_scrub)
-    top_ten_combined_scrub.to_excel("final_df_gradients_scrub_extended.xlsx")
-    # graph it
-    s = sns.relplot(data=top_ten_combined_scrub, x='Parameter_values', y='Population', col='Parameter_names', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
-    s.fig.suptitle('Thorny scrub gradients')
+    top_ten = scrub_gradients.iloc[0:10,:]
+    top_ten.to_excel("final_df_gradients_scrub.xlsx")
+    # plot those
+    top_ten_scrub = merged_dfs[merged_dfs['Parameter_Changes'].isin(top_ten['Parameter_names'])]
+    ro = sns.relplot(data=top_ten_scrub , x='Parameter_Value', y='Thorny Scrub', col='Parameter_Changes', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
+    ro.fig.suptitle('Scrub gradients')
     plt.tight_layout()
-    plt.savefig('sensitivity_scrub_extended.png')
+    plt.savefig('sensitivity_scrub.png')
     plt.show()
 
 
 
     # # WOODLAND
     woodland_gradients = []
-    column_names_woodland = []
-    column_values_woodland= []
-    populations_woodland= []
-    gradients_woodland= []
-    
     # find the gradient
-    for column in merged_dfs.iloc[:,0:77]:
-        res = linregress(merged_dfs[column], merged_dfs["Woodland"])
-        woodland_gradient = [column, res.slope]
+    for grouped_name, grouped_data in grouped_dfs:
+        res = linregress(grouped_data["Parameter_Value"], grouped_data["Woodland"])
+        woodland_gradient = [grouped_name, res.slope]
         woodland_gradients.append(woodland_gradient)
-        # append column name & values, populations and gradients 
-        column_names_woodland.append([column]*6*77)
-        column_values_woodland.append(merged_dfs[column].to_list())
-        populations_woodland.append(merged_dfs["Woodland"].to_list())
-        gradients_woodland.append([res.slope]*6*77)
-
-    # organize the data
-    woodland_gradients = pd.DataFrame(data=woodland_gradients, columns = ['Parameter name', 'Gradient'])
-    all_values_woodland = pd.DataFrame()
-    flat_column_names_woodland = [item for sublist in column_names_woodland for item in sublist]
-    flat_column_values_woodland= [item for sublist in column_values_woodland for item in sublist]
-    flat_populations_woodland = [item for sublist in populations_woodland for item in sublist]
-    flat_gradients_woodland = [item for sublist in gradients_woodland for item in sublist]
-    all_values_woodland['Parameter_names'] = flat_column_names_woodland
-    all_values_woodland['Parameter_values'] = flat_column_values_woodland
-    all_values_woodland['Population'] = flat_populations_woodland
-    all_values_woodland['Gradient'] = flat_gradients_woodland
+    woodland_gradients = pd.DataFrame(woodland_gradients)
+    woodland_gradients.columns = ['Parameter_names', 'Gradient']
     # take the top 10 most important ones; make sure to turn the negative ones positive when organizing them
     woodland_gradients['Gradient'] = woodland_gradients['Gradient'].abs()
     woodland_gradients = woodland_gradients.sort_values(['Gradient'], ascending=[False])
-    top_ten_woodland = woodland_gradients.iloc[0:10,:]
-    print(top_ten_woodland)
-    top_ten_combined_woodland= all_values_woodland.where(all_values_woodland.Parameter_names.isin(top_ten_woodland['Parameter name']))
-    top_ten_combined_woodland= top_ten_combined_woodland[top_ten_combined_woodland['Parameter_names'].notna()]
-    print(top_ten_combined_woodland)
-    top_ten_combined_woodland.to_excel("final_df_gradients_woodland_extended.xlsx")
-    # graph it
-    w = sns.relplot(data=top_ten_combined_woodland, x='Parameter_values', y='Population', col='Parameter_names', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
-    w.fig.suptitle('Woodland gradients')
+    top_ten = woodland_gradients.iloc[0:10,:]
+    top_ten.to_excel("final_df_gradients_woodland.xlsx")
+    # plot those
+    top_ten_woodland = merged_dfs[merged_dfs['Parameter_Changes'].isin(top_ten['Parameter_names'])]
+    ro = sns.relplot(data=top_ten_woodland, x='Parameter_Value', y='Woodland', col='Parameter_Changes', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
+    ro.fig.suptitle('Woodland gradients')
     plt.tight_layout()
-    plt.savefig('sensitivity_woodland_extended.png')
+    plt.savefig('sensitivity_woodland.png')
     plt.show()
 
 
