@@ -1,6 +1,4 @@
 # graph the runs
-from typing import final
-from run_experiments import run_counterfactual
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
@@ -8,10 +6,8 @@ import pandas as pd
 from KneppModel_ABM import KneppModel 
 from geneticAlgorithm import run_optimizer
 import numpy as np
-import random
 import pandas as pd
 from scipy.stats import linregress
-
 
 
 def optimizer_fails():
@@ -85,38 +81,38 @@ def optimizer_fails():
         pigs_gain_from_Saplings = output_parameters["variable"][47]
         pigs_gain_from_YoungScrub = output_parameters["variable"][48]
         # impact grass
-        roeDeer_impactGrass = round(output_parameters["variable"][49])
-        fallowDeer_impactGrass = round(output_parameters["variable"][50])
-        redDeer_impactGrass = round(output_parameters["variable"][51])
-        ponies_impactGrass = round(output_parameters["variable"][52])
-        cows_impactGrass = round(output_parameters["variable"][53])
-        pigs_impactGrass = round(output_parameters["variable"][54])
+        roeDeer_impactGrass = output_parameters["variable"][49]
+        fallowDeer_impactGrass = output_parameters["variable"][50]
+        redDeer_impactGrass = output_parameters["variable"][51]
+        ponies_impactGrass = output_parameters["variable"][52]
+        cows_impactGrass = output_parameters["variable"][53]
+        pigs_impactGrass = output_parameters["variable"][54]
         # impact saplings
-        roeDeer_saplingsEaten = round(output_parameters["variable"][55])
-        fallowDeer_saplingsEaten = round(output_parameters["variable"][56])
-        redDeer_saplingsEaten = round(output_parameters["variable"][57])
-        ponies_saplingsEaten = round(output_parameters["variable"][58])
-        cows_saplingsEaten =  round(output_parameters["variable"][59])
-        pigs_saplingsEaten = round(output_parameters["variable"][60])
+        roeDeer_saplingsEaten = output_parameters["variable"][55]
+        fallowDeer_saplingsEaten = output_parameters["variable"][56]
+        redDeer_saplingsEaten = output_parameters["variable"][57]
+        ponies_saplingsEaten = output_parameters["variable"][58]
+        cows_saplingsEaten =  output_parameters["variable"][59]
+        pigs_saplingsEaten = output_parameters["variable"][60]
         # impact young scrub
-        roeDeer_youngScrubEaten = round(output_parameters["variable"][61])
-        fallowDeer_youngScrubEaten = round(output_parameters["variable"][62])
-        redDeer_youngScrubEaten = round(output_parameters["variable"][63])
-        ponies_youngScrubEaten = round(output_parameters["variable"][64])
-        cows_youngScrubEaten = round(output_parameters["variable"][65])
-        pigs_youngScrubEaten = round(output_parameters["variable"][66])
+        roeDeer_youngScrubEaten = output_parameters["variable"][61]
+        fallowDeer_youngScrubEaten = output_parameters["variable"][62]
+        redDeer_youngScrubEaten = output_parameters["variable"][63]
+        ponies_youngScrubEaten = output_parameters["variable"][64]
+        cows_youngScrubEaten = output_parameters["variable"][65]
+        pigs_youngScrubEaten = output_parameters["variable"][66]
         # impact scrub
-        roeDeer_scrubEaten = round(output_parameters["variable"][67])
-        fallowDeer_scrubEaten = round(output_parameters["variable"][68])
-        redDeer_scrubEaten = round(output_parameters["variable"][69])
-        ponies_scrubEaten = round(output_parameters["variable"][70])
-        cows_scrubEaten = round(output_parameters["variable"][71])
+        roeDeer_scrubEaten = output_parameters["variable"][67]
+        fallowDeer_scrubEaten = output_parameters["variable"][68]
+        redDeer_scrubEaten = output_parameters["variable"][69]
+        ponies_scrubEaten = output_parameters["variable"][70]
+        cows_scrubEaten = output_parameters["variable"][71]
         # impact trees
-        roeDeer_treesEaten = round(output_parameters["variable"][72])
-        fallowDeer_treesEaten = round(output_parameters["variable"][73])
-        redDeer_treesEaten = round(output_parameters["variable"][74])
-        ponies_treesEaten = round(output_parameters["variable"][75])
-        cows_treesEaten =  round(output_parameters["variable"][76])
+        roeDeer_treesEaten = output_parameters["variable"][72]
+        fallowDeer_treesEaten = output_parameters["variable"][73]
+        redDeer_treesEaten = output_parameters["variable"][74]
+        ponies_treesEaten = output_parameters["variable"][75]
+        cows_treesEaten =  output_parameters["variable"][76]
 
         
         # keep track of my parameters

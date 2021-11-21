@@ -85,21 +85,18 @@ chart_element = ChartModule([{"Label": "Roe deer", "Color": "#666666"},
 
 
 server = ModularServer(KneppModel, [canvas_element, chart_element],
-                       "KneppModel", {"chance_reproduceSapling":0.5, "chance_reproduceYoungScrub":0.5, "chance_regrowGrass":0.5, "chance_saplingBecomingTree":0.001, "chance_youngScrubMatures":0.01,
-                        "chance_scrubOutcompetedByTree":0.5, "chance_grassOutcompetedByTree":0.5, "chance_grassOutcompetedByScrub":0.5, "chance_saplingOutcompetedByTree":0.5, "chance_saplingOutcompetedByScrub":0.5, "chance_youngScrubOutcompetedByScrub":0.5, "chance_youngScrubOutcompetedByTree":0.5,
-                        "initial_roeDeer":12, "initial_grassland":71, "initial_woodland":12, "initial_scrubland":1, 
-                        "roeDeer_reproduce":0.05, "roeDeer_gain_from_grass":0.5, "roeDeer_gain_from_Trees":0.25, "roeDeer_gain_from_Scrub":0.25, "roeDeer_gain_from_Saplings":0.15, "roeDeer_gain_from_YoungScrub":0.15, 
-                        "roeDeer_impactGrass": 5, "roeDeer_saplingsEaten":100, "roeDeer_youngScrubEaten":100, "roeDeer_treesEaten":10, "roeDeer_scrubEaten":10,
+                       "KneppModel", {"chance_reproduceSapling":0.26, "chance_reproduceYoungScrub":0.61, "chance_regrowGrass":0.76, "chance_saplingBecomingTree":0.00002, "chance_youngScrubMatures":0.0011,
+                        "chance_scrubOutcompetedByTree":0.84, "chance_grassOutcompetedByTree":0.34, "chance_grassOutcompetedByScrub":0.24, "chance_saplingOutcompetedByTree":0.13, "chance_saplingOutcompetedByScrub":0.31, "chance_youngScrubOutcompetedByScrub":0.041, "chance_youngScrubOutcompetedByTree":0.086,
+                        "initial_roeDeer":0.12, "initial_grassland":0.71, "initial_woodland":0.12, "initial_scrubland":0.01, 
+                        "roeDeer_reproduce":0.051, "roeDeer_gain_from_grass":0.015, "roeDeer_gain_from_Trees":0.032, "roeDeer_gain_from_Scrub":0.059, "roeDeer_gain_from_Saplings":0.0012, "roeDeer_gain_from_YoungScrub":0.0032, 
                         "ponies_gain_from_grass": 0.5, "ponies_gain_from_Trees": 0.5, "ponies_gain_from_Scrub": 0.5, "ponies_gain_from_Saplings": 0.5, "ponies_gain_from_YoungScrub": 0.5, 
-                        "ponies_impactGrass": 25, "ponies_saplingsEaten": 5, "ponies_youngScrubEaten": 5, "ponies_treesEaten": 5, "ponies_scrubEaten": 5, 
                         "cows_reproduce": 0.5, "cows_gain_from_grass": 0.5, "cows_gain_from_Trees": 0.5, "cows_gain_from_Scrub": 0.5, "cows_gain_from_Saplings": 0.5, "cows_gain_from_YoungScrub": 0.5, 
-                        "cows_impactGrass": 10, "cows_saplingsEaten": 10, "cows_youngScrubEaten": 10, "cows_treesEaten": 10, "cows_scrubEaten": 10, 
                         "fallowDeer_reproduce": 0.5, "fallowDeer_gain_from_grass": 0.5, "fallowDeer_gain_from_Trees": 0.5, "fallowDeer_gain_from_Scrub": 0.5, "fallowDeer_gain_from_Saplings": 0.5, "fallowDeer_gain_from_YoungScrub": 0.5, 
-                        "fallowDeer_impactGrass": 5, "fallowDeer_saplingsEaten": 5, "fallowDeer_youngScrubEaten": 5, "fallowDeer_treesEaten": 5, "fallowDeer_scrubEaten": 5,
                         "redDeer_reproduce": 0.5, "redDeer_gain_from_grass": 0.5, "redDeer_gain_from_Trees": 0.5, "redDeer_gain_from_Scrub": 0.5, "redDeer_gain_from_Saplings": 0.5, "redDeer_gain_from_YoungScrub": 0.5, 
-                        "redDeer_impactGrass": 5, "redDeer_saplingsEaten": 5, "redDeer_youngScrubEaten": 5, "redDeer_treesEaten": 5, "redDeer_scrubEaten": 5, 
                         "pigs_reproduce": 0.5, "pigs_gain_from_grass": 0.5, "pigs_gain_from_Saplings": 0.5, "pigs_gain_from_YoungScrub": 0.5, 
-                        "pigs_impactGrass": 75, "pigs_saplingsEaten": 5, "pigs_youngScrubEaten": 5, "width":50, "height":36})
+                        "width":50, "height":36, 
+                        "max_time": 141, "reintroduction": False, 
+                        "RC1_noFood": False, "RC2_noTreesScrub": False, "RC3_noTrees": False, "RC4_noScrub": False})
 
 server.port = 8521 # The default
 server.launch()

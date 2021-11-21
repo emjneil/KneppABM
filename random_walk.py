@@ -4,7 +4,9 @@
 import random
 from mesa import Agent
 
-
+def get_month(self):
+    return (self.schedule.time % 12) + 1
+    
 class RandomWalker(Agent):
     '''
     Class implementing random walker methods in a generalized manner.
@@ -41,31 +43,36 @@ class RandomWalker(Agent):
 
     def roe_move(self):
         '''
-        move towards woodland and scrub
+        move towards areas with most undergrowth (saplings and thorny scrub)
         '''
         # move: look at my neighbors
         next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, True)
         next_in_neighborhood = list(map(self.model.grid.get_cell_list_contents, next_moves)) 
         # are any of the adjoining habitats woodland or scrubland?  
-        available_woodScrubCells = [obj for obj in next_in_neighborhood if (isinstance(x, habitatAgent) for x in obj)]
-        only_habitats = [item[0] for item in available_woodScrubCells]
-        my_choices = [i for i in only_habitats if i.condition == "woodland" or i.condition == "thorny_scrubland"]
-        if len(my_choices) > 0:
-            # if yes, pick one of those at random
-            my_next_patch = random.choice(my_choices)
-            next_move = my_next_patch.pos
-        # otherwise, pick any one at random
-        else:
-            next_move = random.choice(next_moves)
+        only_habitats = [obj[0] for obj in next_in_neighborhood if obj[0].condition != None]
+        # I want the one with maximum undergrowth (saplings/young scrub)
+        maximum = (max(node.edibles["saplings"] + node.edibles["youngScrub"] for node in only_habitats))
+        my_choice = [i for i in only_habitats if i.edibles["saplings"] + i.edibles["youngScrub"] == maximum]
+        next_move = my_choice[0].pos
         # Now move:
         self.model.grid.move_agent(self, next_move)
+
+        # my_choices = [i for i in only_habitats if i.condition == "woodland" or i.condition == "thorny_scrubland"]
+        # if len(my_choices) > 0:
+        #     # if yes, pick one of those at random
+        #     my_next_patch = random.choice(my_choices)
+        #     next_move = my_next_patch.pos
+        # # otherwise, pick any one at random
+        # else:
+        #     next_move = random.choice(next_moves)
+        # # Now move:
+        # self.model.grid.move_agent(self, next_move)
 
     
     def browser_move(self):
         '''
         move in any direction regardless of habitat type (they like anything)
         '''
-        # Pick the next cell from the adjacent cells.
         next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, True)
         next_move = random.choice(next_moves)
         # Now move:
@@ -74,22 +81,16 @@ class RandomWalker(Agent):
 
     def grazer_move(self):
         '''
-        move towards grassland
+        move towards grass
         '''
         # move: look at my neighbors
         next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, True)
         next_in_neighborhood = list(map(self.model.grid.get_cell_list_contents, next_moves)) 
-        # are any of the adjoining habitats woodland or scrubland?  
-        available_grassCells = [obj for obj in next_in_neighborhood if (isinstance(x, habitatAgent) for x in obj)]
-        only_habitats = [item[0] for item in available_grassCells]
-        my_choices = [i for i in only_habitats if i.condition == "grassland"]
-        if len(my_choices) > 0:
-            # if yes, pick one of those at random
-            my_next_patch = random.choice(my_choices)
-            next_move = my_next_patch.pos
-        # otherwise, pick any one at random
-        else:
-            next_move = random.choice(next_moves)
+        # where is there mostly grass?
+        only_habitats = [obj[0] for obj in next_in_neighborhood if obj[0].condition != None]
+        maximum = (max(node.edibles["grass"] for node in only_habitats))
+        my_choice = [i for i in only_habitats if i.edibles["grass"] == maximum]
+        next_move = my_choice[0].pos
         # Now move:
         self.model.grid.move_agent(self, next_move)
 
@@ -97,23 +98,20 @@ class RandomWalker(Agent):
 
     def mixedDiet_move(self):
         '''
-        move towards grassland in spring/summer, any habitat in autumn/winter
+        move towards grass in spring/summer, any habitat in autumn/winter
         '''
         # if grass is available, and it's summer (March-Aug; 3-8), go there
         next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, True)
         # if it's spring/summer (March-Aug):
-        if (3 <= self.model.schedule.time < 9 or 15 <= self.model.schedule.time < 21 or 27 <= self.model.schedule.time < 33 or 39 <= self.model.schedule.time < 45 or 51 <= self.model.schedule.time < 57 or 63 <= self.model.schedule.time < 69 or 75 <= self.model.schedule.time < 81 or 87 <= self.model.schedule.time < 93 or 99 <= self.model.schedule.time < 105 or 111 <= self.model.schedule.time < 117 or 123 <= self.model.schedule.time < 129 or 135 <= self.model.schedule.time < 141 or 147 <= self.model.schedule.time < 153 or 159 <= self.model.schedule.time < 165 or 171 <= self.model.schedule.time < 177 or 183 <= self.model.schedule.time < 189 or 195 <= self.model.schedule.time < 201 or 207 <= self.model.schedule.time < 213 or 219 <= self.model.schedule.time < 225 or 231 <= self.model.schedule.time < 237 or 243 <= self.model.schedule.time < 249 or 255 <= self.model.schedule.time < 261 or 267 <= self.model.schedule.time < 273 or 279 <= self.model.schedule.time < 285 or 291 <= self.model.schedule.time < 297):
+        if (3 <= self.model.get_month() < 9):
             next_in_neighborhood = list(map(self.model.grid.get_cell_list_contents, next_moves)) 
-            # is there grass near me?
-            available_grassCells = [obj for obj in next_in_neighborhood if (isinstance(x, habitatAgent) for x in obj)]
-            only_habitats = [item[0] for item in available_grassCells]
-            my_choices = [i for i in only_habitats if i.condition == "grassland"]
-            if len(my_choices) > 0:
-                # if yes, pick one of those at random
-                my_next_patch = random.choice(my_choices)
-                next_move = my_next_patch.pos
-            else:
-                next_move = random.choice(next_moves)
+            # where is there the most grass?
+            only_habitats = [obj[0] for obj in next_in_neighborhood if obj[0].condition != None]
+            maximum = (max(node.edibles["grass"] for node in only_habitats))
+            my_choice = [i for i in only_habitats if i.edibles["grass"] == maximum]
+            next_move = my_choice[0].pos
+            # Now move:
+            self.model.grid.move_agent(self, next_move)
         else:
             next_move = random.choice(next_moves)
         # Now move:

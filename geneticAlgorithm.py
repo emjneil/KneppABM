@@ -1,9 +1,7 @@
 # ------ Optimization of the Knepp ABM model --------
 from KneppModel_ABM import KneppModel 
 import numpy as np
-import numpy as np
 import pandas as pd
-import random
 from geneticalgorithm import geneticalgorithm as ga
 import timeit
 
@@ -124,249 +122,249 @@ def objectiveFunction(x):
         # pre-reintro model
         (((list(results.loc[results['Time'] == 49, 'Roe deer'])[0])-23)**2) +
         (((list(results.loc[results['Time'] == 49, 'Grassland'])[0])-70)**2) +
-        (((list(results.loc[results['Time'] == 49, 'Thorny Scrub'])[0])-11)**2) +
+        (((list(results.loc[results['Time'] == 49, 'Thorny Scrub'])[0])-13)**2) +
         (((list(results.loc[results['Time'] == 49, 'Woodland'])[0])-17)**2) +
-        # post-reintro model: April 2015
-        (((list(results.loc[results['Time'] == 123, 'Longhorn cattle'])[0])-115)**2) +
-        (((list(results.loc[results['Time'] == 123, 'Tamworth pigs'])[0])-22)**2) +
-        (((list(results.loc[results['Time'] == 123, 'Exmoor pony'])[0])-10)**2) +
-        # May 2015
-        (((list(results.loc[results['Time'] == 124, 'Exmoor pony'])[0])-10)**2) +
-        (((list(results.loc[results['Time'] == 124, 'Longhorn cattle'])[0])-129)**2) +
-        (((list(results.loc[results['Time'] == 124, 'Tamworth pigs'])[0])-14)**2) +
-        # June 2015
-        (((list(results.loc[results['Time'] == 125, 'Exmoor pony'])[0])-10)**2) +
-        (((list(results.loc[results['Time'] == 125, 'Longhorn cattle'])[0])-129)**2) +
-        (((list(results.loc[results['Time'] == 125, 'Tamworth pigs'])[0])-14)**2) +
-        # July 2015
-        (((list(results.loc[results['Time'] == 126, 'Exmoor pony'])[0])-10)**2) +
-        (((list(results.loc[results['Time'] == 126, 'Longhorn cattle'])[0])-129)**2) +
-        (((list(results.loc[results['Time'] == 126, 'Tamworth pigs'])[0])-14)**2) +
-        # Aug 2015
-        (((list(results.loc[results['Time'] == 127, 'Exmoor pony'])[0])-10)**2) +
-        (((list(results.loc[results['Time'] == 127, 'Longhorn cattle'])[0])-129)**2) +
-        (((list(results.loc[results['Time'] == 127, 'Tamworth pigs'])[0])-14)**2) +
-        # Sept 2015
-        (((list(results.loc[results['Time'] == 128, 'Exmoor pony'])[0])-10)**2) +
-        (((list(results.loc[results['Time'] == 128, 'Longhorn cattle'])[0])-130)**2) +
-        (((list(results.loc[results['Time'] == 128, 'Tamworth pigs'])[0])-14)**2) +
-        # Oct 2015
-        (((list(results.loc[results['Time'] == 129, 'Exmoor pony'])[0])-10)**2) +
-        (((list(results.loc[results['Time'] == 129, 'Longhorn cattle'])[0])-91)**2) +
-        (((list(results.loc[results['Time'] == 129, 'Tamworth pigs'])[0])-14)**2) +
-        # Nov 2015
-        (((list(results.loc[results['Time'] == 130, 'Exmoor pony'])[0])-10)**2) +
-        (((list(results.loc[results['Time'] == 130, 'Longhorn cattle'])[0])-91)**2) +
-        (((list(results.loc[results['Time'] == 130, 'Tamworth pigs'])[0])-13)**2) +
-        # Dec 2015
-        (((list(results.loc[results['Time'] == 131, 'Exmoor pony'])[0])-10)**2) +
-        (((list(results.loc[results['Time'] == 131, 'Longhorn cattle'])[0])-86)**2) +
-        (((list(results.loc[results['Time'] == 131, 'Tamworth pigs'])[0])-13)**2) +
-        # Jan 2016
-        (((list(results.loc[results['Time'] == 132, 'Exmoor pony'])[0])-10)**2) +
-        (((list(results.loc[results['Time'] == 132, 'Longhorn cattle'])[0])-86)**2) +
-        (((list(results.loc[results['Time'] == 132, 'Tamworth pigs'])[0])-10)**2) +
-        # Feb 2016
-        (((list(results.loc[results['Time'] == 133, 'Exmoor pony'])[0])-10)**2) +
-        (((list(results.loc[results['Time'] == 133, 'Longhorn cattle'])[0])-86)**2) +
-        (((list(results.loc[results['Time'] == 133, 'Tamworth pigs'])[0])-8)**2) +
-        # # March 2016
-        (((list(results.loc[results['Time'] == 134, 'Fallow deer'])[0])-140)**2) +
-        (((list(results.loc[results['Time'] == 134, 'Red deer'])[0])-26)**2) +
-        (((list(results.loc[results['Time'] == 134, 'Tamworth pigs'])[0])-9)**2) +
-        (((list(results.loc[results['Time'] == 134, 'Longhorn cattle'])[0])-86)**2) +
-        (((list(results.loc[results['Time'] == 134, 'Exmoor pony'])[0])-11)**2) +
-        # April 2016
-        (((list(results.loc[results['Time'] == 135, 'Longhorn cattle'])[0])-103)**2) +
-        (((list(results.loc[results['Time'] == 135, 'Exmoor pony'])[0])-11)**2) +
-        (((list(results.loc[results['Time'] == 135, 'Tamworth pigs'])[0])-9)**2) +
-        # # May 2016
-        (((list(results.loc[results['Time'] == 136, 'Longhorn cattle'])[0])-108)**2) +
-        (((list(results.loc[results['Time'] == 136, 'Tamworth pigs'])[0])-17)**2) +
-        (((list(results.loc[results['Time'] == 136, 'Exmoor pony'])[0])-11)**2) +
-        # June 2016
-        (((list(results.loc[results['Time'] == 137, 'Longhorn cattle'])[0])-89)**2) +
-        (((list(results.loc[results['Time'] == 137, 'Exmoor pony'])[0])-11)**2) +
-        (((list(results.loc[results['Time'] == 137, 'Tamworth pigs'])[0])-17)**2) +
-        # July 2016
-        (((list(results.loc[results['Time'] == 138, 'Exmoor pony'])[0])-11)**2) +
-        (((list(results.loc[results['Time'] == 138, 'Tamworth pigs'])[0])-17)**2) +
-        (((list(results.loc[results['Time'] == 138, 'Longhorn cattle'])[0])-87)**2) +
-        # August 2016
-        (((list(results.loc[results['Time'] == 139, 'Exmoor pony'])[0])-11)**2) +
-        (((list(results.loc[results['Time'] == 139, 'Tamworth pigs'])[0])-17)**2) +
-        (((list(results.loc[results['Time'] == 139, 'Longhorn cattle'])[0])-87)**2) +
-        # September 2016
-        (((list(results.loc[results['Time'] == 140, 'Exmoor pony'])[0])-11)**2) +
-        (((list(results.loc[results['Time'] == 140, 'Tamworth pigs'])[0])-17)**2) +
-        (((list(results.loc[results['Time'] == 140, 'Longhorn cattle'])[0])-97)**2) +
-        # Oct 2016
-        (((list(results.loc[results['Time'] == 141, 'Exmoor pony'])[0])-11)**2) +
-        (((list(results.loc[results['Time'] == 141, 'Tamworth pigs'])[0])-17)**2) +
-        (((list(results.loc[results['Time'] == 141, 'Longhorn cattle'])[0])-97)**2) +
-        # Nov 2016
-        (((list(results.loc[results['Time'] == 142, 'Exmoor pony'])[0])-11)**2) +
-        (((list(results.loc[results['Time'] == 142, 'Tamworth pigs'])[0])-17)**2) +
-        (((list(results.loc[results['Time'] == 142, 'Longhorn cattle'])[0])-92)**2) +
-        # Dec 2016
-        (((list(results.loc[results['Time'] == 143, 'Exmoor pony'])[0])-11)**2) +
-        (((list(results.loc[results['Time'] == 143, 'Tamworth pigs'])[0])-13)**2) +
-        (((list(results.loc[results['Time'] == 143, 'Longhorn cattle'])[0])-79)**2) +
-        # Jan 2017
-        (((list(results.loc[results['Time'] == 144, 'Exmoor pony'])[0])-11)**2) +
-        (((list(results.loc[results['Time'] == 144, 'Tamworth pigs'])[0])-9)**2) +
-        (((list(results.loc[results['Time'] == 144, 'Longhorn cattle'])[0])-79)**2) +
-        # Feb 2017
-        (((list(results.loc[results['Time'] == 145, 'Exmoor pony'])[0])-11)**2) +
-        (((list(results.loc[results['Time'] == 145, 'Tamworth pigs'])[0])-7)**2) +
-        (((list(results.loc[results['Time'] == 145, 'Longhorn cattle'])[0])-79)**2) +
-        # # March 2017
-        (((list(results.loc[results['Time'] == 146, 'Fallow deer'])[0])-165)**2) +
-        (((list(results.loc[results['Time'] == 146, 'Longhorn cattle'])[0])-79)**2) +
-        (((list(results.loc[results['Time'] == 146, 'Tamworth pigs'])[0])-7)**2) +
-        (((list(results.loc[results['Time'] == 146, 'Exmoor pony'])[0])-10)**2) +
-        # April 2017
-        (((list(results.loc[results['Time'] == 147, 'Longhorn cattle'])[0])-100)**2) +
-        (((list(results.loc[results['Time'] == 147, 'Tamworth pigs'])[0])-22)**2) +
-        (((list(results.loc[results['Time'] == 147, 'Exmoor pony'])[0])-10)**2) +
-        # May 2017
-        (((list(results.loc[results['Time'] == 148, 'Longhorn cattle'])[0])-109)**2) +
-        (((list(results.loc[results['Time'] == 148, 'Exmoor pony'])[0])-10)**2) +
-        (((list(results.loc[results['Time'] == 148, 'Tamworth pigs'])[0])-22)**2) +
-        # June 2017
-        (((list(results.loc[results['Time'] == 149, 'Longhorn cattle'])[0])-94)**2) +
-        (((list(results.loc[results['Time'] == 149, 'Exmoor pony'])[0])-10)**2) +
-        (((list(results.loc[results['Time'] == 149, 'Tamworth pigs'])[0])-22)**2) +
-        # July 2017
-        (((list(results.loc[results['Time'] == 150, 'Exmoor pony'])[0])-10)**2) +
-        (((list(results.loc[results['Time'] == 150, 'Longhorn cattle'])[0])-94)**2) +
-        (((list(results.loc[results['Time'] == 150, 'Tamworth pigs'])[0])-22)**2) +
-        # Aug 2017
-        (((list(results.loc[results['Time'] == 151, 'Exmoor pony'])[0])-10)**2) +
-        (((list(results.loc[results['Time'] == 151, 'Longhorn cattle'])[0])-94)**2) +
-        (((list(results.loc[results['Time'] == 151, 'Tamworth pigs'])[0])-22)**2) +
-        # Sept 2017
-        (((list(results.loc[results['Time'] == 152, 'Exmoor pony'])[0])-10)**2) +
-        (((list(results.loc[results['Time'] == 152, 'Longhorn cattle'])[0])-90)**2) +
-        (((list(results.loc[results['Time'] == 152, 'Tamworth pigs'])[0])-22)**2) +
-        # Oct 2017
-        (((list(results.loc[results['Time'] == 153, 'Exmoor pony'])[0])-10)**2) +
-        (((list(results.loc[results['Time'] == 153, 'Longhorn cattle'])[0])-88)**2) +
-        (((list(results.loc[results['Time'] == 153, 'Tamworth pigs'])[0])-22)**2) +
-        # Nov 2017
-        (((list(results.loc[results['Time'] == 154, 'Exmoor pony'])[0])-10)**2) +
-        (((list(results.loc[results['Time'] == 154, 'Longhorn cattle'])[0])-88)**2) +
-        (((list(results.loc[results['Time'] == 154, 'Tamworth pigs'])[0])-22)**2) +
-        # # Dec 2017
-        (((list(results.loc[results['Time'] == 155, 'Exmoor pony'])[0])-10)**2) +
-        (((list(results.loc[results['Time'] == 155, 'Longhorn cattle'])[0])-88)**2) +
-        (((list(results.loc[results['Time'] == 155, 'Tamworth pigs'])[0])-18)**2) +
-        # Jan 2018
-        (((list(results.loc[results['Time'] == 156, 'Tamworth pigs'])[0])-11)**2) +
-        (((list(results.loc[results['Time'] == 156, 'Exmoor pony'])[0])-10)**2) +
-        (((list(results.loc[results['Time'] == 156, 'Longhorn cattle'])[0])-88)**2) +
-        # Feb 2018
-        (((list(results.loc[results['Time'] == 157, 'Exmoor pony'])[0])-10)**2) +
-        (((list(results.loc[results['Time'] == 157, 'Tamworth pigs'])[0])-16)**2) +
-        (((list(results.loc[results['Time'] == 157, 'Longhorn cattle'])[0])-88)**2) +
-        # March 2018
-        (((list(results.loc[results['Time'] == 158, 'Fallow deer'])[0])-251)**2) +
-        (((list(results.loc[results['Time'] == 158, 'Red deer'])[0])-24)**2) +
-        (((list(results.loc[results['Time'] == 158, 'Longhorn cattle'])[0])-88)**2) +
-        (((list(results.loc[results['Time'] == 158, 'Tamworth pigs'])[0])-16)**2) +
-        (((list(results.loc[results['Time'] == 158, 'Exmoor pony'])[0])-9)**2) +
-        # April 2018
-        (((list(results.loc[results['Time'] == 159, 'Longhorn cattle'])[0])-101)**2) +
-        (((list(results.loc[results['Time'] == 159, 'Exmoor pony'])[0])-9)**2) +
-        (((list(results.loc[results['Time'] == 159, 'Tamworth pigs'])[0])-16)**2) +
-        # # May 2018
-        (((list(results.loc[results['Time'] == 160, 'Longhorn cattle'])[0])-117)**2) +
-        (((list(results.loc[results['Time'] == 160, 'Tamworth pigs'])[0])-23)**2) +
-        (((list(results.loc[results['Time'] == 160, 'Exmoor pony'])[0])-9)**2) +
-        # June 2018
-        (((list(results.loc[results['Time'] == 161, 'Longhorn cattle'])[0])-103)**2) +
-        (((list(results.loc[results['Time'] == 161, 'Exmoor pony'])[0])-9)**2) +
-        (((list(results.loc[results['Time'] == 161, 'Tamworth pigs'])[0])-23)**2) +
-        # July 2019
-        (((list(results.loc[results['Time'] == 162, 'Exmoor pony'])[0])-9)**2) +
-        (((list(results.loc[results['Time'] == 162, 'Longhorn cattle'])[0])-103)**2) +
-        (((list(results.loc[results['Time'] == 162, 'Tamworth pigs'])[0])-22)**2) +
-        # Aug 2019
-        (((list(results.loc[results['Time'] == 163, 'Longhorn cattle'])[0])-102)**2) +
-        (((list(results.loc[results['Time'] == 163, 'Tamworth pigs'])[0])-22)**2) +
-        # Sept 2019
-        (((list(results.loc[results['Time'] == 164, 'Longhorn cattle'])[0])-106)**2) +
-        (((list(results.loc[results['Time'] == 164, 'Tamworth pigs'])[0])-22)**2) +
-        # Oct 2019
-        (((list(results.loc[results['Time'] == 165, 'Longhorn cattle'])[0])-101)**2) +
-        (((list(results.loc[results['Time'] == 165, 'Tamworth pigs'])[0])-21)**2) +
-        # Nov 2019
-        (((list(results.loc[results['Time'] == 166, 'Longhorn cattle'])[0])-93)**2) +
-        (((list(results.loc[results['Time'] == 166, 'Tamworth pigs'])[0])-9)**2) +
-        # Dec 2019
-        (((list(results.loc[results['Time'] == 167, 'Longhorn cattle'])[0])-89)**2) +
-        (((list(results.loc[results['Time'] == 167, 'Tamworth pigs'])[0])-9)**2) +
-        # Jan 2020
-        (((list(results.loc[results['Time'] == 168, 'Longhorn cattle'])[0])-89)**2) +
-        (((list(results.loc[results['Time'] == 168, 'Tamworth pigs'])[0])-9)**2) +
-        # Feb 2020
-        (((list(results.loc[results['Time'] == 169, 'Longhorn cattle'])[0])-87)**2) +
-        (((list(results.loc[results['Time'] == 169, 'Tamworth pigs'])[0])-10)**2) +
-        # March 2019
-        (((list(results.loc[results['Time'] == 170, 'Fallow deer'])[0])-278)**2) +
-        (((list(results.loc[results['Time'] == 170, 'Red deer'])[0])-37)**2) +
-        (((list(results.loc[results['Time'] == 170, 'Longhorn cattle'])[0])-87)**2) +
-        (((list(results.loc[results['Time'] == 170, 'Tamworth pigs'])[0])-9)**2) +
-        # April 2019
-        (((list(results.loc[results['Time'] == 171, 'Longhorn cattle'])[0])-101)**2) +
-        (((list(results.loc[results['Time'] == 171, 'Tamworth pigs'])[0])-8)**2) +
-        # May 2019
-        (((list(results.loc[results['Time'] == 172, 'Longhorn cattle'])[0])-110)**2) +
-        (((list(results.loc[results['Time'] == 172, 'Tamworth pigs'])[0])-8)**2) +
-        # June 2019
-        (((list(results.loc[results['Time'] == 173, 'Longhorn cattle'])[0])-89)**2) +
-        (((list(results.loc[results['Time'] == 173, 'Tamworth pigs'])[0])-8)**2) +
-        # July 2019        
-        (((list(results.loc[results['Time'] == 174, 'Tamworth pigs'])[0])-9)**2) +
-        (((list(results.loc[results['Time'] == 174, 'Longhorn cattle'])[0])-91)**2) +
-        # Aug 2019 
-        (((list(results.loc[results['Time'] == 175, 'Longhorn cattle'])[0])-91)**2) +
-        (((list(results.loc[results['Time'] == 175, 'Tamworth pigs'])[0])-9)**2) +
-        # Sept 2019 
-        (((list(results.loc[results['Time'] == 176, 'Longhorn cattle'])[0])-93)**2) +
-        (((list(results.loc[results['Time'] == 176, 'Tamworth pigs'])[0])-9)**2) +
-        # Oct 2019 
-        (((list(results.loc[results['Time'] == 177, 'Longhorn cattle'])[0])-88)**2) +
-        (((list(results.loc[results['Time'] == 177, 'Tamworth pigs'])[0])-9)**2) +
-        # Nov 2019 
-        (((list(results.loc[results['Time'] == 178, 'Longhorn cattle'])[0])-87)**2) +
-        (((list(results.loc[results['Time'] == 178, 'Tamworth pigs'])[0])-9)**2) +
-        # Dec 2019 
-        (((list(results.loc[results['Time'] == 179, 'Longhorn cattle'])[0])-80)**2) +
-        (((list(results.loc[results['Time'] == 179, 'Tamworth pigs'])[0])-10)**2) +
-        # Jan 2020 
-        (((list(results.loc[results['Time'] == 180, 'Longhorn cattle'])[0])-80)**2) +
-        (((list(results.loc[results['Time'] == 180, 'Tamworth pigs'])[0])-10)**2) +
-        # Feb 2020 
-        (((list(results.loc[results['Time'] == 181, 'Longhorn cattle'])[0])-79)**2) +
-        (((list(results.loc[results['Time'] == 181, 'Tamworth pigs'])[0])-8)**2) +
-        # March 2021 
-        (((list(results.loc[results['Time'] == 182, 'Fallow deer'])[0])-247)**2) +
-        (((list(results.loc[results['Time'] == 182, 'Red deer'])[0])-35)**2) +
-        (((list(results.loc[results['Time'] == 182, 'Tamworth pigs'])[0])-7)**2) +
-        (((list(results.loc[results['Time'] == 182, 'Longhorn cattle'])[0])-81)**2) +
-        # April 2021
-        (((list(results.loc[results['Time'] == 183, 'Tamworth pigs'])[0])-7)**2) +
-        (((list(results.loc[results['Time'] == 183, 'Longhorn cattle'])[0])-81)**2) +
-        (((list(results.loc[results['Time'] == 183, 'Exmoor pony'])[0])-15)**2) +
+        # # post-reintro model: April 2015
+        # (((list(results.loc[results['Time'] == 123, 'Longhorn cattle'])[0])-115)**2) +
+        # (((list(results.loc[results['Time'] == 123, 'Tamworth pigs'])[0])-22)**2) +
+        # (((list(results.loc[results['Time'] == 123, 'Exmoor pony'])[0])-10)**2) +
+        # # May 2015
+        # (((list(results.loc[results['Time'] == 124, 'Exmoor pony'])[0])-10)**2) +
+        # (((list(results.loc[results['Time'] == 124, 'Longhorn cattle'])[0])-129)**2) +
+        # (((list(results.loc[results['Time'] == 124, 'Tamworth pigs'])[0])-14)**2) +
+        # # June 2015
+        # (((list(results.loc[results['Time'] == 125, 'Exmoor pony'])[0])-10)**2) +
+        # (((list(results.loc[results['Time'] == 125, 'Longhorn cattle'])[0])-129)**2) +
+        # (((list(results.loc[results['Time'] == 125, 'Tamworth pigs'])[0])-14)**2) +
+        # # July 2015
+        # (((list(results.loc[results['Time'] == 126, 'Exmoor pony'])[0])-10)**2) +
+        # (((list(results.loc[results['Time'] == 126, 'Longhorn cattle'])[0])-129)**2) +
+        # (((list(results.loc[results['Time'] == 126, 'Tamworth pigs'])[0])-14)**2) +
+        # # Aug 2015
+        # (((list(results.loc[results['Time'] == 127, 'Exmoor pony'])[0])-10)**2) +
+        # (((list(results.loc[results['Time'] == 127, 'Longhorn cattle'])[0])-129)**2) +
+        # (((list(results.loc[results['Time'] == 127, 'Tamworth pigs'])[0])-14)**2) +
+        # # Sept 2015
+        # (((list(results.loc[results['Time'] == 128, 'Exmoor pony'])[0])-10)**2) +
+        # (((list(results.loc[results['Time'] == 128, 'Longhorn cattle'])[0])-130)**2) +
+        # (((list(results.loc[results['Time'] == 128, 'Tamworth pigs'])[0])-14)**2) +
+        # # Oct 2015
+        # (((list(results.loc[results['Time'] == 129, 'Exmoor pony'])[0])-10)**2) +
+        # (((list(results.loc[results['Time'] == 129, 'Longhorn cattle'])[0])-91)**2) +
+        # (((list(results.loc[results['Time'] == 129, 'Tamworth pigs'])[0])-14)**2) +
+        # # Nov 2015
+        # (((list(results.loc[results['Time'] == 130, 'Exmoor pony'])[0])-10)**2) +
+        # (((list(results.loc[results['Time'] == 130, 'Longhorn cattle'])[0])-91)**2) +
+        # (((list(results.loc[results['Time'] == 130, 'Tamworth pigs'])[0])-13)**2) +
+        # # Dec 2015
+        # (((list(results.loc[results['Time'] == 131, 'Exmoor pony'])[0])-10)**2) +
+        # (((list(results.loc[results['Time'] == 131, 'Longhorn cattle'])[0])-86)**2) +
+        # (((list(results.loc[results['Time'] == 131, 'Tamworth pigs'])[0])-13)**2) +
+        # # Jan 2016
+        # (((list(results.loc[results['Time'] == 132, 'Exmoor pony'])[0])-10)**2) +
+        # (((list(results.loc[results['Time'] == 132, 'Longhorn cattle'])[0])-86)**2) +
+        # (((list(results.loc[results['Time'] == 132, 'Tamworth pigs'])[0])-10)**2) +
+        # # Feb 2016
+        # (((list(results.loc[results['Time'] == 133, 'Exmoor pony'])[0])-10)**2) +
+        # (((list(results.loc[results['Time'] == 133, 'Longhorn cattle'])[0])-86)**2) +
+        # (((list(results.loc[results['Time'] == 133, 'Tamworth pigs'])[0])-8)**2) +
+        # # # March 2016
+        # (((list(results.loc[results['Time'] == 134, 'Fallow deer'])[0])-140)**2) +
+        # (((list(results.loc[results['Time'] == 134, 'Red deer'])[0])-26)**2) +
+        # (((list(results.loc[results['Time'] == 134, 'Tamworth pigs'])[0])-9)**2) +
+        # (((list(results.loc[results['Time'] == 134, 'Longhorn cattle'])[0])-86)**2) +
+        # (((list(results.loc[results['Time'] == 134, 'Exmoor pony'])[0])-11)**2) +
+        # # April 2016
+        # (((list(results.loc[results['Time'] == 135, 'Longhorn cattle'])[0])-103)**2) +
+        # (((list(results.loc[results['Time'] == 135, 'Exmoor pony'])[0])-11)**2) +
+        # (((list(results.loc[results['Time'] == 135, 'Tamworth pigs'])[0])-9)**2) +
+        # # # May 2016
+        # (((list(results.loc[results['Time'] == 136, 'Longhorn cattle'])[0])-108)**2) +
+        # (((list(results.loc[results['Time'] == 136, 'Tamworth pigs'])[0])-17)**2) +
+        # (((list(results.loc[results['Time'] == 136, 'Exmoor pony'])[0])-11)**2) +
+        # # June 2016
+        # (((list(results.loc[results['Time'] == 137, 'Longhorn cattle'])[0])-89)**2) +
+        # (((list(results.loc[results['Time'] == 137, 'Exmoor pony'])[0])-11)**2) +
+        # (((list(results.loc[results['Time'] == 137, 'Tamworth pigs'])[0])-17)**2) +
+        # # July 2016
+        # (((list(results.loc[results['Time'] == 138, 'Exmoor pony'])[0])-11)**2) +
+        # (((list(results.loc[results['Time'] == 138, 'Tamworth pigs'])[0])-17)**2) +
+        # (((list(results.loc[results['Time'] == 138, 'Longhorn cattle'])[0])-87)**2) +
+        # # August 2016
+        # (((list(results.loc[results['Time'] == 139, 'Exmoor pony'])[0])-11)**2) +
+        # (((list(results.loc[results['Time'] == 139, 'Tamworth pigs'])[0])-17)**2) +
+        # (((list(results.loc[results['Time'] == 139, 'Longhorn cattle'])[0])-87)**2) +
+        # # September 2016
+        # (((list(results.loc[results['Time'] == 140, 'Exmoor pony'])[0])-11)**2) +
+        # (((list(results.loc[results['Time'] == 140, 'Tamworth pigs'])[0])-17)**2) +
+        # (((list(results.loc[results['Time'] == 140, 'Longhorn cattle'])[0])-97)**2) +
+        # # Oct 2016
+        # (((list(results.loc[results['Time'] == 141, 'Exmoor pony'])[0])-11)**2) +
+        # (((list(results.loc[results['Time'] == 141, 'Tamworth pigs'])[0])-17)**2) +
+        # (((list(results.loc[results['Time'] == 141, 'Longhorn cattle'])[0])-97)**2) +
+        # # Nov 2016
+        # (((list(results.loc[results['Time'] == 142, 'Exmoor pony'])[0])-11)**2) +
+        # (((list(results.loc[results['Time'] == 142, 'Tamworth pigs'])[0])-17)**2) +
+        # (((list(results.loc[results['Time'] == 142, 'Longhorn cattle'])[0])-92)**2) +
+        # # Dec 2016
+        # (((list(results.loc[results['Time'] == 143, 'Exmoor pony'])[0])-11)**2) +
+        # (((list(results.loc[results['Time'] == 143, 'Tamworth pigs'])[0])-13)**2) +
+        # (((list(results.loc[results['Time'] == 143, 'Longhorn cattle'])[0])-79)**2) +
+        # # Jan 2017
+        # (((list(results.loc[results['Time'] == 144, 'Exmoor pony'])[0])-11)**2) +
+        # (((list(results.loc[results['Time'] == 144, 'Tamworth pigs'])[0])-9)**2) +
+        # (((list(results.loc[results['Time'] == 144, 'Longhorn cattle'])[0])-79)**2) +
+        # # Feb 2017
+        # (((list(results.loc[results['Time'] == 145, 'Exmoor pony'])[0])-11)**2) +
+        # (((list(results.loc[results['Time'] == 145, 'Tamworth pigs'])[0])-7)**2) +
+        # (((list(results.loc[results['Time'] == 145, 'Longhorn cattle'])[0])-79)**2) +
+        # # # March 2017
+        # (((list(results.loc[results['Time'] == 146, 'Fallow deer'])[0])-165)**2) +
+        # (((list(results.loc[results['Time'] == 146, 'Longhorn cattle'])[0])-79)**2) +
+        # (((list(results.loc[results['Time'] == 146, 'Tamworth pigs'])[0])-7)**2) +
+        # (((list(results.loc[results['Time'] == 146, 'Exmoor pony'])[0])-10)**2) +
+        # # April 2017
+        # (((list(results.loc[results['Time'] == 147, 'Longhorn cattle'])[0])-100)**2) +
+        # (((list(results.loc[results['Time'] == 147, 'Tamworth pigs'])[0])-22)**2) +
+        # (((list(results.loc[results['Time'] == 147, 'Exmoor pony'])[0])-10)**2) +
+        # # May 2017
+        # (((list(results.loc[results['Time'] == 148, 'Longhorn cattle'])[0])-109)**2) +
+        # (((list(results.loc[results['Time'] == 148, 'Exmoor pony'])[0])-10)**2) +
+        # (((list(results.loc[results['Time'] == 148, 'Tamworth pigs'])[0])-22)**2) +
+        # # June 2017
+        # (((list(results.loc[results['Time'] == 149, 'Longhorn cattle'])[0])-94)**2) +
+        # (((list(results.loc[results['Time'] == 149, 'Exmoor pony'])[0])-10)**2) +
+        # (((list(results.loc[results['Time'] == 149, 'Tamworth pigs'])[0])-22)**2) +
+        # # July 2017
+        # (((list(results.loc[results['Time'] == 150, 'Exmoor pony'])[0])-10)**2) +
+        # (((list(results.loc[results['Time'] == 150, 'Longhorn cattle'])[0])-94)**2) +
+        # (((list(results.loc[results['Time'] == 150, 'Tamworth pigs'])[0])-22)**2) +
+        # # Aug 2017
+        # (((list(results.loc[results['Time'] == 151, 'Exmoor pony'])[0])-10)**2) +
+        # (((list(results.loc[results['Time'] == 151, 'Longhorn cattle'])[0])-94)**2) +
+        # (((list(results.loc[results['Time'] == 151, 'Tamworth pigs'])[0])-22)**2) +
+        # # Sept 2017
+        # (((list(results.loc[results['Time'] == 152, 'Exmoor pony'])[0])-10)**2) +
+        # (((list(results.loc[results['Time'] == 152, 'Longhorn cattle'])[0])-90)**2) +
+        # (((list(results.loc[results['Time'] == 152, 'Tamworth pigs'])[0])-22)**2) +
+        # # Oct 2017
+        # (((list(results.loc[results['Time'] == 153, 'Exmoor pony'])[0])-10)**2) +
+        # (((list(results.loc[results['Time'] == 153, 'Longhorn cattle'])[0])-88)**2) +
+        # (((list(results.loc[results['Time'] == 153, 'Tamworth pigs'])[0])-22)**2) +
+        # # Nov 2017
+        # (((list(results.loc[results['Time'] == 154, 'Exmoor pony'])[0])-10)**2) +
+        # (((list(results.loc[results['Time'] == 154, 'Longhorn cattle'])[0])-88)**2) +
+        # (((list(results.loc[results['Time'] == 154, 'Tamworth pigs'])[0])-22)**2) +
+        # # # Dec 2017
+        # (((list(results.loc[results['Time'] == 155, 'Exmoor pony'])[0])-10)**2) +
+        # (((list(results.loc[results['Time'] == 155, 'Longhorn cattle'])[0])-88)**2) +
+        # (((list(results.loc[results['Time'] == 155, 'Tamworth pigs'])[0])-18)**2) +
+        # # Jan 2018
+        # (((list(results.loc[results['Time'] == 156, 'Tamworth pigs'])[0])-11)**2) +
+        # (((list(results.loc[results['Time'] == 156, 'Exmoor pony'])[0])-10)**2) +
+        # (((list(results.loc[results['Time'] == 156, 'Longhorn cattle'])[0])-88)**2) +
+        # # Feb 2018
+        # (((list(results.loc[results['Time'] == 157, 'Exmoor pony'])[0])-10)**2) +
+        # (((list(results.loc[results['Time'] == 157, 'Tamworth pigs'])[0])-16)**2) +
+        # (((list(results.loc[results['Time'] == 157, 'Longhorn cattle'])[0])-88)**2) +
+        # # March 2018
+        # (((list(results.loc[results['Time'] == 158, 'Fallow deer'])[0])-251)**2) +
+        # (((list(results.loc[results['Time'] == 158, 'Red deer'])[0])-24)**2) +
+        # (((list(results.loc[results['Time'] == 158, 'Longhorn cattle'])[0])-88)**2) +
+        # (((list(results.loc[results['Time'] == 158, 'Tamworth pigs'])[0])-16)**2) +
+        # (((list(results.loc[results['Time'] == 158, 'Exmoor pony'])[0])-9)**2) +
+        # # April 2018
+        # (((list(results.loc[results['Time'] == 159, 'Longhorn cattle'])[0])-101)**2) +
+        # (((list(results.loc[results['Time'] == 159, 'Exmoor pony'])[0])-9)**2) +
+        # (((list(results.loc[results['Time'] == 159, 'Tamworth pigs'])[0])-16)**2) +
+        # # # May 2018
+        # (((list(results.loc[results['Time'] == 160, 'Longhorn cattle'])[0])-117)**2) +
+        # (((list(results.loc[results['Time'] == 160, 'Tamworth pigs'])[0])-23)**2) +
+        # (((list(results.loc[results['Time'] == 160, 'Exmoor pony'])[0])-9)**2) +
+        # # June 2018
+        # (((list(results.loc[results['Time'] == 161, 'Longhorn cattle'])[0])-103)**2) +
+        # (((list(results.loc[results['Time'] == 161, 'Exmoor pony'])[0])-9)**2) +
+        # (((list(results.loc[results['Time'] == 161, 'Tamworth pigs'])[0])-23)**2) +
+        # # July 2019
+        # (((list(results.loc[results['Time'] == 162, 'Exmoor pony'])[0])-9)**2) +
+        # (((list(results.loc[results['Time'] == 162, 'Longhorn cattle'])[0])-103)**2) +
+        # (((list(results.loc[results['Time'] == 162, 'Tamworth pigs'])[0])-22)**2) +
+        # # Aug 2019
+        # (((list(results.loc[results['Time'] == 163, 'Longhorn cattle'])[0])-102)**2) +
+        # (((list(results.loc[results['Time'] == 163, 'Tamworth pigs'])[0])-22)**2) +
+        # # Sept 2019
+        # (((list(results.loc[results['Time'] == 164, 'Longhorn cattle'])[0])-106)**2) +
+        # (((list(results.loc[results['Time'] == 164, 'Tamworth pigs'])[0])-22)**2) +
+        # # Oct 2019
+        # (((list(results.loc[results['Time'] == 165, 'Longhorn cattle'])[0])-101)**2) +
+        # (((list(results.loc[results['Time'] == 165, 'Tamworth pigs'])[0])-21)**2) +
+        # # Nov 2019
+        # (((list(results.loc[results['Time'] == 166, 'Longhorn cattle'])[0])-93)**2) +
+        # (((list(results.loc[results['Time'] == 166, 'Tamworth pigs'])[0])-9)**2) +
+        # # Dec 2019
+        # (((list(results.loc[results['Time'] == 167, 'Longhorn cattle'])[0])-89)**2) +
+        # (((list(results.loc[results['Time'] == 167, 'Tamworth pigs'])[0])-9)**2) +
+        # # Jan 2020
+        # (((list(results.loc[results['Time'] == 168, 'Longhorn cattle'])[0])-89)**2) +
+        # (((list(results.loc[results['Time'] == 168, 'Tamworth pigs'])[0])-9)**2) +
+        # # Feb 2020
+        # (((list(results.loc[results['Time'] == 169, 'Longhorn cattle'])[0])-87)**2) +
+        # (((list(results.loc[results['Time'] == 169, 'Tamworth pigs'])[0])-10)**2) +
+        # # March 2019
+        # (((list(results.loc[results['Time'] == 170, 'Fallow deer'])[0])-278)**2) +
+        # (((list(results.loc[results['Time'] == 170, 'Red deer'])[0])-37)**2) +
+        # (((list(results.loc[results['Time'] == 170, 'Longhorn cattle'])[0])-87)**2) +
+        # (((list(results.loc[results['Time'] == 170, 'Tamworth pigs'])[0])-9)**2) +
+        # # April 2019
+        # (((list(results.loc[results['Time'] == 171, 'Longhorn cattle'])[0])-101)**2) +
+        # (((list(results.loc[results['Time'] == 171, 'Tamworth pigs'])[0])-8)**2) +
+        # # May 2019
+        # (((list(results.loc[results['Time'] == 172, 'Longhorn cattle'])[0])-110)**2) +
+        # (((list(results.loc[results['Time'] == 172, 'Tamworth pigs'])[0])-8)**2) +
+        # # June 2019
+        # (((list(results.loc[results['Time'] == 173, 'Longhorn cattle'])[0])-89)**2) +
+        # (((list(results.loc[results['Time'] == 173, 'Tamworth pigs'])[0])-8)**2) +
+        # # July 2019        
+        # (((list(results.loc[results['Time'] == 174, 'Tamworth pigs'])[0])-9)**2) +
+        # (((list(results.loc[results['Time'] == 174, 'Longhorn cattle'])[0])-91)**2) +
+        # # Aug 2019 
+        # (((list(results.loc[results['Time'] == 175, 'Longhorn cattle'])[0])-91)**2) +
+        # (((list(results.loc[results['Time'] == 175, 'Tamworth pigs'])[0])-9)**2) +
+        # # Sept 2019 
+        # (((list(results.loc[results['Time'] == 176, 'Longhorn cattle'])[0])-93)**2) +
+        # (((list(results.loc[results['Time'] == 176, 'Tamworth pigs'])[0])-9)**2) +
+        # # Oct 2019 
+        # (((list(results.loc[results['Time'] == 177, 'Longhorn cattle'])[0])-88)**2) +
+        # (((list(results.loc[results['Time'] == 177, 'Tamworth pigs'])[0])-9)**2) +
+        # # Nov 2019 
+        # (((list(results.loc[results['Time'] == 178, 'Longhorn cattle'])[0])-87)**2) +
+        # (((list(results.loc[results['Time'] == 178, 'Tamworth pigs'])[0])-9)**2) +
+        # # Dec 2019 
+        # (((list(results.loc[results['Time'] == 179, 'Longhorn cattle'])[0])-80)**2) +
+        # (((list(results.loc[results['Time'] == 179, 'Tamworth pigs'])[0])-10)**2) +
+        # # Jan 2020 
+        # (((list(results.loc[results['Time'] == 180, 'Longhorn cattle'])[0])-80)**2) +
+        # (((list(results.loc[results['Time'] == 180, 'Tamworth pigs'])[0])-10)**2) +
+        # # Feb 2020 
+        # (((list(results.loc[results['Time'] == 181, 'Longhorn cattle'])[0])-79)**2) +
+        # (((list(results.loc[results['Time'] == 181, 'Tamworth pigs'])[0])-8)**2) +
+        # # March 2021 
+        # (((list(results.loc[results['Time'] == 182, 'Fallow deer'])[0])-247)**2) +
+        # (((list(results.loc[results['Time'] == 182, 'Red deer'])[0])-35)**2) +
+        # (((list(results.loc[results['Time'] == 182, 'Tamworth pigs'])[0])-7)**2) +
+        # (((list(results.loc[results['Time'] == 182, 'Longhorn cattle'])[0])-81)**2) +
+        # # April 2021
+        # (((list(results.loc[results['Time'] == 183, 'Tamworth pigs'])[0])-7)**2) +
+        # (((list(results.loc[results['Time'] == 183, 'Longhorn cattle'])[0])-81)**2) +
+        # (((list(results.loc[results['Time'] == 183, 'Exmoor pony'])[0])-15)**2) +
         # # May 2021
-        (((list(results.loc[results['Time'] == 184, 'Exmoor pony'])[0])-15)**2) +
-        (((list(results.loc[results['Time'] == 184, 'Tamworth pigs'])[0])-19)**2) +
-        (((list(results.loc[results['Time'] == 184, 'Longhorn cattle'])[0])-81)**2) +
+        # (((list(results.loc[results['Time'] == 184, 'Exmoor pony'])[0])-15)**2) +
+        # (((list(results.loc[results['Time'] == 184, 'Tamworth pigs'])[0])-19)**2) +
+        # (((list(results.loc[results['Time'] == 184, 'Longhorn cattle'])[0])-81)**2) +
         (((list(results.loc[results['Time'] == 184, 'Roe deer'])[0])-30)**2) +
-        (((list(results.loc[results['Time'] == 184, 'Grassland'])[0])-59)**2) +
-        (((list(results.loc[results['Time'] == 184, 'Thorny Scrub'])[0])-28)**2) +
-        (((list(results.loc[results['Time'] == 184, 'Woodland'])[0])-19)**2))
+        (((list(results.loc[results['Time'] == 184, 'Grassland'])[0])-57)**2) +
+        (((list(results.loc[results['Time'] == 184, 'Thorny Scrub'])[0])-26)**2) +
+        (((list(results.loc[results['Time'] == 184, 'Woodland'])[0])-17)**2))
                          
 
     # if filtered_result < 50000:
@@ -387,41 +385,41 @@ def run_optimizer():
     # Define bounds
     bds = np.array([
         # habitat parameters
-        [0.1,1],[0.1,1],[0.5,1],[0,0.001],[0,0.001],[0.1,1],[0.1,1],[0.1,1],[0.1,1],[0.1,1],[0.1,1],[0.1,1],
+        [0,1],[0,1],[0,1],[0,0.001],[0,0.01],[0,1],[0,1],[0,1],[0,1],[0,1],[0,1],[0,1],
         # initial values
         [0.06,0.18],[0.75,0.85],[0.09,0.19],[0,0.06],
         # roe deer parameters
-        [0.01,0.5],[0.5,1],[0.1,1],[0.1,1],[0.1,1],[0.1,1],
+        [0.05,0.5],[0,1],[0,1],[0,1],[0,1],[0,1],
         # fallow deer parameters
-        [0.1,0.5],[0.8,1],[0.1,1],[0.1,1],[0.1,1],[0.1,1],
+        [0,1],[0,1],[0,1],[0,1],[0,1],[0,1],
         # red deer parameters
-        [0.1,0.5],[0.7,1],[0.1,1],[0.1,1],[0.1,1],[0.1,1],
+        [0,1],[0,1],[0,1],[0,1],[0,1],[0,1],
         # exmoor pony parameters
-        [0.8,1],[0.1,1],[0.1,1],[0.1,1],[0.1,1],
+        [0,1],[0,1],[0,1],[0,1],[0,1],
         # cattle parameters
-        [0.1,0.35],[0.6,1],[0.1,1],[0.1,1],[0.1,1],[0.1,1],
+        [0,1],[0,1],[0,1],[0,1],[0,1],[0,1],
         # pig parameters
-        [0.01,0.5],[0.5,1],[0.1,1],[0.1,1],
+        [0,1],[0,1],[0,1],[0,1],
         # grass impact
-        [0,1],[0,1],[0,1],[0,1],[0,1],[0.5,1],
+        [0,1],[0,1],[0,1],[0,1],[0,1],[0,1],
         # sapling impact - assumed to not eat more than 10 per day
-        [0.01,0.5],[0.01,0.5],[0.01,0.5],[0.01,0.5],[0.01,0.5],[0.01,0.5],
+        [0,1],[0,1],[0,1],[0,1],[0,1],[0,1],
         # young scrub impact - assumed to not eat more than 10 per day
-        [0.01,0.5],[0.01,0.5],[0.01,0.5],[0.01,0.5],[0.01,0.5],[0.01,0.5],
+        [0,1],[0,1],[0,1],[0,1],[0,1],[0,1],
         # scrub impact - assumed to not eat more than 1 per day
-        [0.01,0.5],[0.01,0.5],[0.01,0.5],[0.01,0.5],[0.01,0.5],
+        [0,1],[0,1],[0,1],[0,1],[0,1],
         # tree impact - assumed to not eat more than 1 per day
-        [0.01,0.5],[0.01,0.5],[0.01,0.5],[0.01,0.5],[0.01,0.5], 
+        [0,1],[0,1],[0,1],[0,1],[0,1]
     ])
 
-    algorithm_param = {'max_num_iteration': 100,\
-                    'population_size':50,\
+    algorithm_param = {'max_num_iteration': 50,\
+                    'population_size':15,\
                     'mutation_probability':0.1,\
                     'elit_ratio': 0.01,\
                     'crossover_probability': 0.5,\
                     'parents_portion': 0.3,\
                     'crossover_type':'uniform',\
-                    'max_iteration_without_improv':None}
+                    'max_iteration_without_improv': None}
 
 
     optimization =  ga(function = objectiveFunction, dimension = 77, variable_type = 'real',variable_boundaries= bds, algorithm_parameters = algorithm_param, function_timeout=6000)
