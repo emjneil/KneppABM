@@ -853,7 +853,7 @@ def graph_results():
     plt.xticks([25, 50, 75, 100, 125, 150, 175])
     plt.ylabel('Amount Died')
     plt.title('What kills grass?')
-    plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/post_reintro/DE_Eaten_Grass_PostReintro.png')
+    plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/post_reintro/Eaten_Grass_PostReintro.png')
     plt.show()
 
     # habitat deaths - stacked bar charts. what's killing scrub? 
