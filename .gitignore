@@ -1,0 +1,6 @@
+/outputs/
+/__pycache__/
+/.history/
+.DS_Store
+/.vscode/
+/.pytest_cache/

@@ -9,9 +9,11 @@ import pandas as pd
 
 
 def run_all_models():
+    
+    print("now doing 25%")
 
     # define number of simulations
-    number_simulations =  5
+    number_simulations =  100000
     # make list of variables
     final_results_list = []
     final_parameters = []
@@ -19,25 +21,26 @@ def run_all_models():
 
 
     for _ in range(number_simulations):
-        # keep track of the runs
+        # keep track of the runs 
         run_number += 1
         print(run_number)
         # choose my percent above/below number
-        perc_aboveBelow = 0.01
+        perc_aboveBelow = 0.25
+
 
         # define the parameters
-        chance_reproduceSapling = random.uniform(0.0037389-(0.0037389*perc_aboveBelow), 0.0037389+(0.0037389*perc_aboveBelow))
-        chance_reproduceYoungScrub = random.uniform(0.00322869-(0.00322869*perc_aboveBelow), 0.00322869+(0.00322869*perc_aboveBelow))
-        chance_regrowGrass = random.uniform(0.0139838-(0.0139838*perc_aboveBelow), 0.0139838+(0.0139838*perc_aboveBelow))
-        chance_saplingBecomingTree = random.uniform(0.00232948-(0.00232948*perc_aboveBelow), 0.00232948+(0.00232948*perc_aboveBelow))
-        chance_youngScrubMatures =random.uniform(0.00865091-(0.00865091*perc_aboveBelow), 0.00865091+(0.00865091*perc_aboveBelow))
-        chance_scrubOutcompetedByTree = random.uniform(0.00199731-(0.00199731*perc_aboveBelow), 0.00199731+(0.00199731*perc_aboveBelow))
-        chance_grassOutcompetedByTree = random.uniform(0.09451909-(0.09451909*perc_aboveBelow), 0.09451909+(0.09451909*perc_aboveBelow))
-        chance_grassOutcompetedByScrub = random.uniform(0.09333696-(0.09333696*perc_aboveBelow), 0.09333696+(0.09333696*perc_aboveBelow))
-        chance_saplingOutcompetedByTree = random.uniform(0.08138607-(0.08138607*perc_aboveBelow), 0.08138607+(0.08138607*perc_aboveBelow))
-        chance_saplingOutcompetedByScrub = random.uniform(0.01685629-(0.01685629*perc_aboveBelow), 0.01685629+(0.01685629*perc_aboveBelow))
-        chance_youngScrubOutcompetedByScrub =random.uniform(0.07791945-(0.07791945*perc_aboveBelow), 0.07791945+(0.07791945*perc_aboveBelow))
-        chance_youngScrubOutcompetedByTree = random.uniform(0.07842738-(0.07842738*perc_aboveBelow), 0.07842738+(0.07842738*perc_aboveBelow))
+        chance_reproduceSapling = random.uniform(0.10689392-(0.10689392*perc_aboveBelow), 0.10689392+(0.10689392*perc_aboveBelow))
+        chance_reproduceYoungScrub = random.uniform(0.24015217-(0.24015217*perc_aboveBelow), 0.24015217+(0.24015217*perc_aboveBelow))
+        chance_regrowGrass = random.uniform(0.30423892-(0.30423892*perc_aboveBelow), 0.30423892+(0.30423892*perc_aboveBelow))
+        chance_saplingBecomingTree = random.uniform(0.00284643-(0.00284643*perc_aboveBelow), 0.00284643+(0.00284643*perc_aboveBelow))
+        chance_youngScrubMatures =random.uniform(0.00573939-(0.00573939*perc_aboveBelow), 0.00573939+(0.00573939*perc_aboveBelow))
+        chance_scrubOutcompetedByTree = random.uniform(0.02412406-(0.02412406*perc_aboveBelow), 0.02412406+(0.02412406*perc_aboveBelow))
+        chance_grassOutcompetedByTree = random.uniform(0.94724942-(0.94724942*perc_aboveBelow), 0.94724942+(0.94724942*perc_aboveBelow))
+        chance_grassOutcompetedByScrub = random.uniform(0.94365962-(0.94365962*perc_aboveBelow), 0.94365962+(0.94365962*perc_aboveBelow))
+        chance_saplingOutcompetedByTree = random.uniform(0.90002424-(0.90002424*perc_aboveBelow), 0.90002424+(0.90002424*perc_aboveBelow))
+        chance_saplingOutcompetedByScrub = random.uniform(0.89430521-(0.89430521*perc_aboveBelow), 0.89430521+(0.89430521*perc_aboveBelow))
+        chance_youngScrubOutcompetedByScrub =random.uniform(0.90509186-(0.90509186*perc_aboveBelow), 0.90509186+(0.90509186*perc_aboveBelow))
+        chance_youngScrubOutcompetedByTree = random.uniform(0.94722833-(0.94722833*perc_aboveBelow), 0.94722833+(0.94722833*perc_aboveBelow))
 
         # initial values
         initial_roeDeer = 0.12
@@ -46,47 +49,83 @@ def run_all_models():
         initial_scrubland = 0.01
 
         # roe deer
-        roeDeer_reproduce = random.uniform(0.1783482-(0.1783482*perc_aboveBelow), 0.1783482+(0.1783482*perc_aboveBelow))
-        roeDeer_gain_from_grass = random.uniform(0.9328174-(0.9328174*perc_aboveBelow), 0.9328174+(0.9328174*perc_aboveBelow))
-        roeDeer_gain_from_Trees =random.uniform(0.9144764-(0.9144764*perc_aboveBelow), 0.9144764+(0.9144764*perc_aboveBelow))
-        roeDeer_gain_from_Scrub =random.uniform(0.91391136-(0.91391136*perc_aboveBelow), 0.91391136+(0.91391136*perc_aboveBelow))
-        roeDeer_gain_from_Saplings = random.uniform(0.11702867-(0.11702867*perc_aboveBelow), 0.11702867+(0.11702867*perc_aboveBelow))
-        roeDeer_gain_from_YoungScrub = random.uniform(0.11623631-(0.11623631*perc_aboveBelow), 0.11623631+(0.11623631*perc_aboveBelow))
+        roeDeer_reproduce = random.uniform(0.18203732-(0.18203732*perc_aboveBelow), 0.18203732+(0.18203732*perc_aboveBelow))
+        roeDeer_gain_from_grass = random.uniform(0.85140101-(0.85140101*perc_aboveBelow), 0.85140101+(0.85140101*perc_aboveBelow))
+        roeDeer_gain_from_Trees =random.uniform(0.55494915-(0.55494915*perc_aboveBelow), 0.55494915+(0.55494915*perc_aboveBelow))
+        roeDeer_gain_from_Scrub =random.uniform(0.3150886-(0.3150886*perc_aboveBelow), 0.3150886+(0.3150886*perc_aboveBelow))
+        roeDeer_gain_from_Saplings = random.uniform(0.17500993-(0.17500993*perc_aboveBelow), 0.17500993+(0.17500993*perc_aboveBelow))
+        roeDeer_gain_from_YoungScrub = random.uniform(0.10840577-(0.10840577*perc_aboveBelow), 0.10840577+(0.10840577*perc_aboveBelow))
+
         # Fallow deer
-        fallowDeer_reproduce = random.uniform(0.31526015-(0.31526015*perc_aboveBelow), 0.31526015+(0.31526015*perc_aboveBelow))
-        fallowDeer_gain_from_grass = random.uniform(0.92255558-(0.92255558*perc_aboveBelow), 0.92255558+(0.92255558*perc_aboveBelow))
-        fallowDeer_gain_from_Trees = random.uniform(0.89146959-(0.89146959*perc_aboveBelow), 0.89146959+(0.89146959*perc_aboveBelow))
-        fallowDeer_gain_from_Scrub = random.uniform(0.89571586-(0.89571586*perc_aboveBelow), 0.89571586+(0.89571586*perc_aboveBelow))
-        fallowDeer_gain_from_Saplings = random.uniform(0.11610159-(0.11610159*perc_aboveBelow), 0.11610159+(0.11610159*perc_aboveBelow))
-        fallowDeer_gain_from_YoungScrub = random.uniform(0.10764306-(0.10764306*perc_aboveBelow), 0.10764306+(0.10764306*perc_aboveBelow))
+        fallowDeer_reproduce = random.uniform(0.28541271-(0.28541271*perc_aboveBelow), 0.28541271+(0.28541271*perc_aboveBelow))
+        fallowDeer_gain_from_grass = random.uniform(0.79704305-(0.79704305*perc_aboveBelow), 0.79704305+(0.79704305*perc_aboveBelow))
+        fallowDeer_gain_from_Trees = random.uniform(0.53392473-(0.53392473*perc_aboveBelow), 0.53392473+(0.53392473*perc_aboveBelow))
+        fallowDeer_gain_from_Scrub = random.uniform(0.24861395-(0.24861395*perc_aboveBelow), 0.24861395+(0.24861395*perc_aboveBelow))
+        fallowDeer_gain_from_Saplings = random.uniform(0.1184058-(0.1184058*perc_aboveBelow), 0.1184058+(0.1184058*perc_aboveBelow))
+        fallowDeer_gain_from_YoungScrub = random.uniform(0.07327595-(0.07327595*perc_aboveBelow), 0.07327595+(0.07327595*perc_aboveBelow))
         # Red deer
-        redDeer_reproduce = random.uniform(0.36341145-(0.36341145*perc_aboveBelow), 0.36341145+(0.36341145*perc_aboveBelow))
-        redDeer_gain_from_grass = random.uniform(0.92949652-(0.92949652*perc_aboveBelow), 0.92949652+(0.92949652*perc_aboveBelow))
-        redDeer_gain_from_Trees = random.uniform(0.9052971-(0.9052971*perc_aboveBelow), 0.9052971+(0.9052971*perc_aboveBelow))
-        redDeer_gain_from_Scrub = random.uniform(0.89380651-(0.89380651*perc_aboveBelow), 0.89380651+(0.89380651*perc_aboveBelow))
-        redDeer_gain_from_Saplings = random.uniform(0.11747397-(0.11747397*perc_aboveBelow), 0.11747397+(0.11747397*perc_aboveBelow))
-        redDeer_gain_from_YoungScrub = random.uniform(0.08173538-(0.08173538*perc_aboveBelow), 0.08173538+(0.08173538*perc_aboveBelow))
-        
+        redDeer_reproduce = random.uniform(0.30656575-(0.30656575*perc_aboveBelow), 0.30656575+(0.30656575*perc_aboveBelow))
+        redDeer_gain_from_grass = random.uniform(0.74254951-(0.74254951*perc_aboveBelow), 0.74254951+(0.74254951*perc_aboveBelow))
+        redDeer_gain_from_Trees = random.uniform(0.44633234-(0.44633234*perc_aboveBelow), 0.44633234+(0.44633234*perc_aboveBelow))
+        redDeer_gain_from_Scrub = random.uniform(0.18817947-(0.18817947*perc_aboveBelow), 0.18817947+(0.18817947*perc_aboveBelow))
+        redDeer_gain_from_Saplings = random.uniform(0.07572942-(0.07572942*perc_aboveBelow), 0.07572942+(0.07572942*perc_aboveBelow))
+        redDeer_gain_from_YoungScrub = random.uniform(0.06516447-(0.06516447*perc_aboveBelow), 0.06516447+(0.06516447*perc_aboveBelow))
         # Exmoor ponies
-        ponies_gain_from_grass = random.uniform(0.90420608-(0.90420608*perc_aboveBelow), 0.90420608+(0.90420608*perc_aboveBelow))
-        ponies_gain_from_Trees = random.uniform(0.89434907-(0.89434907*perc_aboveBelow), 0.89434907+(0.89434907*perc_aboveBelow)) 
-        ponies_gain_from_Scrub = random.uniform(0.882705-(0.882705*perc_aboveBelow), 0.882705+(0.882705*perc_aboveBelow))
-        ponies_gain_from_Saplings = random.uniform(0.10818295-(0.10818295*perc_aboveBelow), 0.10818295+(0.10818295*perc_aboveBelow))
-        ponies_gain_from_YoungScrub = random.uniform(0.06682179-(0.06682179*perc_aboveBelow), 0.06682179+(0.06682179*perc_aboveBelow))
+        ponies_gain_from_grass = random.uniform(0.6766493-(0.6766493*perc_aboveBelow), 0.6766493+(0.6766493*perc_aboveBelow))
+        ponies_gain_from_Trees = random.uniform(0.29251235-(0.29251235*perc_aboveBelow), 0.29251235+(0.29251235*perc_aboveBelow)) 
+        ponies_gain_from_Scrub = random.uniform(0.14860288-(0.14860288*perc_aboveBelow), 0.14860288+(0.14860288*perc_aboveBelow))
+        ponies_gain_from_Saplings = random.uniform(0.07-(0.07*perc_aboveBelow), 0.07+(0.07*perc_aboveBelow))
+        ponies_gain_from_YoungScrub = random.uniform(0.03731702-(0.03731702*perc_aboveBelow), 0.03731702+(0.03731702*perc_aboveBelow))
         # Longhorn cattle
-        cows_reproduce = random.uniform(0.18626336-(0.18626336*perc_aboveBelow), 0.18626336+(0.18626336*perc_aboveBelow))
-        cows_gain_from_grass = random.uniform(0.90102432-(0.90102432*perc_aboveBelow), 0.90102432+(0.90102432*perc_aboveBelow))
-        cows_gain_from_Trees = random.uniform(0.89963841-(0.89963841*perc_aboveBelow), 0.89963841+(0.89963841*perc_aboveBelow))
-        cows_gain_from_Scrub = random.uniform(0.88759371-(0.88759371*perc_aboveBelow), 0.88759371+(0.88759371*perc_aboveBelow))
-        cows_gain_from_Saplings = random.uniform(0.09148747-(0.09148747*perc_aboveBelow), 0.09148747+(0.09148747*perc_aboveBelow))
-        cows_gain_from_YoungScrub = random.uniform(0.0842241-(0.0842241*perc_aboveBelow), 0.0842241+(0.0842241*perc_aboveBelow))
+        cows_reproduce = random.uniform(0.18684058-(0.18684058*perc_aboveBelow), 0.18684058+(0.18684058*perc_aboveBelow))
+        cows_gain_from_grass = random.uniform(0.60323306-(0.60323306*perc_aboveBelow), 0.60323306+(0.60323306*perc_aboveBelow))
+        cows_gain_from_Trees = random.uniform(0.21599744-(0.21599744*perc_aboveBelow), 0.21599744+(0.21599744*perc_aboveBelow))
+        cows_gain_from_Scrub = random.uniform(0.09316363-(0.09316363*perc_aboveBelow), 0.09316363+(0.09316363*perc_aboveBelow))
+        cows_gain_from_Saplings = random.uniform(0.06101444-(0.06101444*perc_aboveBelow), 0.06101444+(0.06101444*perc_aboveBelow))
+        cows_gain_from_YoungScrub = random.uniform(0.01609566-(0.01609566*perc_aboveBelow), 0.01609566+(0.01609566*perc_aboveBelow))
         # Tamworth pigs
-        pigs_reproduce = random.uniform(0.17226346-(0.17226346*perc_aboveBelow), 0.17226346+(0.17226346*perc_aboveBelow))
-        pigs_gain_from_grass = random.uniform(0.8765768-(0.8765768*perc_aboveBelow), 0.8765768+(0.8765768*perc_aboveBelow))
-        pigs_gain_from_Trees =random.uniform(0.90491902-(0.90491902*perc_aboveBelow), 0.90491902+(0.90491902*perc_aboveBelow))
-        pigs_gain_from_Scrub = random.uniform(0.90649852-(0.90649852*perc_aboveBelow), 0.90649852+(0.90649852*perc_aboveBelow))
-        pigs_gain_from_Saplings = random.uniform(0.10604675-(0.10604675*perc_aboveBelow), 0.10604675+(0.10604675*perc_aboveBelow))
-        pigs_gain_from_YoungScrub = random.uniform(0.11007447-(0.11007447*perc_aboveBelow), 0.11007447+(0.11007447*perc_aboveBelow))
+        pigs_reproduce = random.uniform(0.24870944-(0.24870944*perc_aboveBelow), 0.24870944+(0.24870944*perc_aboveBelow))
+        pigs_gain_from_grass = random.uniform(0.59825361-(0.59825361*perc_aboveBelow), 0.59825361+(0.59825361*perc_aboveBelow))
+        pigs_gain_from_Trees =random.uniform(0.2569851-(0.2569851*perc_aboveBelow), 0.2569851+(0.2569851*perc_aboveBelow))
+        pigs_gain_from_Scrub = random.uniform(0.1637277-(0.1637277*perc_aboveBelow), 0.1637277+(0.1637277*perc_aboveBelow))
+        pigs_gain_from_Saplings = random.uniform(0.14782646-(0.14782646*perc_aboveBelow), 0.14782646+(0.14782646*perc_aboveBelow))
+        pigs_gain_from_YoungScrub = random.uniform(0.09885063-(0.09885063*perc_aboveBelow), 0.09885063+(0.09885063*perc_aboveBelow))
+        
+        # stocking values
+        fallowDeer_stocking = 247
+        cattle_stocking = 81
+        redDeer_stocking = 35
+        tamworthPig_stocking = 7
+        exmoor_stocking = 15
+
+
+
+        # euro bison parameters
+        reproduce_bison = 0
+        # bison should have higher impact than any other consumer
+        bison_gain_from_grass =  0
+        bison_gain_from_Trees =0
+        bison_gain_from_Scrub =0
+        bison_gain_from_Saplings = 0
+        bison_gain_from_YoungScrub = 0  
+        # euro elk parameters
+        reproduce_elk = 0
+        # bison should have higher impact than any other consumer
+        elk_gain_from_grass =  0
+        elk_gain_from_Trees = 0
+        elk_gain_from_Scrub = 0
+        elk_gain_from_Saplings =  0
+        elk_gain_from_YoungScrub =  0
+        # reindeer parameters
+        reproduce_reindeer = 0
+        # reindeer should have impacts between red and fallow deer
+        reindeer_gain_from_grass = 0
+        reindeer_gain_from_Trees =0
+        reindeer_gain_from_Scrub =0
+        reindeer_gain_from_Saplings = 0
+        reindeer_gain_from_YoungScrub = 0
+
+
         # keep track of my parameters
         parameters_used = [
         chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
@@ -97,7 +136,10 @@ def run_all_models():
         cows_reproduce, cows_gain_from_grass, cows_gain_from_Trees, cows_gain_from_Scrub, cows_gain_from_Saplings, cows_gain_from_YoungScrub, 
         fallowDeer_reproduce, fallowDeer_gain_from_grass, fallowDeer_gain_from_Trees, fallowDeer_gain_from_Scrub, fallowDeer_gain_from_Saplings, fallowDeer_gain_from_YoungScrub, 
         redDeer_reproduce, redDeer_gain_from_grass, redDeer_gain_from_Trees, redDeer_gain_from_Scrub, redDeer_gain_from_Saplings, redDeer_gain_from_YoungScrub, 
-        pigs_reproduce, pigs_gain_from_grass, pigs_gain_from_Trees, pigs_gain_from_Scrub, pigs_gain_from_Saplings, pigs_gain_from_YoungScrub, 
+        pigs_reproduce, pigs_gain_from_grass, pigs_gain_from_Trees, pigs_gain_from_Scrub, pigs_gain_from_Saplings, pigs_gain_from_YoungScrub, fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
+        reproduce_bison, bison_gain_from_grass, bison_gain_from_Trees, bison_gain_from_Scrub, bison_gain_from_Saplings, bison_gain_from_YoungScrub,
+        reproduce_elk, elk_gain_from_grass, elk_gain_from_Trees, elk_gain_from_Scrub, elk_gain_from_Saplings, elk_gain_from_YoungScrub,
+        reproduce_reindeer, reindeer_gain_from_grass, reindeer_gain_from_Trees, reindeer_gain_from_Scrub, reindeer_gain_from_Saplings, reindeer_gain_from_YoungScrub,
         run_number]
 
         # append to dataframe
@@ -113,8 +155,12 @@ def run_all_models():
             fallowDeer_reproduce, fallowDeer_gain_from_grass, fallowDeer_gain_from_Trees, fallowDeer_gain_from_Scrub, fallowDeer_gain_from_Saplings, fallowDeer_gain_from_YoungScrub, 
             redDeer_reproduce, redDeer_gain_from_grass, redDeer_gain_from_Trees, redDeer_gain_from_Scrub, redDeer_gain_from_Saplings, redDeer_gain_from_YoungScrub, 
             pigs_reproduce, pigs_gain_from_grass, pigs_gain_from_Trees, pigs_gain_from_Scrub, pigs_gain_from_Saplings, pigs_gain_from_YoungScrub, 
-            width = 25, height = 18, max_time = 184, reintroduction = True, 
-            RC1_noFood = False, RC2_noTreesScrub = False, RC3_noTrees = False, RC4_noScrub = False)
+            fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
+            reproduce_bison, bison_gain_from_grass, bison_gain_from_Trees, bison_gain_from_Scrub, bison_gain_from_Saplings, bison_gain_from_YoungScrub,
+            reproduce_elk, elk_gain_from_grass, elk_gain_from_Trees, elk_gain_from_Scrub, elk_gain_from_Saplings, elk_gain_from_YoungScrub,
+            reproduce_reindeer, reindeer_gain_from_grass, reindeer_gain_from_Trees, reindeer_gain_from_Scrub, reindeer_gain_from_Saplings, reindeer_gain_from_YoungScrub,
+            width = 25, height = 18, max_time = 184, reintroduction = True,
+            introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
 
         model.run_model()
 
@@ -136,6 +182,10 @@ def run_all_models():
         "fallowDeer_reproduce", "fallowDeer_gain_from_grass", "fallowDeer_gain_from_Trees", "fallowDeer_gain_from_Scrub", "fallowDeer_gain_from_Saplings", "fallowDeer_gain_from_YoungScrub", 
         "redDeer_reproduce", "redDeer_gain_from_grass", "redDeer_gain_from_Trees", "redDeer_gain_from_Scrub", "redDeer_gain_from_Saplings", "redDeer_gain_from_YoungScrub", 
         "pigs_reproduce", "pigs_gain_from_grass", "pigs_gain_from_Trees", "pigs_gain_from_Scrub", "pigs_gain_from_Saplings", "pigs_gain_from_YoungScrub", 
+        "fallowDeer_stocking", "cattle_stocking", "redDeer_stocking", "tamworthPig_stocking", "exmoor_stocking",
+        "reproduce_bison", "bison_gain_from_grass", "bison_gain_from_Trees", "bison_gain_from_Scrub", "bison_gain_from_Saplings", "bison_gain_from_YoungScrub",
+        "reproduce_elk", "elk_gain_from_grass", "elk_gain_from_Trees", "elk_gain_from_Scrub", "elk_gain_from_Saplings", "elk_gain_from_YoungScrub",
+        "reproduce_reindeer", "reindeer_gain_from_grass", "reindeer_gain_from_Trees", "reindeer_gain_from_Scrub", "reindeer_gain_from_Saplings", "reindeer_gain_from_YoungScrub",
         "run_number"]
 
     # check out the parameters used
@@ -148,7 +198,7 @@ def run_all_models():
     my_time = final_results.loc[final_results['Time'] == 50]
     accepted_runs = []
     for index, row in my_time.iterrows():
-        if (row["Roe deer"] <= 40) & (row["Roe deer"] >= 6) & (row["Grassland"] <= 90) & (row["Grassland"] >= 49) & (row["Woodland"] <= 27) & (row["Woodland"] >= 7) & (row["Thorny Scrub"] <= 21) & (row["Thorny Scrub"] >= 1):
+        if (row["Roe deer"] <= 40) & (row["Roe deer"] >= 12) & (row["Grassland"] <= 80) & (row["Grassland"] >= 49) & (row["Woodland"] <= 27) & (row["Woodland"] >= 7) & (row["Thorny Scrub"] <= 21) & (row["Thorny Scrub"] >= 1):
             accepted_runs.append(row["run_number"])
     final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
     # April 2015
@@ -593,21 +643,31 @@ def run_all_models():
         if (row["Tamworth pigs"] <= 29) & (row["Tamworth pigs"] >= 9) &(row["Exmoor pony"] <= 17) & (row["Exmoor pony"] >= 14) &(row["Longhorn cattle"] <= 106) & (row["Longhorn cattle"] >= 56) &(row["Roe deer"] <= 80) & (row["Roe deer"] >= 20) & (row["Grassland"] <= 69) & (row["Grassland"] >= 49) & (row["Thorny Scrub"] <= 35) & (row["Thorny Scrub"] >= 21) &(row["Woodland"] <= 29) & (row["Woodland"] >= 9):
             accepted_runs.append(row["run_number"])
     final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
-  
+    
+
     # get the top 1% of results 
     last_year = final_results.loc[final_results['Time'] == 184] # pick one year to look at
-    best_results = last_year.nlargest(3, 'passed_filters')
-    print(best_results)
+    best_results = last_year.nlargest(1000, 'passed_filters')
+    # keep track of how many passed filters
+    filters_passed_graph = best_results[["passed_filters"]]/64
+    filters_passed_graph["perc"] = 25
+    # filters_passed_graph.to_excel('/Users/emilyneil/Desktop/KneppABM/outputs/one_perc/filters_passed_graph.xlsx')
+    filters_passed_graph.to_excel('filters_passed_graph_25%.xlsx')
 
     # accepted parameters
     accepted_parameters = final_parameters[final_parameters['run_number'].isin(best_results['run_number'])]
     # tag the accepted simulations
     final_results['accepted?'] = np.where(final_results['run_number'].isin(accepted_parameters['run_number']), 'Accepted', 'Rejected')
 
-    # save to csv
+    # save to csv - all parameters
+    final_parameters["accepted?"] = np.where(final_parameters['run_number'].isin(best_results['run_number']), 'Accepted', 'Rejected')
+    # final_parameters.to_csv('/Users/emilyneil/Desktop/KneppABM/outputs/one_perc/all_parameters.csv')
+    final_parameters.to_csv('all_parameters_25%.csv')
+    # and accepted parameters
     # accepted_parameters.to_csv('/Users/emilyneil/Desktop/KneppABM/outputs/one_perc/accepted_parameters.csv')
-    accepted_parameters.to_csv('accepted_parameters.csv')
-    final_results.to_csv('final_results.csv')
+    # final_results.to_csv('/Users/emilyneil/Desktop/KneppABM/outputs/one_perc/final_results.csv')
+    accepted_parameters.to_csv('accepted_parameters_25%.csv')
+    final_results.to_csv('final_results_25%.csv')
 
     return number_simulations, final_results, accepted_parameters
 

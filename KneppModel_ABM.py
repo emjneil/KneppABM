@@ -18,7 +18,6 @@ def eat_saplings(habitat_patch, eatenSaps):
 
 def eat_trees(habitat_patch, eatenTrees):
     habitat_patch.edibles["trees"] -= eatenTrees
-    # trees_eaten
 
 def eat_scrub(habitat_patch, eatenScrub):
     habitat_patch.edibles["scrub"] -= eatenScrub
@@ -62,16 +61,16 @@ class habitatAgent (Agent):
 
         # chance of 1 young scrub becoming 1 mature scrub
         number_scrub_maturing = np.random.binomial(n=self.edibles["youngScrub"], p=self.model.chance_youngScrubMatures)
-        # don't let it go over 8000 mature shrubs
-        number_scrub_maturing = min(number_scrub_maturing, 8000 - self.edibles['scrub'])
+        # don't let it go over 800 mature shrubs
+        number_scrub_maturing = min(number_scrub_maturing, 800 - self.edibles['scrub'])
         self.edibles['scrub'] += number_scrub_maturing
         self.edibles["youngScrub"] -= number_scrub_maturing
         self.habs_grew_up["youngScrub"] += number_scrub_maturing
 
         # chance of sapling becoming tree
         number_saplings_maturing = np.random.binomial(n=self.edibles["saplings"], p=self.model.chance_saplingBecomingTree)
-        # don't let it go over 4000 trees
-        number_saplings_maturing = min(number_saplings_maturing, 4000 - self.edibles["trees"])
+        # don't let it go over 400 trees
+        number_saplings_maturing = min(number_saplings_maturing, 400 - self.edibles["trees"])
         self.edibles["trees"] += number_saplings_maturing
         self.edibles["saplings"] -= number_saplings_maturing
         self.habs_grew_up["saplings"] += number_saplings_maturing
@@ -85,7 +84,7 @@ class habitatAgent (Agent):
         # chance of reproducing saplings
         number_reproduce_trees = np.random.binomial(n=self.edibles["trees"], p=self.model.chance_reproduceSapling)
         # are there any that aren't full of other saplings/trees?
-        available_sapling_cell = [i for i in no_herbivores if i.edibles["saplings"] < 5000 and i.edibles["trees"] < 4000]
+        available_sapling_cell = [i for i in no_herbivores if i.edibles["saplings"] < 5000 and i.edibles["trees"] < 400]
         if len(available_sapling_cell) > 0: 
             list_of_choices = random.choices(available_sapling_cell, k = number_reproduce_trees)
             for i in range(number_reproduce_trees):
@@ -96,7 +95,7 @@ class habitatAgent (Agent):
         # chance of reproducing scrub
         number_reproduce_shrubs = np.random.binomial(n=self.edibles['scrub'], p=self.model.chance_reproduceYoungScrub)
         # are there any that aren't full of other scrub/young scrub?
-        available_youngscrub_cell = [i for i in no_herbivores if i.edibles["youngScrub"] < 5000 and i.edibles['scrub'] < 4000]
+        available_youngscrub_cell = [i for i in no_herbivores if i.edibles["youngScrub"] < 5000 and i.edibles['scrub'] < 400]
         if len(available_youngscrub_cell) > 0:
             list_of_choices = random.choices(available_youngscrub_cell, k = number_reproduce_shrubs)
             for i in range(number_reproduce_shrubs):
@@ -109,14 +108,16 @@ class habitatAgent (Agent):
         self.edibles["bare_ground"] -= number_reproduce_bareGround
 
         # chance of grass being outcompeted by mature trees and scrub
-        outcompeted_by_trees = ((self.edibles["trees"]/4000)*self.model.chance_grassOutcompetedByTree) 
+        outcompeted_by_trees = ((self.edibles["trees"]/400)*self.model.chance_grassOutcompetedByTree) 
+        if outcompeted_by_trees>1: outcompeted_by_trees=1
         outcompeted_grass_byTrees = np.random.binomial(n=self.edibles["grass"], p=outcompeted_by_trees)
         if self.edibles["grass"] - outcompeted_grass_byTrees < 0: outcompeted_grass_byTrees = self.edibles["grass"]
         self.edibles["grass"] -= outcompeted_grass_byTrees
         self.edibles["bare_ground"] += outcompeted_grass_byTrees
         self.habs_outcompeted_byTrees["grass"] += outcompeted_grass_byTrees
         #shrubs
-        outcompeted_by_shrubs = ((self.edibles['scrub']/8000)*self.model.chance_grassOutcompetedByScrub)
+        outcompeted_by_shrubs = ((self.edibles['scrub']/800)*self.model.chance_grassOutcompetedByScrub)
+        if outcompeted_by_shrubs>1: outcompeted_by_shrubs=1
         outcompeted_grass_byScrub = np.random.binomial(n=self.edibles["grass"], p=outcompeted_by_shrubs)
         if self.edibles["grass"] - outcompeted_grass_byScrub < 0: outcompeted_grass_byScrub = self.edibles["grass"]
         self.edibles["grass"] -= outcompeted_grass_byScrub
@@ -124,29 +125,35 @@ class habitatAgent (Agent):
         self.habs_outcompeted_byScrub["grass"] += outcompeted_grass_byScrub
 
         # chance of mature scrub being outcompeted by trees 
-        mature_scrub_outcompeted = np.random.binomial(n=self.edibles['scrub'], p=(self.edibles["trees"]/4000)*self.model.chance_scrubOutcompetedByTree)
+        prob=(self.edibles["trees"]/400)*self.model.chance_scrubOutcompetedByTree
+        if prob>1: prob=1
+        mature_scrub_outcompeted = np.random.binomial(n=self.edibles['scrub'], p=prob)
         self.edibles['scrub'] -= mature_scrub_outcompeted
         self.habs_outcompeted_byTrees["scrub"] += mature_scrub_outcompeted
 
         # saplings being outcompeted by scrub/trees
-        outcompeted_by_trees = ((self.edibles["trees"]/4000)*self.model.chance_saplingOutcompetedByTree) 
+        outcompeted_by_trees = ((self.edibles["trees"]/400)*self.model.chance_saplingOutcompetedByTree) 
+        if outcompeted_by_trees>1: outcompeted_by_trees=1
         outcompeted_saplings_byTrees = np.random.binomial(n=self.edibles["saplings"], p=outcompeted_by_trees)
         if self.edibles["saplings"] - outcompeted_saplings_byTrees < 0: outcompeted_saplings_byTrees = self.edibles["saplings"]
         self.edibles["saplings"] -= outcompeted_saplings_byTrees
         self.habs_outcompeted_byTrees["saplings"] += outcompeted_saplings_byTrees
 
-        outcompeted_by_shrubs = ((self.edibles['scrub']/8000)*self.model.chance_saplingOutcompetedByScrub)
+        outcompeted_by_shrubs = ((self.edibles['scrub']/800)*self.model.chance_saplingOutcompetedByScrub)
+        if outcompeted_by_shrubs>1: outcompeted_by_shrubs=1
         outcompeted_saplings_byScrub = np.random.binomial(n=self.edibles["saplings"], p=outcompeted_by_shrubs)
         if self.edibles["saplings"] - outcompeted_saplings_byScrub < 0: outcompeted_saplings_byScrub = self.edibles["saplings"]
         self.edibles["saplings"] -= outcompeted_saplings_byScrub
         self.habs_outcompeted_byScrub["saplings"] += outcompeted_saplings_byScrub
 
         # young scrub being outcompeted by scrub/trees
-        outcompeted_by_trees = ((self.edibles["trees"]/4000)*self.model.chance_youngScrubOutcompetedByTree) 
+        outcompeted_by_trees = ((self.edibles["trees"]/400)*self.model.chance_youngScrubOutcompetedByTree) 
+        if outcompeted_by_trees > 1: outcompeted_by_trees = 1
         outcompeted_youngScrub_byTrees = np.random.binomial(n=self.edibles["youngScrub"], p=outcompeted_by_trees)
         self.edibles["youngScrub"] -= outcompeted_youngScrub_byTrees
         self.habs_outcompeted_byTrees["youngScrub"] += outcompeted_youngScrub_byTrees
-        outcompeted_by_shrubs = ((self.edibles['scrub']/8000)*self.model.chance_youngScrubOutcompetedByScrub)
+        outcompeted_by_shrubs = ((self.edibles['scrub']/800)*self.model.chance_youngScrubOutcompetedByScrub)
+        if outcompeted_by_shrubs>1: outcompeted_by_shrubs=1
         outcompeted_youngScrub_byScrub = np.random.binomial(n=self.edibles["youngScrub"], p=outcompeted_by_shrubs)
         self.edibles["youngScrub"] -= outcompeted_youngScrub_byScrub
         self.habs_outcompeted_byScrub["youngScrub"] += outcompeted_youngScrub_byScrub
@@ -162,8 +169,260 @@ class habitatAgent (Agent):
             self.condition = "bare_ground"
         
 
+class reindeer(RandomWalker):
+    def __init__(self, unique_id, pos, model, moore, energy):
+        super().__init__(unique_id, pos, model, moore=moore)
+        self.count_eaten = defaultdict(int)
+        self.energy = energy
 
-class roeDeer_agent(RandomWalker):
+    def step(self):
+        # move & reduce energy
+        self.mixedDiet_move()
+        living = True
+        self.energy -= 1
+        self.count_eaten.clear()
+        # Eat what's on my patch: roe deer are broswers, so randomly choose any habitat to eat
+        this_cell = self.model.grid.get_cell_list_contents([self.pos])
+        habitat_patch = [obj for obj in this_cell if isinstance(obj, habitatAgent)][0]
+        habitat_choices = ["saplings", "trees", "scrub", "youngScrub", "grass"]
+        # pick a habitat type and eat it 
+        for _ in range(len(habitat_choices)):
+            if self.energy < 1:
+                # pick a habitat type
+                my_choice = rchoice(habitat_choices)
+                habitat_choices.remove(my_choice)
+                # if my energy is low enough, eat it 
+                if my_choice == "saplings":
+                    eatenSaps = math.ceil((1-self.energy)/self.model.reindeer_gain_from_Saplings)
+                    # scrub facilitates saplings by preventing herbivory
+                    if eatenSaps >= habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/800))):
+                        eatenSaps = habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/800)))
+                    eat_saplings(habitat_patch, eatenSaps)
+                    self.energy += (self.model.reindeer_gain_from_Saplings * eatenSaps)
+                    self.count_eaten[my_choice] += eatenSaps
+                elif my_choice == "trees":
+                    eatenTrees = math.ceil((1-self.energy)/self.model.reindeer_gain_from_Trees)
+                    if eatenTrees >= habitat_patch.edibles["trees"]:
+                        eatenTrees = habitat_patch.edibles["trees"]
+                    eat_trees(habitat_patch, eatenTrees)
+                    self.energy += (self.model.reindeer_gain_from_Trees * eatenTrees)
+                    self.count_eaten[my_choice] += eatenTrees
+                elif my_choice == "scrub":
+                    eatenScrub = math.ceil((1-self.energy)/self.model.reindeer_gain_from_Scrub)
+                    if eatenScrub >= habitat_patch.edibles['scrub']:
+                        eatenScrub = habitat_patch.edibles['scrub']
+                    eat_scrub(habitat_patch, eatenScrub)
+                    self.energy += (self.model.reindeer_gain_from_Scrub * eatenScrub)
+                    self.count_eaten[my_choice] += eatenScrub
+                elif my_choice == "youngScrub":
+                    eatenYoungScrub = math.ceil((1-self.energy)/self.model.reindeer_gain_from_YoungScrub)
+                    # scrub facilitates saplings by preventing herbivory
+                    if eatenYoungScrub >= habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/800))):
+                        eatenYoungScrub = habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/800)))
+                    eat_youngscrub(habitat_patch, eatenYoungScrub)
+                    self.energy += (self.model.reindeer_gain_from_YoungScrub * eatenYoungScrub)
+                    self.count_eaten[my_choice] += eatenYoungScrub
+                elif my_choice == "grass":
+                    eatenGrass = math.ceil((1-self.energy)/self.model.reindeer_gain_from_grass)
+                    if eatenGrass >= habitat_patch.edibles["grass"]:
+                        eatenGrass = habitat_patch.edibles["grass"]
+                    eat_grass(habitat_patch, eatenGrass)
+                    self.energy += (self.model.reindeer_gain_from_grass * eatenGrass)
+                    self.count_eaten[my_choice] += eatenGrass
+            else:
+                break
+            # don't let energy be above 1; do a break and >= 1
+            if self.energy >= 1:
+                self.energy = 1
+
+        # if cow's energy is less than 0, die 
+        if self.energy <= 0:
+            self.model.grid._remove_agent(self.pos, self)
+            self.model.schedule.remove(self)
+            living = False
+
+        # I reproduce in April, May, and June (assuming model starts in Jan at beginning of year, April, May & June = time steps 4-6 out of every 12 months)
+        if living and (random.random() < self.model.reproduce_reindeer/np.log10(self.model.schedule.get_breed_count(reindeer)+ 1)) and (4 <= self.model.get_month() < 7):
+            # Create a new cow and divide energy:
+            self.energy = np.random.uniform(0, self.energy)
+            calf = reindeer(self.model.next_id(), self.pos, self.model, self.moore, self.energy)
+            self.model.grid.place_agent(calf, self.pos)
+            self.model.schedule.add(calf)
+
+
+
+
+
+
+
+class euroElk(RandomWalker):
+    def __init__(self, unique_id, pos, model, moore, energy):
+        super().__init__(unique_id, pos, model, moore=moore)
+        self.count_eaten = defaultdict(int)
+        self.energy = energy
+
+    def step(self):
+        # move & reduce energy
+        self.roe_move()
+        living = True
+        self.energy -= 1
+        self.count_eaten.clear()
+        # Eat what's on my patch: roe deer are broswers, so randomly choose any habitat to eat
+        this_cell = self.model.grid.get_cell_list_contents([self.pos])
+        habitat_patch = [obj for obj in this_cell if isinstance(obj, habitatAgent)][0]
+        habitat_choices = ["saplings", "trees", "scrub", "youngScrub", "grass"]
+        # pick a habitat type and eat it 
+        for _ in range(len(habitat_choices)):
+            if self.energy < 1:
+                # pick a habitat type
+                my_choice = rchoice(habitat_choices)
+                habitat_choices.remove(my_choice)
+                # if my energy is low enough, eat it 
+                if my_choice == "saplings":
+                    eatenSaps = math.ceil((1-self.energy)/self.model.elk_gain_from_Saplings)
+                    # scrub facilitates saplings by preventing herbivory
+                    if eatenSaps >= habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/800))):
+                        eatenSaps = habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/800)))
+                    eat_saplings(habitat_patch, eatenSaps)
+                    self.energy += (self.model.elk_gain_from_Saplings * eatenSaps)
+                    self.count_eaten[my_choice] += eatenSaps
+                elif my_choice == "trees":
+                    eatenTrees = math.ceil((1-self.energy)/self.model.elk_gain_from_Trees)
+                    if eatenTrees >= habitat_patch.edibles["trees"]:
+                        eatenTrees = habitat_patch.edibles["trees"]
+                    eat_trees(habitat_patch, eatenTrees)
+                    self.energy += (self.model.elk_gain_from_Trees * eatenTrees)
+                    self.count_eaten[my_choice] += eatenTrees
+                elif my_choice == "scrub":
+                    eatenScrub = math.ceil((1-self.energy)/self.model.elk_gain_from_Scrub)
+                    if eatenScrub >= habitat_patch.edibles['scrub']:
+                        eatenScrub = habitat_patch.edibles['scrub']
+                    eat_scrub(habitat_patch, eatenScrub)
+                    self.energy += (self.model.elk_gain_from_Scrub * eatenScrub)
+                    self.count_eaten[my_choice] += eatenScrub
+                elif my_choice == "youngScrub":
+                    eatenYoungScrub = math.ceil((1-self.energy)/self.model.elk_gain_from_YoungScrub)
+                    # scrub facilitates saplings by preventing herbivory
+                    if eatenYoungScrub >= habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/800))):
+                        eatenYoungScrub = habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/800)))
+                    eat_youngscrub(habitat_patch, eatenYoungScrub)
+                    self.energy += (self.model.elk_gain_from_YoungScrub * eatenYoungScrub)
+                    self.count_eaten[my_choice] += eatenYoungScrub
+                elif my_choice == "grass":
+                    eatenGrass = math.ceil((1-self.energy)/self.model.elk_gain_from_grass)
+                    if eatenGrass >= habitat_patch.edibles["grass"]:
+                        eatenGrass = habitat_patch.edibles["grass"]
+                    eat_grass(habitat_patch, eatenGrass)
+                    self.energy += (self.model.elk_gain_from_grass * eatenGrass)
+                    self.count_eaten[my_choice] += eatenGrass
+            else:
+                break
+            # don't let energy be above 1; do a break and >= 1
+            if self.energy >= 1:
+                self.energy = 1
+
+        # if cow's energy is less than 0, die 
+        if self.energy <= 0:
+            self.model.grid._remove_agent(self.pos, self)
+            self.model.schedule.remove(self)
+            living = False
+
+        # I reproduce in April, May, and June (assuming model starts in Jan at beginning of year, April, May & June = time steps 4-6 out of every 12 months)
+        if living and (random.random() < self.model.reproduce_elk/np.log10(self.model.schedule.get_breed_count(euroElk)+ 1)) and (4 <= self.model.get_month() < 7):
+            # Create a new cow and divide energy:
+            self.energy = np.random.uniform(0, self.energy)
+            calf = euroElk(self.model.next_id(), self.pos, self.model, self.moore, self.energy)
+            self.model.grid.place_agent(calf, self.pos)
+            self.model.schedule.add(calf)
+
+
+
+
+
+class euroBison(RandomWalker):
+    def __init__(self, unique_id, pos, model, moore, energy):
+        super().__init__(unique_id, pos, model, moore=moore)
+        self.count_eaten = defaultdict(int)
+        self.energy = energy
+
+    def step(self):
+        # move & reduce energy
+        self.mixedDiet_move()
+        living = True
+        self.energy -= 1
+
+        self.count_eaten.clear()
+        # Eat what's on my patch: roe deer are broswers, so randomly choose any habitat to eat
+        this_cell = self.model.grid.get_cell_list_contents([self.pos])
+        habitat_patch = [obj for obj in this_cell if isinstance(obj, habitatAgent)][0]
+        habitat_choices = ["saplings", "trees", "scrub", "youngScrub", "grass"]
+        # pick a habitat type and eat it 
+        for _ in range(len(habitat_choices)):
+            if self.energy < 1:
+                # pick a habitat type
+                my_choice = rchoice(habitat_choices)
+                habitat_choices.remove(my_choice)
+                # if my energy is low enough, eat it 
+                if my_choice == "saplings":
+                    eatenSaps = math.ceil((1-self.energy)/self.model.bison_gain_from_Saplings)
+                    # scrub facilitates saplings by preventing herbivory
+                    if eatenSaps >= habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/800))):
+                        eatenSaps = habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/800)))
+                    eat_saplings(habitat_patch, eatenSaps)
+                    self.energy += (self.model.bison_gain_from_Saplings * eatenSaps)
+                    self.count_eaten[my_choice] += eatenSaps
+                elif my_choice == "trees":
+                    eatenTrees = math.ceil((1-self.energy)/self.model.bison_gain_from_Trees)
+                    if eatenTrees >= habitat_patch.edibles["trees"]:
+                        eatenTrees = habitat_patch.edibles["trees"]
+                    eat_trees(habitat_patch, eatenTrees)
+                    self.energy += (self.model.bison_gain_from_Trees * eatenTrees)
+                    self.count_eaten[my_choice] += eatenTrees
+                elif my_choice == "scrub":
+                    eatenScrub = math.ceil((1-self.energy)/self.model.bison_gain_from_Scrub)
+                    if eatenScrub >= habitat_patch.edibles['scrub']:
+                        eatenScrub = habitat_patch.edibles['scrub']
+                    eat_scrub(habitat_patch, eatenScrub)
+                    self.energy += (self.model.bison_gain_from_Scrub * eatenScrub)
+                    self.count_eaten[my_choice] += eatenScrub
+                elif my_choice == "youngScrub":
+                    eatenYoungScrub = math.ceil((1-self.energy)/self.model.bison_gain_from_YoungScrub)
+                    # scrub facilitates saplings by preventing herbivory
+                    if eatenYoungScrub >= habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/800))):
+                        eatenYoungScrub = habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/800)))
+                    eat_youngscrub(habitat_patch, eatenYoungScrub)
+                    self.energy += (self.model.bison_gain_from_YoungScrub * eatenYoungScrub)
+                    self.count_eaten[my_choice] += eatenYoungScrub
+                elif my_choice == "grass":
+                    eatenGrass = math.ceil((1-self.energy)/self.model.bison_gain_from_grass)
+                    if eatenGrass >= habitat_patch.edibles["grass"]:
+                        eatenGrass = habitat_patch.edibles["grass"]
+                    eat_grass(habitat_patch, eatenGrass)
+                    self.energy += (self.model.bison_gain_from_grass * eatenGrass)
+                    self.count_eaten[my_choice] += eatenGrass
+            else:
+                break
+            # don't let energy be above 1; do a break and >= 1
+            if self.energy >= 1:
+                self.energy = 1
+
+        # if cow's energy is less than 0, die 
+        if self.energy <= 0:
+            self.model.grid._remove_agent(self.pos, self)
+            self.model.schedule.remove(self)
+            living = False
+
+        # I reproduce in April, May, and June (assuming model starts in Jan at beginning of year, April, May & June = time steps 4-6 out of every 12 months)
+        if living and (random.random() < self.model.reproduce_bison/np.log10(self.model.schedule.get_breed_count(euroBison)+ 1)) and (4 <= self.model.get_month() < 7):
+            # Create a new cow and divide energy:
+            self.energy = np.random.uniform(0, self.energy)
+            calf = euroBison(self.model.next_id(), self.pos, self.model, self.moore, self.energy)
+            self.model.grid.place_agent(calf, self.pos)
+            self.model.schedule.add(calf)
+
+
+
+class roeDeer(RandomWalker):
     def __init__(self, unique_id, pos, model, moore, energy):
         super().__init__(unique_id, pos, model, moore=moore)
         self.count_eaten = defaultdict(int)
@@ -193,15 +452,13 @@ class roeDeer_agent(RandomWalker):
                 if my_choice == "saplings":
                     eatenSaps = math.ceil((1-self.energy)/self.model.roeDeer_gain_from_Saplings)
                     # scrub facilitates saplings by preventing herbivory
-                    if eatenSaps >= habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/8000))):
-                        eatenSaps = habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/8000)))
+                    if eatenSaps >= habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/800))):
+                        eatenSaps = habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/800)))
                     eat_saplings(habitat_patch, eatenSaps)
                     self.energy += (self.model.roeDeer_gain_from_Saplings * eatenSaps)
                     self.count_eaten[my_choice] += eatenSaps
                 elif my_choice == "trees":
                     eatenTrees = math.ceil((1-self.energy)/self.model.roeDeer_gain_from_Trees)
-                    if eatenTrees >= self.model.max_treesScrub_roeDeer: 
-                        eatenTrees = self.model.max_treesScrub_roeDeer
                     if eatenTrees >= habitat_patch.edibles["trees"]:
                         eatenTrees = habitat_patch.edibles["trees"]
                     eat_trees(habitat_patch, eatenTrees)
@@ -209,8 +466,6 @@ class roeDeer_agent(RandomWalker):
                     self.count_eaten[my_choice] += eatenTrees
                 elif my_choice == "scrub":
                     eatenScrub = math.ceil((1-self.energy)/self.model.roeDeer_gain_from_Scrub)
-                    if eatenScrub >= self.model.max_treesScrub_roeDeer: 
-                        eatenScrub = self.model.max_treesScrub_roeDeer
                     if eatenScrub >= habitat_patch.edibles['scrub']:
                         eatenScrub = habitat_patch.edibles['scrub']
                     eat_scrub(habitat_patch, eatenScrub)
@@ -219,8 +474,8 @@ class roeDeer_agent(RandomWalker):
                 elif my_choice == "youngScrub":
                     eatenYoungScrub = math.ceil((1-self.energy)/self.model.roeDeer_gain_from_YoungScrub)
                     # scrub facilitates saplings by preventing herbivory
-                    if eatenYoungScrub >= habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/8000))):
-                        eatenYoungScrub = habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/8000)))
+                    if eatenYoungScrub >= habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/800))):
+                        eatenYoungScrub = habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/800)))
                     eat_youngscrub(habitat_patch, eatenYoungScrub)
                     self.energy += (self.model.roeDeer_gain_from_YoungScrub * eatenYoungScrub)
                     self.count_eaten[my_choice] += eatenYoungScrub
@@ -244,10 +499,10 @@ class roeDeer_agent(RandomWalker):
             living = False
 
         # I can reproduce in May & June (assuming model starts in Jan at beginning of year, May & June = time steps 5&6 out of every 12 months)
-        if living and (random.random() < self.model.roeDeer_reproduce/np.log10(self.model.schedule.get_breed_count(roeDeer_agent)+ 1)) and (5 <= self.model.get_month() < 7):
+        if living and (random.random() < self.model.roeDeer_reproduce/np.log10(self.model.schedule.get_breed_count(roeDeer)+ 1)) and (5 <= self.model.get_month() < 7):
             # Create a new roe deer and divide energy:
             self.energy = np.random.uniform(0, self.energy)
-            fawn = roeDeer_agent(self.model.next_id(), self.pos, self.model, self.moore, self.energy)
+            fawn = roeDeer(self.model.next_id(), self.pos, self.model, self.moore, self.energy)
             self.model.grid.place_agent(fawn, self.pos)
             self.model.schedule.add(fawn)
 
@@ -279,15 +534,13 @@ class exmoorPony(RandomWalker):
                 if my_choice == "saplings":
                     eatenSaps = math.ceil((1-self.energy)/self.model.ponies_gain_from_Saplings)
                     # scrub facilitates saplings by preventing herbivory
-                    if eatenSaps >= habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/8000))):
-                        eatenSaps = habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/8000)))
+                    if eatenSaps >= habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/800))):
+                        eatenSaps = habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/800)))
                     eat_saplings(habitat_patch, eatenSaps)
                     self.energy += (self.model.ponies_gain_from_Saplings * eatenSaps)
                     self.count_eaten[my_choice] += eatenSaps
                 elif my_choice == "trees":
                     eatenTrees = math.ceil((1-self.energy)/self.model.ponies_gain_from_Trees)
-                    if eatenTrees >= self.model.max_treesScrub_largeHerb: 
-                        eatenTrees = self.model.max_treesScrub_largeHerb
                     if eatenTrees >= habitat_patch.edibles["trees"]:
                         eatenTrees = habitat_patch.edibles["trees"]
                     eat_trees(habitat_patch, eatenTrees)
@@ -295,8 +548,6 @@ class exmoorPony(RandomWalker):
                     self.count_eaten[my_choice] += eatenTrees
                 elif my_choice == "scrub":
                     eatenScrub = math.ceil((1-self.energy)/self.model.ponies_gain_from_Scrub)
-                    if eatenScrub >= self.model.max_treesScrub_largeHerb: 
-                        eatenScrub = self.model.max_treesScrub_largeHerb
                     if eatenScrub >= habitat_patch.edibles['scrub']:
                         eatenScrub = habitat_patch.edibles['scrub']
                     eat_scrub(habitat_patch, eatenScrub)
@@ -305,8 +556,8 @@ class exmoorPony(RandomWalker):
                 elif my_choice == "youngScrub":
                     eatenYoungScrub = math.ceil((1-self.energy)/self.model.ponies_gain_from_YoungScrub)
                     # scrub facilitates saplings by preventing herbivory
-                    if eatenYoungScrub >= habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/8000))):
-                        eatenYoungScrub = habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/8000)))
+                    if eatenYoungScrub >= habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/800))):
+                        eatenYoungScrub = habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/800)))
                     eat_youngscrub(habitat_patch, eatenYoungScrub)
                     self.energy += (self.model.ponies_gain_from_YoungScrub * eatenYoungScrub)
                     self.count_eaten[my_choice] += eatenYoungScrub
@@ -357,15 +608,13 @@ class longhornCattle(RandomWalker):
                 if my_choice == "saplings":
                     eatenSaps = math.ceil((1-self.energy)/self.model.cows_gain_from_Saplings)
                     # scrub facilitates saplings by preventing herbivory
-                    if eatenSaps >= habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/8000))):
-                        eatenSaps = habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/8000)))
+                    if eatenSaps >= habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/800))):
+                        eatenSaps = habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/800)))
                     eat_saplings(habitat_patch, eatenSaps)
                     self.energy += (self.model.cows_gain_from_Saplings * eatenSaps)
                     self.count_eaten[my_choice] += eatenSaps
                 elif my_choice == "trees":
                     eatenTrees = math.ceil((1-self.energy)/self.model.cows_gain_from_Trees)
-                    if eatenTrees >= self.model.max_treesScrub_largeHerb: 
-                        eatenTrees = self.model.max_treesScrub_largeHerb
                     if eatenTrees >= habitat_patch.edibles["trees"]:
                         eatenTrees = habitat_patch.edibles["trees"]
                     eat_trees(habitat_patch, eatenTrees)
@@ -373,8 +622,6 @@ class longhornCattle(RandomWalker):
                     self.count_eaten[my_choice] += eatenTrees
                 elif my_choice == "scrub":
                     eatenScrub = math.ceil((1-self.energy)/self.model.cows_gain_from_Scrub)
-                    if eatenScrub >= self.model.max_treesScrub_largeHerb: 
-                        eatenScrub = self.model.max_treesScrub_largeHerb
                     if eatenScrub >= habitat_patch.edibles['scrub']:
                         eatenScrub = habitat_patch.edibles['scrub']
                     eat_scrub(habitat_patch, eatenScrub)
@@ -383,8 +630,8 @@ class longhornCattle(RandomWalker):
                 elif my_choice == "youngScrub":
                     eatenYoungScrub = math.ceil((1-self.energy)/self.model.cows_gain_from_YoungScrub)
                     # scrub facilitates saplings by preventing herbivory
-                    if eatenYoungScrub >= habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/8000))):
-                        eatenYoungScrub = habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/8000)))
+                    if eatenYoungScrub >= habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/800))):
+                        eatenYoungScrub = habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/800)))
                     eat_youngscrub(habitat_patch, eatenYoungScrub)
                     self.energy += (self.model.cows_gain_from_YoungScrub * eatenYoungScrub)
                     self.count_eaten[my_choice] += eatenYoungScrub
@@ -443,15 +690,13 @@ class fallowDeer(RandomWalker):
                 if my_choice == "saplings":
                     eatenSaps = math.ceil((1-self.energy)/self.model.fallowDeer_gain_from_Saplings)
                     # scrub facilitates saplings by preventing herbivory
-                    if eatenSaps >= habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/8000))):
-                        eatenSaps = habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/8000)))
+                    if eatenSaps >= habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/800))):
+                        eatenSaps = habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/800)))
                     eat_saplings(habitat_patch, eatenSaps)
                     self.energy += (self.model.fallowDeer_gain_from_Saplings * eatenSaps)
                     self.count_eaten[my_choice] += eatenSaps
                 elif my_choice == "trees":
                     eatenTrees = math.ceil((1-self.energy)/self.model.fallowDeer_gain_from_Trees)
-                    if eatenTrees >= self.model.max_treesScrub_largeHerb: 
-                        eatenTrees = self.model.max_treesScrub_largeHerb
                     if eatenTrees >= habitat_patch.edibles["trees"]:
                         eatenTrees = habitat_patch.edibles["trees"]
                     eat_trees(habitat_patch, eatenTrees)
@@ -459,8 +704,6 @@ class fallowDeer(RandomWalker):
                     self.count_eaten[my_choice] += eatenTrees
                 elif my_choice == "scrub":
                     eatenScrub = math.ceil((1-self.energy)/self.model.fallowDeer_gain_from_Scrub)
-                    if eatenScrub >= self.model.max_treesScrub_largeHerb: 
-                        eatenScrub = self.model.max_treesScrub_largeHerb
                     if eatenScrub >= habitat_patch.edibles['scrub']:
                         eatenScrub = habitat_patch.edibles['scrub']
                     eat_scrub(habitat_patch, eatenScrub)
@@ -469,8 +712,8 @@ class fallowDeer(RandomWalker):
                 elif my_choice == "youngScrub":
                     eatenYoungScrub = math.ceil((1-self.energy)/self.model.fallowDeer_gain_from_YoungScrub)
                     # scrub facilitates saplings by preventing herbivory
-                    if eatenYoungScrub >= habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/8000))):
-                        eatenYoungScrub = habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/8000)))
+                    if eatenYoungScrub >= habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/800))):
+                        eatenYoungScrub = habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/800)))
                     eat_youngscrub(habitat_patch, eatenYoungScrub)
                     self.energy += (self.model.fallowDeer_gain_from_YoungScrub * eatenYoungScrub)
                     self.count_eaten[my_choice] += eatenYoungScrub
@@ -529,15 +772,13 @@ class redDeer(RandomWalker):
                 if my_choice == "saplings":
                     eatenSaps = math.ceil((1-self.energy)/self.model.redDeer_gain_from_Saplings)
                     # scrub facilitates saplings by preventing herbivory
-                    if eatenSaps >= habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/8000))):
-                        eatenSaps = habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/8000)))
+                    if eatenSaps >= habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/800))):
+                        eatenSaps = habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/800)))
                     eat_saplings(habitat_patch, eatenSaps)
                     self.energy += (self.model.redDeer_gain_from_Saplings * eatenSaps)
                     self.count_eaten[my_choice] += eatenSaps
                 elif my_choice == "trees":
                     eatenTrees = math.ceil((1-self.energy)/self.model.redDeer_gain_from_Trees)
-                    if eatenTrees >= self.model.max_treesScrub_largeHerb: 
-                        eatenTrees = self.model.max_treesScrub_largeHerb
                     if eatenTrees >= habitat_patch.edibles["trees"]:
                         eatenTrees = habitat_patch.edibles["trees"]
                     eat_trees(habitat_patch, eatenTrees)
@@ -545,8 +786,6 @@ class redDeer(RandomWalker):
                     self.count_eaten[my_choice] += eatenTrees
                 elif my_choice == "scrub":
                     eatenScrub = math.ceil((1-self.energy)/self.model.redDeer_gain_from_Scrub)
-                    if eatenScrub >= self.model.max_treesScrub_largeHerb: 
-                        eatenScrub = self.model.max_treesScrub_largeHerb
                     if eatenScrub >= habitat_patch.edibles['scrub']:
                         eatenScrub = habitat_patch.edibles['scrub']
                     eat_scrub(habitat_patch, eatenScrub)
@@ -555,8 +794,8 @@ class redDeer(RandomWalker):
                 elif my_choice == "youngScrub":
                     eatenYoungScrub = math.ceil((1-self.energy)/self.model.redDeer_gain_from_YoungScrub)
                     # scrub facilitates saplings by preventing herbivory
-                    if eatenYoungScrub >= habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/8000))):
-                        eatenYoungScrub = habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/8000)))
+                    if eatenYoungScrub >= habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/800))):
+                        eatenYoungScrub = habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/800)))
                     eat_youngscrub(habitat_patch, eatenYoungScrub)
                     self.energy += (self.model.redDeer_gain_from_YoungScrub * eatenYoungScrub)
                     self.count_eaten[my_choice] += eatenYoungScrub
@@ -618,16 +857,16 @@ class tamworthPigs(RandomWalker):
                 if my_choice == "saplings":
                     eatenSaps = math.ceil((1-self.energy)/self.model.pigs_gain_from_Saplings)
                     # scrub facilitates saplings by preventing herbivory
-                    if eatenSaps >= habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/8000))):
-                        eatenSaps = habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/8000)))
+                    if eatenSaps >= habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/800))):
+                        eatenSaps = habitat_patch.edibles["saplings"] - (round(habitat_patch.edibles["saplings"] * (habitat_patch.edibles['scrub']/800)))
                     eat_saplings(habitat_patch, eatenSaps)
                     self.energy += (self.model.pigs_gain_from_Saplings * eatenSaps)
                     self.count_eaten[my_choice] += eatenSaps
                 elif my_choice == "youngScrub":
                     eatenYoungScrub = math.ceil((1-self.energy)/self.model.pigs_gain_from_YoungScrub)
                     # scrub facilitates saplings by preventing herbivory
-                    if eatenYoungScrub >= habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/8000))):
-                        eatenYoungScrub = habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/8000)))
+                    if eatenYoungScrub >= habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/800))):
+                        eatenYoungScrub = habitat_patch.edibles["youngScrub"] - (round(habitat_patch.edibles["youngScrub"] * (habitat_patch.edibles['scrub']/800)))
                     eat_youngscrub(habitat_patch, eatenYoungScrub)
                     self.energy += (self.model.pigs_gain_from_YoungScrub * eatenYoungScrub)
                     self.count_eaten[my_choice] += eatenYoungScrub
@@ -640,8 +879,6 @@ class tamworthPigs(RandomWalker):
                     self.count_eaten[my_choice] += eatenGrass
                 elif my_choice == "trees":
                     eatenTrees = math.ceil((1-self.energy)/self.model.pigs_gain_from_Trees)
-                    if eatenTrees >= self.model.max_treesScrub_largeHerb: 
-                        eatenTrees = self.model.max_treesScrub_largeHerb
                     if eatenTrees >= habitat_patch.edibles["trees"]:
                         eatenTrees = habitat_patch.edibles["trees"]
                     eat_trees(habitat_patch, eatenTrees)
@@ -649,8 +886,6 @@ class tamworthPigs(RandomWalker):
                     self.count_eaten[my_choice] += eatenTrees
                 elif my_choice == "scrub":
                     eatenScrub = math.ceil((1-self.energy)/self.model.pigs_gain_from_Scrub)
-                    if eatenScrub >= self.model.max_treesScrub_largeHerb: 
-                        eatenScrub = self.model.max_treesScrub_largeHerb
                     if eatenScrub >= habitat_patch.edibles['scrub']:
                         eatenScrub = habitat_patch.edibles['scrub']
                     eat_scrub(habitat_patch, eatenScrub)
@@ -683,12 +918,6 @@ class tamworthPigs(RandomWalker):
             # divide my energy
             self.energy = np.random.uniform(0, self.energy)
 
-        # # # pigs reproduce Jan - July (1 - 7, < 8).         
-        # if living and (random.random() < self.model.pigs_reproduce/np.log10(self.model.schedule.get_breed_count(tamworthPigs)+ 1)) and (1 <= self.model.get_month() < 8):
-        # # if there are, set the timer so other pigs reproduce in a few months
-        #     self.giveBirth()
-        #     self.energy = np.random.uniform(0, self.energy)
-
     def giveBirth(self):
         # Pick a number of piglets to have
         number_piglets = np.random.binomial(n=10, p=0.5)
@@ -703,10 +932,7 @@ class tamworthPigs(RandomWalker):
                                 # # # # ------ Define the model ------ # # # # 
 
 class KneppModel(Model):
-    
-    max_treesScrub_roeDeer = 3 # assume roe deer don't kill more than 3 trees or adult scrub per month
-    max_treesScrub_largeHerb = 6 # assume they don't kill more than 15 per month
-    
+
     def __init__(self,             
             chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
             chance_scrubOutcompetedByTree, chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
@@ -717,8 +943,11 @@ class KneppModel(Model):
             fallowDeer_reproduce, fallowDeer_gain_from_grass, fallowDeer_gain_from_Trees, fallowDeer_gain_from_Scrub, fallowDeer_gain_from_Saplings, fallowDeer_gain_from_YoungScrub, 
             redDeer_reproduce, redDeer_gain_from_grass, redDeer_gain_from_Trees, redDeer_gain_from_Scrub, redDeer_gain_from_Saplings, redDeer_gain_from_YoungScrub, 
             pigs_reproduce, pigs_gain_from_grass, pigs_gain_from_Trees, pigs_gain_from_Scrub, pigs_gain_from_Saplings, pigs_gain_from_YoungScrub, 
-            width, height, max_time, reintroduction, 
-            RC1_noFood, RC2_noTreesScrub, RC3_noTrees, RC4_noScrub):
+            fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
+            reproduce_bison, bison_gain_from_grass, bison_gain_from_Trees, bison_gain_from_Scrub, bison_gain_from_Saplings, bison_gain_from_YoungScrub,
+            reproduce_elk, elk_gain_from_grass, elk_gain_from_Trees, elk_gain_from_Scrub, elk_gain_from_Saplings, elk_gain_from_YoungScrub,
+            reproduce_reindeer, reindeer_gain_from_grass, reindeer_gain_from_Trees, reindeer_gain_from_Scrub, reindeer_gain_from_Saplings, reindeer_gain_from_YoungScrub,
+            width, height, max_time, reintroduction, introduce_euroBison, introduce_elk, introduce_reindeer):
 
         self.steps = 0
         # set parameters
@@ -733,9 +962,15 @@ class KneppModel(Model):
         self.chance_youngScrubMatures = chance_youngScrubMatures
         self.chance_scrubOutcompetedByTree = chance_scrubOutcompetedByTree
         self.chance_saplingOutcompetedByScrub = chance_saplingOutcompetedByScrub
+        if self.chance_saplingOutcompetedByScrub > 1: self.chance_saplingOutcompetedByScrub == 1
+
         self.chance_grassOutcompetedByTree = chance_grassOutcompetedByTree
+        if self.chance_grassOutcompetedByTree > 1: self.chance_grassOutcompetedByTree == 1
+
         self.chance_grassOutcompetedByScrub = chance_grassOutcompetedByScrub
+        if self.chance_grassOutcompetedByScrub > 1: self.chance_grassOutcompetedByScrub == 1
         self.chance_saplingOutcompetedByTree = chance_saplingOutcompetedByTree
+        if self.chance_saplingOutcompetedByTree > 1: self.chance_saplingOutcompetedByTree == 1
         self.chance_youngScrubOutcompetedByScrub = chance_youngScrubOutcompetedByScrub
         self.chance_youngScrubOutcompetedByTree = chance_youngScrubOutcompetedByTree
         # roe deer parameters
@@ -784,13 +1019,39 @@ class KneppModel(Model):
         self.width = width
         self.max_time = max_time
         self.reintroduction = reintroduction
-        # reality checks
-        self.RC1_noFood = RC1_noFood
-        self.RC2_noTreesScrub = RC2_noTreesScrub
-        self.RC3_noTrees = RC3_noTrees
-        self.RC4_noScrub = RC4_noScrub
+        self.introduce_euroBison = introduce_euroBison
+        self.introduce_elk = introduce_elk
+        self.introduce_reindeer = introduce_reindeer
+        # stocking densities
+        self.fallowDeer_stocking = fallowDeer_stocking
+        self.cattle_stocking = cattle_stocking
+        self.redDeer_stocking = redDeer_stocking
+        self.tamworthPig_stocking = tamworthPig_stocking
+        self.exmoor_stocking = exmoor_stocking
+        # euro bison parameters
+        self.reproduce_bison = reproduce_bison
+        self.bison_gain_from_grass = bison_gain_from_grass
+        self.bison_gain_from_Trees = bison_gain_from_Trees 
+        self.bison_gain_from_Scrub = bison_gain_from_Scrub
+        self.bison_gain_from_Saplings = bison_gain_from_Saplings
+        self.bison_gain_from_YoungScrub = bison_gain_from_YoungScrub
+        # elk parameters
+        self.reproduce_elk = reproduce_elk
+        self.elk_gain_from_grass = elk_gain_from_grass
+        self.elk_gain_from_Trees = elk_gain_from_Trees
+        self.elk_gain_from_Scrub = elk_gain_from_Scrub
+        self.elk_gain_from_Saplings = elk_gain_from_Saplings
+        self.elk_gain_from_YoungScrub = elk_gain_from_YoungScrub
+        # reindeer parameters
+        self.reproduce_reindeer = reproduce_reindeer
+        self.reindeer_gain_from_grass = reindeer_gain_from_grass
+        self.reindeer_gain_from_Trees = reindeer_gain_from_Trees
+        self.reindeer_gain_from_Scrub = reindeer_gain_from_Scrub
+        self.reindeer_gain_from_Saplings = reindeer_gain_from_Saplings
+        self.reindeer_gain_from_YoungScrub = reindeer_gain_from_YoungScrub
+
         # set grid & schedule
-        self.grid = MultiGrid(width, height, True) # this grid allows for multiple agents on same cell
+        self.grid = MultiGrid(width, height, False) # this grid allows for multiple agents on same cell
         self.schedule = RandomActivationByBreed(self)
         self.current_id = 0
 
@@ -820,40 +1081,29 @@ class KneppModel(Model):
                 youngscrub_here = 0
                 perc_grass_here = random.randint(50, 100)
                 perc_bareground_here = 100 - perc_grass_here
-            elif my_condition == "thorny_scrubland" and self.RC3_noTrees == False:  # at least 10 scrub plants, no more than 10 trees
+            elif my_condition == "thorny_scrubland":  # at least 10 scrub plants, no more than 10 trees
                 trees_here = random.randint(0, 49)
-                saplings_here = random.randint(0, 5000)
-                scrub_here = random.randint(100, 8000)
-                youngscrub_here = random.randint(0, 5000)
+                saplings_here = random.randint(0, 50)
+                scrub_here = random.randint(100, 800)
+                youngscrub_here = random.randint(0, 50)
                 perc_grass_here = random.randint(0, 100)
                 perc_bareground_here = 100 - perc_grass_here
-            elif my_condition == "thorny_scrubland" and self.RC3_noTrees == True:  # at least 10 scrub plants, no more than 10 trees
-                trees_here = 0
-                saplings_here = 0
-                scrub_here = random.randint(100, 8000)
-                youngscrub_here = random.randint(0, 5000)
-                perc_grass_here = random.randint(0, 100)
-                perc_bareground_here = 100 - perc_grass_here
-            elif my_condition == "woodland" and self.RC4_noScrub == False:  # woodland has 10-100 trees
-                trees_here = random.randint(50, 4000)
-                saplings_here = random.randint(0, 5000)
-                scrub_here = random.randint(0, 8000)
-                youngscrub_here = random.randint(0, 5000)
-                perc_grass_here = random.randint(0, 100)
-                perc_bareground_here = 100 - perc_grass_here
-            elif my_condition == "woodland" and self.RC4_noScrub == True:  # woodland has 10-100 trees
-                trees_here = random.randint(50, 4000)
-                saplings_here = random.randint(0, 5000)
-                scrub_here = 0
-                youngscrub_here = 0
+            elif my_condition == "woodland":  # woodland has 10-100 trees
+                trees_here = random.randint(50, 400)
+                saplings_here = random.randint(0, 50)
+                scrub_here = random.randint(0, 80)
+                youngscrub_here = random.randint(0, 50)
                 perc_grass_here = random.randint(0, 100)
                 perc_bareground_here = 100 - perc_grass_here
             elif my_condition == "bare_ground": # more than 50% bare ground
                 trees_here = random.randint(0, 49)
+                # trees_here = 0
                 saplings_here = 0
                 scrub_here = random.randint(0, 99)
+                # scrub_here = 0
                 youngscrub_here = 0
                 perc_bareground_here = random.randint(51, 100)
+                # perc_bareground_here = 100
                 perc_grass_here = 100 - perc_bareground_here
             patch = habitatAgent(self.next_id(), (x, y), self, my_condition, trees_here, saplings_here, scrub_here, youngscrub_here, perc_grass_here, perc_bareground_here)
             self.grid.place_agent(patch, (x, y))
@@ -865,21 +1115,26 @@ class KneppModel(Model):
             x = random.randrange(self.width)
             y = random.randrange(self.height)
             energy = np.random.uniform(0, 1)
-            roeDeer = roeDeer_agent(self.next_id(), (x, y), self, True, energy)
-            self.grid.place_agent(roeDeer, (x, y))
-            self.schedule.add(roeDeer)
+            roe = roeDeer(self.next_id(), (x, y), self, True, energy)
+            self.grid.place_agent(roe, (x, y))
+            self.schedule.add(roe)
 
 
         # get data organized
         self.datacollector = DataCollector(
                         model_reporters = {
+                        # number and type of habitats
                         "Time": lambda m: m.schedule.time, 
-                        "Roe deer": lambda m: m.schedule.get_breed_count(roeDeer_agent),
+                        "Roe deer": lambda m: m.schedule.get_breed_count(roeDeer),
                         "Exmoor pony": lambda m: m.schedule.get_breed_count(exmoorPony),
                         "Fallow deer": lambda m: m.schedule.get_breed_count(fallowDeer),
                         "Longhorn cattle": lambda m: m.schedule.get_breed_count(longhornCattle),
                         "Red deer": lambda m: m.schedule.get_breed_count(redDeer),
                         "Tamworth pigs": lambda m: m.schedule.get_breed_count(tamworthPigs),
+                        "European bison": lambda m: m.schedule.get_breed_count(euroBison),
+                        "European elk": lambda m: m.schedule.get_breed_count(euroElk),
+                        "Reindeer": lambda m: m.schedule.get_breed_count(reindeer),
+
                         # number of habitat types
                         "Grass": lambda m: self.count_habitat_numbers(m, "grass"),
                         "Trees": lambda m: self.count_habitat_numbers(m, "trees"),
@@ -897,7 +1152,7 @@ class KneppModel(Model):
                         "Saplings grown up": lambda m: self.count_habitats_grew(m, "saplings"),
                         "Saplings Outcompeted by Trees": lambda m: self.count_habitats_outcompeted_trees(m, "saplings"),
                         "Saplings Outcompeted by Scrub": lambda m: self.count_habitats_outcompeted_scrub(m, "saplings"),
-                        "Saplings eaten by roe deer": lambda m: self.count_eaten(m, roeDeer_agent, "saplings"),
+                        "Saplings eaten by roe deer": lambda m: self.count_eaten(m, roeDeer, "saplings"),
                         "Saplings eaten by Exmoor pony": lambda m: self.count_eaten(m, exmoorPony, "saplings"),
                         "Saplings eaten by Fallow deer": lambda m: self.count_eaten(m, fallowDeer, "saplings"),
                         "Saplings eaten by longhorn cattle": lambda m: self.count_eaten(m, longhornCattle, "saplings"),
@@ -907,7 +1162,7 @@ class KneppModel(Model):
                         "Young scrub grown up": lambda m: self.count_habitats_grew(m, "youngScrub"),
                         "Young Scrub Outcompeted by Trees": lambda m: self.count_habitats_outcompeted_trees(m, "youngScrub"), 
                         "Young Scrub Outcompeted by Scrub": lambda m: self.count_habitats_outcompeted_scrub(m, "youngScrub"), 
-                        "Young Scrub eaten by roe deer": lambda m: self.count_eaten(m, roeDeer_agent, "youngScrub"),
+                        "Young Scrub eaten by roe deer": lambda m: self.count_eaten(m, roeDeer, "youngScrub"),
                         "Young Scrub eaten by Exmoor pony": lambda m: self.count_eaten(m, exmoorPony, "youngScrub"),
                         "Young Scrub eaten by Fallow deer": lambda m: self.count_eaten(m, fallowDeer, "youngScrub"),
                         "Young Scrub eaten by longhorn cattle": lambda m: self.count_eaten(m, longhornCattle, "youngScrub"),
@@ -916,7 +1171,7 @@ class KneppModel(Model):
                         # what's eating grass? 
                         "Grass Outcompeted by Trees": lambda m: self.count_habitats_outcompeted_trees(m, "grass"),
                         "Grass Outcompeted by Scrub": lambda m: self.count_habitats_outcompeted_scrub(m, "grass"),
-                        "Grass eaten by roe deer": lambda m: self.count_eaten(m, roeDeer_agent, "grass"),
+                        "Grass eaten by roe deer": lambda m: self.count_eaten(m, roeDeer, "grass"),
                         "Grass eaten by Exmoor pony": lambda m: self.count_eaten(m, exmoorPony, "grass"),
                         "Grass eaten by Fallow deer": lambda m: self.count_eaten(m, fallowDeer, "grass"),
                         "Grass eaten by longhorn cattle": lambda m: self.count_eaten(m, longhornCattle, "grass"),
@@ -924,38 +1179,40 @@ class KneppModel(Model):
                         "Grass eaten by pigs": lambda m: self.count_eaten(m, tamworthPigs, "grass"),
                         # what's killing scrub? 
                         "Scrub Outcompeted by Trees": lambda m: self.count_habitats_outcompeted_trees(m, "scrub"),
-                        "Scrub eaten by roe deer": lambda m: self.count_eaten(m, roeDeer_agent, "scrub"),
+                        "Scrub eaten by roe deer": lambda m: self.count_eaten(m, roeDeer, "scrub"),
                         "Scrub eaten by Exmoor pony": lambda m: self.count_eaten(m, exmoorPony, "scrub"),
                         "Scrub eaten by Fallow deer": lambda m: self.count_eaten(m, fallowDeer, "scrub"),
                         "Scrub eaten by longhorn cattle": lambda m: self.count_eaten(m, longhornCattle, "scrub"),
                         "Scrub eaten by red deer": lambda m: self.count_eaten(m, redDeer, "scrub"),
                         "Scrub eaten by pigs": lambda m: self.count_eaten(m, tamworthPigs, "scrub"),
                         # how many trees are being eaten? 
-                        "Trees eaten by roe deer": lambda m: self.count_eaten(m, roeDeer_agent, "trees"),
+                        "Trees eaten by roe deer": lambda m: self.count_eaten(m, roeDeer, "trees"),
                         "Trees eaten by Exmoor pony": lambda m: self.count_eaten(m, exmoorPony, "trees"),
                         "Trees eaten by Fallow deer": lambda m: self.count_eaten(m, fallowDeer, "trees"),
                         "Trees eaten by longhorn cattle": lambda m: self.count_eaten(m, longhornCattle, "trees"),                   
                         "Trees eaten by red deer": lambda m: self.count_eaten(m, redDeer, "trees"),
                         "Trees eaten by pigs": lambda m: self.count_eaten(m, tamworthPigs, "trees"),
-                        # pig conditions
-                        "Boars": lambda m: self.count_pig_condition(m, "boar"),
-                        "Sow": lambda m: self.count_pig_condition(m, "sow"),
-                        "Piglet": lambda m: self.count_pig_condition(m, "piglet")
+                        },
+
+                        # where are the animals at each timestep
+                        agent_reporters = {
+                        "Breed": lambda agent: agent.__class__.__name__ if (agent.__class__.__name__ != "habitatAgent") else agent.condition,
+                        "ID": lambda agent: agent.unique_id,
+                        "Energy": lambda agent: agent.energy if (agent.__class__.__name__ != "habitatAgent") else None,
+                        "X": lambda agent: agent.pos[0],
+                        "Y": lambda agent: agent.pos[1],
+
                         }
                         )
 
         self.running = True
         self.datacollector.collect(self)
 
-    
-    def count_pig_condition(self, model, condition):
-        # want to count grass, wood, scrub, bare ground in each patch
-        count = 0
-        for key, value in model.schedule.agents_by_breed[tamworthPigs].items():
-            if value.condition == condition:
-                count += 1
-        # return percentage of entire area
-        return count
+
+    def track_position(self, model, breed):
+        # want to count the xy coords of each animal
+        for key, value in model.schedule.agents_by_breed[breed].items():
+            return value.pos, value.unique_id
 
     def count_habitats_outcompeted_scrub(self, model, habitat_type):
         # want to count grass, wood, scrub, bare ground in each patch
@@ -1074,6 +1331,7 @@ class KneppModel(Model):
             my_choice_boar = my_choice_boar
             self.grid._remove_agent(my_choice_boar.pos, my_choice_boar)
             self.schedule.remove(my_choice_boar)
+    
     def get_month(self):
         return (self.schedule.time % 12) + 1
 
@@ -1569,8 +1827,335 @@ class KneppModel(Model):
                 self.add_herbivores(exmoorPony, 15)
                 self.add_herbivores(longhornCattle, 2)
                 self.remove_pig(tamworthPigs, 0, 1, 0)
-        
-        # stop running it in May 2021
+
+
+
+
+
+            # # # # # Forecasting (starting at step 185, July 2020) # # # # #             
+            if self.schedule.time == 185:
+                results_2 = self.datacollector.get_model_vars_dataframe()
+                # first make sure that exmoor ponies are at their stocking density
+                exmoorValue = results_2.iloc[185]['Exmoor pony']
+                if exmoorValue > self.exmoor_stocking: # make sure ponies are at their stocking density
+                    number_to_subtract = -self.exmoor_stocking + exmoorValue
+                    self.remove_herbivores(exmoorPony, number_to_subtract)
+                else:
+                    number_to_add = self.exmoor_stocking - exmoorValue
+                    self.add_herbivores(exmoorPony, number_to_add)
+                    # Longhorn cattle can be culled in July
+                    cattleValue = results_2.iloc[185]['Longhorn cattle']
+                    if cattleValue > self.cattle_stocking:
+                        number_to_subtract = random.randint(0,self.cattle_stocking)
+                        self.remove_herbivores(longhornCattle, number_to_subtract)
+                if self.introduce_euroBison == True:
+                    self.add_herbivores(euroBison, 10)
+                if self.introduce_elk == True:
+                    self.add_herbivores(euroElk, 10)
+                if self.introduce_reindeer == True:
+                    self.add_herbivores(reindeer, 10)
+            # August 2020
+            if self.schedule.time == 186:
+                results = self.datacollector.get_model_vars_dataframe()
+                cattleValue = results.iloc[186]['Longhorn cattle']
+                if cattleValue > self.cattle_stocking:
+                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                    self.remove_herbivores(longhornCattle, number_to_subtract)
+                fallowValue = results.iloc[186]['Fallow deer']
+                if fallowValue > self.fallowDeer_stocking:
+                    number_to_subtract = random.randint(0,self.fallowDeer_stocking)
+                    self.remove_herbivores(fallowDeer, number_to_subtract)
+                redDeer_value = results.iloc[186]['Red deer']
+                if redDeer_value > self.redDeer_stocking:
+                    number_to_subtract = random.randint(0,self.redDeer_stocking)
+                    self.remove_herbivores(redDeer, number_to_subtract)
+            # Sept 2020
+            if self.schedule.time == 187:
+                results = self.datacollector.get_model_vars_dataframe()
+                cattleValue = results.iloc[187]['Longhorn cattle']
+                if cattleValue > self.cattle_stocking:
+                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                    self.remove_herbivores(longhornCattle, number_to_subtract)
+                fallowValue = results.iloc[187]['Fallow deer']
+                if fallowValue > self.fallowDeer_stocking:
+                    number_to_subtract = random.randint(0,self.fallowDeer_stocking)
+                    self.remove_herbivores(fallowDeer, number_to_subtract)
+            # Oct 2020
+            if self.schedule.time == 188:
+                results = self.datacollector.get_model_vars_dataframe()
+                cattleValue = results.iloc[188]['Longhorn cattle']
+                if cattleValue > self.cattle_stocking:
+                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                    self.remove_herbivores(longhornCattle, number_to_subtract)
+            # Nov 2020
+            if self.schedule.time == 189:
+                results = self.datacollector.get_model_vars_dataframe()
+                cattleValue = results.iloc[189]['Longhorn cattle']
+                if cattleValue > self.cattle_stocking:
+                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                    self.remove_herbivores(longhornCattle, number_to_subtract)
+                fallowValue = results.iloc[189]['Fallow deer']
+                if fallowValue > self.fallowDeer_stocking:
+                    number_to_subtract = random.randint(0,self.fallowDeer_stocking)
+                    self.remove_herbivores(fallowDeer, number_to_subtract)
+                redDeer_value = results.iloc[189]['Red deer']
+                if redDeer_value > self.redDeer_stocking:
+                    number_to_subtract = random.randint(0,self.redDeer_stocking)
+                    self.remove_herbivores(redDeer, number_to_subtract)
+            # Dec 2020
+            if self.schedule.time == 190:
+                results = self.datacollector.get_model_vars_dataframe()
+                cattleValue = results.iloc[190]['Longhorn cattle']
+                if cattleValue > self.cattle_stocking:
+                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                    self.remove_herbivores(longhornCattle, number_to_subtract)
+                fallowValue = results.iloc[190]['Fallow deer']
+                if fallowValue > self.fallowDeer_stocking:
+                    number_to_subtract = random.randint(0,self.fallowDeer_stocking)
+                    self.remove_herbivores(fallowDeer, number_to_subtract)
+                redDeer_value = results.iloc[190]['Red deer']
+                if redDeer_value > self.redDeer_stocking:
+                    number_to_subtract = random.randint(0,self.redDeer_stocking)
+                    self.remove_herbivores(redDeer, number_to_subtract)
+                pigValue = results.iloc[190]['Tamworth pigs']
+                if pigValue > self.tamworthPig_stocking:
+                    number_to_subtract = random.randint(0,self.tamworthPig_stocking)
+                    self.remove_pig(tamworthPigs,number_to_subtract,0,0)
+            # Jan 2021  
+            if self.schedule.time == 191:
+                results = self.datacollector.get_model_vars_dataframe()
+                cattleValue = results.iloc[191]['Longhorn cattle']
+                if cattleValue > self.cattle_stocking:
+                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                    self.remove_herbivores(longhornCattle, number_to_subtract)
+                fallowValue = results.iloc[191]['Fallow deer']
+                if fallowValue > self.fallowDeer_stocking:
+                    number_to_subtract = random.randint(0,self.fallowDeer_stocking)
+                    self.remove_herbivores(fallowDeer, number_to_subtract)
+                redDeer_value = results.iloc[191]['Red deer']
+                if redDeer_value > self.redDeer_stocking:
+                    number_to_subtract = random.randint(0,self.redDeer_stocking)
+                    self.remove_herbivores(redDeer, number_to_subtract)
+                pigValue = results.iloc[191]['Tamworth pigs']
+                if pigValue > self.tamworthPig_stocking:
+                    number_to_subtract = random.randint(0,self.tamworthPig_stocking)
+                    self.remove_pig(tamworthPigs, number_to_subtract,0,0)
+            # Feb 2021: cull them all back to stocking values
+            if self.schedule.time == 192:
+                results = self.datacollector.get_model_vars_dataframe()
+                cattleValue = results.iloc[192]['Longhorn cattle']
+                if cattleValue > self.cattle_stocking:
+                    number_to_subtract = -self.cattle_stocking + cattleValue
+                    self.remove_herbivores(longhornCattle, number_to_subtract)
+                fallowValue = results.iloc[192]['Fallow deer']
+                if fallowValue > self.fallowDeer_stocking:
+                    number_to_subtract = -self.fallowDeer_stocking + fallowValue
+                    self.remove_herbivores(fallowDeer, number_to_subtract)
+                redDeer_value = results.iloc[192]['Red deer']
+                if redDeer_value > self.redDeer_stocking:
+                    number_to_subtract = -self.redDeer_stocking + redDeer_value
+                    self.remove_herbivores(redDeer, number_to_subtract)
+                pigValue = results.iloc[192]['Tamworth pigs']
+                if pigValue > self.tamworthPig_stocking:
+                    number_to_subtract = -self.tamworthPig_stocking + pigValue
+                    self.remove_pig(tamworthPigs,number_to_subtract,0,0)
+
+
+            # March 2021
+            # reset exmoor pony values
+            if self.schedule.time >= 193 and ((self.schedule.time % 12) + 1) == 3:
+                results = self.datacollector.get_model_vars_dataframe()
+                # first make sure that exmoor ponies are at their stocking density
+                exmoorValue = results.iloc[-1]['Exmoor pony']
+                if exmoorValue < self.exmoor_stocking: # shouldn't have to subtract anything since they don't grow
+                    number_to_add = self.exmoor_stocking - exmoorValue
+                    self.add_herbivores(exmoorPony, number_to_add)
+                # reset fallow deer values (they are culled)
+                fallowValue = results.iloc[-1]['Fallow deer']
+                if fallowValue > self.fallowDeer_stocking:
+                    number_to_subtract = random.randint(0,self.fallowDeer_stocking)
+                    self.remove_herbivores(fallowDeer, number_to_subtract)
+                else:
+                    number_to_add = self.fallowDeer_stocking - fallowValue
+                    self.add_herbivores(fallowDeer, number_to_add)
+                # reset red deer values  (they are culled)
+                redDeer_value = results.iloc[-1]['Red deer']
+                if redDeer_value > self.redDeer_stocking:
+                    number_to_subtract = random.randint(0,self.redDeer_stocking)
+                    self.remove_herbivores(redDeer, number_to_subtract)
+                else:
+                    number_to_add = self.redDeer_stocking - redDeer_value
+                    self.add_herbivores(redDeer, number_to_add)
+                # reset longhorn cattle values (they aren't culled this month)
+                cattleValue = results.iloc[-1]['Longhorn cattle']
+                if cattleValue < self.cattle_stocking:
+                    number_to_add = self.cattle_stocking - cattleValue
+                    self.add_herbivores(longhornCattle, number_to_add)
+                # reset tamworth pig values (they aren't culled this month)
+                pigValue = results.iloc[-1]['Tamworth pigs']
+                if pigValue < self.tamworthPig_stocking:
+                    number_to_add = self.tamworthPig_stocking - pigValue
+                    self.add_pig(tamworthPigs, 0,number_to_add,0)
+                if self.introduce_euroBison == True:
+                    bisonValue = results.iloc[-1]['European bison']
+                    if bisonValue > 10:
+                        number_to_remove = -10 + bisonValue
+                        self.remove_herbivores(euroBison, number_to_remove)
+                if self.introduce_elk == True:
+                    elkValue = results.iloc[-1]['European elk']
+                    if elkValue > 10:
+                        number_to_remove = -10 + elkValue
+                        self.remove_herbivores(euroElk, number_to_remove)
+                if self.introduce_reindeer == True:
+                    reindeerValue = results.iloc[-1]['Reindeer']
+                    if reindeerValue > 10:
+                        number_to_remove = -10 + reindeerValue
+                        self.remove_herbivores(reindeer, number_to_remove)
+            # April 2021
+            if self.schedule.time >= 193 and ((self.schedule.time % 12) + 1) == 4:
+                results = self.datacollector.get_model_vars_dataframe()
+                fallowValue = results.iloc[-1]['Fallow deer']
+                if fallowValue > self.fallowDeer_stocking:
+                    number_to_subtract = -self.fallowDeer_stocking + fallowValue
+                    self.remove_herbivores(fallowDeer, number_to_subtract)
+                redDeer_value = results.iloc[-1]['Red deer']
+                if redDeer_value > self.redDeer_stocking:
+                    number_to_subtract = -self.redDeer_stocking + redDeer_value
+                    self.remove_herbivores(redDeer, number_to_subtract)
+            # May 2021
+            if self.schedule.time >= 193 and ((self.schedule.time % 12) + 1) == 5:
+                results = self.datacollector.get_model_vars_dataframe()
+                pigValue = results.iloc[-1]['Tamworth pigs']
+                if pigValue > self.tamworthPig_stocking:
+                    number_to_subtract = random.randint(0,self.tamworthPig_stocking)
+                    self.remove_pig(tamworthPigs, number_to_subtract,0,0)
+            # June 2021
+            if self.schedule.time >= 193 and ((self.schedule.time % 12) + 1) == 6:
+                results = self.datacollector.get_model_vars_dataframe()
+                cattleValue = results.iloc[-1]['Longhorn cattle']
+                if cattleValue >= self.cattle_stocking:
+                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                    self.remove_herbivores(self.cattle_stocking, number_to_subtract)
+            # July 2021
+            if self.schedule.time >= 193 and ((self.schedule.time % 12) + 1) == 7:
+                results = self.datacollector.get_model_vars_dataframe()
+                cattleValue = results.iloc[-1]['Longhorn cattle']
+                if cattleValue >= self.cattle_stocking:
+                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                    self.remove_herbivores(longhornCattle, number_to_subtract)
+            # August 2021
+            if self.schedule.time >= 193 and ((self.schedule.time % 12) + 1) == 8:
+                results = self.datacollector.get_model_vars_dataframe()
+                cattleValue = results.iloc[-1]['Longhorn cattle']
+                if cattleValue > self.cattle_stocking:
+                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                    self.remove_herbivores(longhornCattle, number_to_subtract)
+                fallowValue = results.iloc[-1]['Fallow deer']
+                if fallowValue > self.fallowDeer_stocking:
+                    number_to_subtract = random.randint(0,self.fallowDeer_stocking)
+                    self.remove_herbivores(fallowDeer, number_to_subtract)
+                redDeer_value = results.iloc[-1]['Red deer']
+                if redDeer_value > self.redDeer_stocking:
+                    number_to_subtract = random.randint(0,self.redDeer_stocking)
+                    self.remove_herbivores(redDeer, number_to_subtract)
+            # Sept 2021
+            if self.schedule.time >= 193 and ((self.schedule.time % 12) + 1) == 9:
+                results = self.datacollector.get_model_vars_dataframe()
+                cattleValue = results.iloc[-1]['Longhorn cattle']
+                if cattleValue > self.cattle_stocking:
+                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                    self.remove_herbivores(longhornCattle, number_to_subtract)
+                fallowValue = results.iloc[-1]['Fallow deer']
+                if fallowValue > self.fallowDeer_stocking:
+                    number_to_subtract = random.randint(0,self.fallowDeer_stocking)
+                    self.remove_herbivores(fallowDeer, number_to_subtract)
+            # Oct 2021
+            if self.schedule.time >= 193 and ((self.schedule.time % 12) + 1) == 10:
+                results = self.datacollector.get_model_vars_dataframe()
+                cattleValue = results.iloc[-1]['Longhorn cattle']
+                if cattleValue > self.cattle_stocking:
+                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                    self.remove_herbivores(longhornCattle, number_to_subtract)
+            # Nov 2021
+            if self.schedule.time >= 193 and ((self.schedule.time % 12) + 1) == 11:
+                results = self.datacollector.get_model_vars_dataframe()
+                cattleValue = results.iloc[-1]['Longhorn cattle']
+                if cattleValue > self.cattle_stocking:
+                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                    self.remove_herbivores(longhornCattle, number_to_subtract)
+                fallowValue = results.iloc[-1]['Fallow deer']
+                if fallowValue > self.fallowDeer_stocking:
+                    number_to_subtract = random.randint(0,self.fallowDeer_stocking)
+                    self.remove_herbivores(fallowDeer, number_to_subtract)
+                redDeer_value = results.iloc[-1]['Red deer']
+                if redDeer_value > self.redDeer_stocking:
+                    number_to_subtract = random.randint(0,self.redDeer_stocking)
+                    self.remove_herbivores(redDeer, number_to_subtract)
+            # Dec 2021
+            if self.schedule.time >= 193 and ((self.schedule.time % 12) + 1) == 12:
+                results = self.datacollector.get_model_vars_dataframe()
+                cattleValue = results.iloc[-1]['Longhorn cattle']
+                if cattleValue > self.cattle_stocking:
+                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                    self.remove_herbivores(longhornCattle, number_to_subtract)
+                fallowValue = results.iloc[-1]['Fallow deer']
+                if fallowValue > self.fallowDeer_stocking:
+                    number_to_subtract = random.randint(0,self.fallowDeer_stocking)
+                    self.remove_herbivores(fallowDeer, number_to_subtract)
+                redDeer_value = results.iloc[-1]['Red deer']
+                if redDeer_value > self.redDeer_stocking:
+                    number_to_subtract = random.randint(0,self.redDeer_stocking)
+                    self.remove_herbivores(redDeer, number_to_subtract)
+                pigValue = results.iloc[-1]['Tamworth pigs']
+                if pigValue > self.tamworthPig_stocking:
+                    number_to_subtract = random.randint(0,self.tamworthPig_stocking)
+                    self.remove_pig(tamworthPigs,number_to_subtract,0,0)
+                # add boars
+                self.add_pig(tamworthPigs, 0, 0, 1)
+
+            # Jan 2022
+            if self.schedule.time >= 193 and ((self.schedule.time % 12) + 1) == 1:
+                results = self.datacollector.get_model_vars_dataframe()
+                cattleValue = results.iloc[-1]['Longhorn cattle']
+                if cattleValue >self.cattle_stocking:
+                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                    self.remove_herbivores(longhornCattle, number_to_subtract)
+                fallowValue = results.iloc[-1]['Fallow deer']
+                if fallowValue > self.fallowDeer_stocking:
+                    number_to_subtract = random.randint(0,self.fallowDeer_stocking)
+                    self.remove_herbivores(fallowDeer, number_to_subtract)
+                redDeer_value = results.iloc[-1]['Red deer']
+                if redDeer_value > self.redDeer_stocking:
+                    number_to_subtract = random.randint(0,self.redDeer_stocking)
+                    self.remove_herbivores(redDeer, number_to_subtract)
+                pigValue = results.iloc[-1]['Tamworth pigs']
+                if pigValue > self.tamworthPig_stocking:
+                    number_to_subtract = random.randint(0,self.tamworthPig_stocking)
+                    # remove boars
+                    self.remove_pig(tamworthPigs,number_to_subtract,0,1)
+
+            # Feb 2022: cull them all back to stocking values
+            if self.schedule.time >= 193 and ((self.schedule.time % 12) + 1) == 2:
+                results = self.datacollector.get_model_vars_dataframe()
+                cattleValue = results.iloc[-1]['Longhorn cattle']
+                if cattleValue > self.cattle_stocking:
+                    number_to_subtract = -self.cattle_stocking + cattleValue
+                    self.remove_herbivores(longhornCattle, number_to_subtract)
+                fallowValue = results.iloc[-1]['Fallow deer']
+                if fallowValue > self.fallowDeer_stocking:
+                    number_to_subtract = -self.fallowDeer_stocking + fallowValue
+                    self.remove_herbivores(fallowDeer, number_to_subtract)
+                redDeer_value = results.iloc[-1]['Red deer']
+                if redDeer_value > self.redDeer_stocking:
+                    number_to_subtract = -self.redDeer_stocking + redDeer_value
+                    self.remove_herbivores(redDeer, number_to_subtract)
+                pigValue = results.iloc[-1]['Tamworth pigs']
+                if pigValue > self.tamworthPig_stocking:
+                    number_to_subtract = -self.tamworthPig_stocking + pigValue
+                    self.remove_pig(tamworthPigs,number_to_subtract,0,0)
+
+
+        # stop running it at the max_time (184 for present day ones)
         if self.schedule.time == self.max_time:
             self.running = False 
 

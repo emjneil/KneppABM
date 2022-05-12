@@ -4,47 +4,45 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import itertools    
 
 
 def graph_runs():
 
     number_simulations, final_results, counterfactual, accepted_parameters = run_counterfactual()
 
-    # histogram of top 5 parameters (derived from sensitivity test)
-    # chance_youngScrubMatures	7
-    # chance_saplingBecomingTree	6
-    # chance_saplingOutcompetedByScrub	6
-    # chance_scrubOutcompetedByTree	6
-    # chance_reproduceYoungScrub	6
+    # there were 8 parameters that were in the top 10 most important parameters for >6/9 nodes. Histograms:
     accepted_parameters["chance_saplingBecomingTree"].hist()
     plt.title("Histogram of chance_saplingBecomingTree")
-    plt.show()
     # plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/one_perc/hist_parameter1.png')
-    plt.savefig('hist_parameter1.png')
-
-
-    accepted_parameters["chance_scrubOutcompetedByTree"].hist()
-    plt.title("Histogram of chance_scrubOutcompetedByTree")
+    plt.savefig('hist_parameter1_50%.png')
     plt.show()
-    plt.savefig('hist_parameter2.png')
 
     accepted_parameters["chance_youngScrubMatures"].hist()
     plt.title("Histogram of chance_youngScrubMatures")
+    # plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/one_perc/hist_parameter2.png')
+    plt.savefig('hist_parameter2_25%.png')
     plt.show()
-    plt.savefig('hist_parameter3.png')
 
-    accepted_parameters["chance_saplingOutcompetedByScrub"].hist()
-    plt.title("Histogram of chance_saplingOutcompetedByScrub")
+    accepted_parameters["cows_gain_from_YoungScrub"].hist()
+    plt.title("Histogram of cows_gain_from_YoungScrub")
+    # plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/one_perc/hist_parameter3.png')
+    plt.savefig('hist_parameter3_25%.png')
     plt.show()
-    plt.savefig('hist_parameter4.png')
 
-    accepted_parameters["chance_reproduceYoungScrub"].hist()
-    plt.title("Histogram of chance_reproduceYoungScrub")
+    accepted_parameters["pigs_gain_from_YoungScrub"].hist()
+    plt.title("Histogram of pigs_gain_from_YoungScrub")
+    # plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/one_perc/hist_parameter4.png')
+    plt.savefig('hist_parameter4_25%.png')
     plt.show()
-    plt.savefig('hist_parameter5.png')
 
+    accepted_parameters["ponies_gain_from_Saplings"].hist()
+    plt.title("Histogram of ponies_gain_from_Saplings")
+    # plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/one_perc/hist_parameter4.png')
+    plt.savefig('hist_parameter5_25%.png')
+    plt.show()
 
-
+    palette=['#db5f57', '#57d3db', '#57db5f','#5f57db', '#db57d3']
     # NUMBERS GRAPHS #
     numbers_results = final_results[["Time", "Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas", "accepted?", "run_number"]]
     counterfactual_results = counterfactual[["Time", "Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas", "accepted?", "run_number"]]
@@ -86,15 +84,15 @@ def graph_runs():
     filtered_final_numbers = filtered_final_numbers.join(perc2, on=['Time','runType', 'Ecosystem Element'])
     # reset the index
     filtered_final_numbers = filtered_final_numbers.reset_index(drop=True)
-    colors = ["#6788ee", "#e26952"]
+
     # now graph it
-    g = sns.FacetGrid(filtered_final_numbers, col="Ecosystem Element", hue = "runType", palette = colors, col_wrap=4, sharey = False)
+    g = sns.FacetGrid(filtered_final_numbers, col="Ecosystem Element", hue = "runType", palette = palette, col_wrap=5, sharey = False)
     g.map(sns.lineplot, 'Time', 'Median')
     g.map(sns.lineplot, 'Time', 'fivePerc')
     g.map(sns.lineplot, 'Time', 'ninetyfivePerc')
     for ax in g.axes.flat:
-        ax.fill_between(ax.lines[2].get_xdata(),ax.lines[2].get_ydata(), ax.lines[4].get_ydata(), color = '#6788ee', alpha =0.2)
-        ax.fill_between(ax.lines[3].get_xdata(),ax.lines[3].get_ydata(), ax.lines[5].get_ydata(), color = '#e26952', alpha=0.2)
+        ax.fill_between(ax.lines[2].get_xdata(),ax.lines[2].get_ydata(), ax.lines[4].get_ydata(), color="#db5f57", alpha=0.2)
+        ax.fill_between(ax.lines[3].get_xdata(),ax.lines[3].get_ydata(), ax.lines[5].get_ydata(), color="#57d3db", alpha=0.2)
         ax.set_ylabel('Abundance')
     axes = g.axes.flatten()
     # fill between the quantiles
@@ -112,10 +110,11 @@ def graph_runs():
     axes[10].set_title("Young Scrub")
     axes[11].set_title("Bare ground")
     # stop the plots from overlapping
-    g.fig.suptitle("Number of Habitat Types, Accepted vs. Rejected Runs")
-    plt.legend(labels=['Rejected Runs', 'Accepted Runs'],bbox_to_anchor=(2.2, 0), loc='lower right', fontsize=12)
+    g.fig.suptitle("Accepted vs. Rejected Runs: Ecosystem Elements & Habitat Components")
     plt.tight_layout()
-    plt.savefig('outputs_numbers_acceptedRejected.png')
+    plt.legend(labels=['Rejected Runs', 'Accepted Runs'],bbox_to_anchor=(2.2, 0), loc='lower right', fontsize=12)
+    # plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/one_perc/outputs_numbers_acceptedRejected.png')
+    plt.savefig('outputs_numbers_acceptedRejected_50%.png')
     plt.show()
 
 
@@ -136,15 +135,14 @@ def graph_runs():
     # reset the index
     filtered_final_numbers_counter = filtered_final_numbers_counter.reset_index(drop=True)
  
-    colors = ["#6788ee", "#e26952"]
     # now graph it
-    h = sns.FacetGrid(filtered_final_numbers_counter, col="Ecosystem Element", hue = "runType", palette = colors, col_wrap=4, sharey = False)
+    h = sns.FacetGrid(filtered_final_numbers_counter, col="Ecosystem Element", hue = "runType", palette = palette, col_wrap=5, sharey = False)
     h.map(sns.lineplot, 'Time', 'Median')
     h.map(sns.lineplot, 'Time', 'fivePerc')
     h.map(sns.lineplot, 'Time', 'ninetyfivePerc')
     for ax in h.axes.flat:
-        ax.fill_between(ax.lines[2].get_xdata(),ax.lines[2].get_ydata(), ax.lines[4].get_ydata(), color = '#6788ee', alpha =0.2)
-        ax.fill_between(ax.lines[3].get_xdata(),ax.lines[3].get_ydata(), ax.lines[5].get_ydata(), color = '#e26952', alpha=0.2)
+        ax.fill_between(ax.lines[2].get_xdata(),ax.lines[2].get_ydata(), ax.lines[4].get_ydata(),color="#db5f57",alpha =0.2)
+        ax.fill_between(ax.lines[3].get_xdata(),ax.lines[3].get_ydata(), ax.lines[5].get_ydata(), color="#57d3db",alpha=0.2)
         ax.set_ylabel('Abundance')
     # fill between the quantiles
     axes = h.axes.flatten()
@@ -161,10 +159,11 @@ def graph_runs():
     axes[10].set_title("Young Scrub")
     axes[11].set_title("Bare ground")
     # stop the plots from overlapping
-    h.fig.suptitle("Number of Habitat Types, Reintroduction vs. No Reintroduction")
-    plt.legend(labels=['Reintroductions', 'No reintroductions'],bbox_to_anchor=(2.2, 0),loc='lower right', fontsize=12)
+    h.fig.suptitle("Reintroduction vs. No Reintroduction: Ecosystem Elements & Habitat Components")
     plt.tight_layout()
-    plt.savefig('outputs_numbers_counterfactual.png')
+    plt.legend(labels=['Reintroductions', 'No reintroductions'],bbox_to_anchor=(2.2, 0),loc='lower right', fontsize=12)
+    # plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/one_perc/outputs_numbers_counterfactual.png')
+    plt.savefig('outputs_numbers_counterfactual_10%.png')
     plt.show()
 
 
@@ -206,19 +205,20 @@ def graph_runs():
     perc2 = final_df.groupby(['Time', 'runType', 'Ecosystem Element'])['Abundance %'].quantile(.05)
     perc2.name = "fivePerc"
     final_df = final_df.join(perc2, on=['Time','runType', 'Ecosystem Element'])
-    colors = ["#6788ee", "#e26952", "#3F9E4D"]
-    final_df.to_csv("combined_df.csv")
+    # final_df.to_csv('/Users/emilyneil/Desktop/KneppABM/outputs/one_perc/combined_df.csv')
+    final_df.to_csv("combined_df_10%.csv")
 
     counterfactual_graph = final_df.loc[(final_df['runType'] == "Accepted") | (final_df['runType'] == "noReintro")]
     counterfactual_graph = counterfactual_graph.reset_index(drop=True)
-    f = sns.FacetGrid(counterfactual_graph, col="Ecosystem Element", hue = "runType", palette = colors, col_wrap=4, sharey = False)
+    f = sns.FacetGrid(counterfactual_graph, col="Ecosystem Element", hue = "runType", palette = palette, col_wrap=4, sharey = False)
     f.map(sns.lineplot, 'Time', 'Median')
     f.map(sns.lineplot, 'Time', 'fivePerc')
     f.map(sns.lineplot, 'Time', 'ninetyfivePerc')
     for ax in f.axes.flat:
-        ax.fill_between(ax.lines[2].get_xdata(),ax.lines[2].get_ydata(), ax.lines[4].get_ydata(), color = '#6788ee', alpha =0.2)
-        ax.fill_between(ax.lines[3].get_xdata(),ax.lines[3].get_ydata(), ax.lines[5].get_ydata(), color = '#e26952', alpha=0.2)
+        ax.fill_between(ax.lines[2].get_xdata(),ax.lines[2].get_ydata(), ax.lines[4].get_ydata(),  color="#db5f57",alpha =0.2)
+        ax.fill_between(ax.lines[3].get_xdata(),ax.lines[3].get_ydata(), ax.lines[5].get_ydata(), color="#57d3db",alpha=0.2)
         ax.set_ylabel('Abundance')
+
     # add subplot titles
     axes = f.axes.flatten()
     # fill between the quantiles
@@ -233,8 +233,8 @@ def graph_runs():
     axes[8].set_title("Thorny scrub")
     axes[9].set_title("Bare ground")
     # add filter lines
-    f.axes[0].vlines(x=50,ymin=6,ymax=40, color='r')
-    f.axes[6].vlines(x=50,ymin=49,ymax=90, color='r')
+    f.axes[0].vlines(x=50,ymin=12,ymax=40, color='r')
+    f.axes[6].vlines(x=50,ymin=49,ymax=80, color='r')
     f.axes[7].vlines(x=50,ymin=7,ymax=27, color='r')
     f.axes[8].vlines(x=50,ymin=1,ymax=21, color='r')
     f.axes[1].vlines(x=123,ymin=9,ymax=11, color='r')
@@ -478,23 +478,24 @@ def graph_runs():
     f.axes[8].vlines(x=184,ymin=21,ymax=35, color='r')
 
     # # stop the plots from overlapping
-    f.fig.suptitle('Forecasting herbivore reintroductions vs. no reintroductions')
+    f.fig.suptitle('Current dynamics vs. if reintroductions had not occurred')
     plt.tight_layout()
     plt.legend(labels=['Reintroductions', 'No reintroductions'],bbox_to_anchor=(2.2, 0),loc='lower right', fontsize=12)
-    plt.savefig('counterfactual.png')
+    # plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/one_perc/counterfactual.png')
+    plt.savefig('counterfactual_10%.png')
     plt.show()
 
 
     # second graph: accepted vs rejected runs
     final_df = final_df.reset_index(drop=True)
     filtered_rejectedAccepted = final_df.loc[(final_df['runType'] == "Accepted") | (final_df['runType'] == "Rejected") ]
-    g = sns.FacetGrid(filtered_rejectedAccepted, col="Ecosystem Element", hue = "runType", palette = colors, col_wrap=4, sharey = False)
+    g = sns.FacetGrid(filtered_rejectedAccepted, col="Ecosystem Element", hue = "runType", palette = palette, col_wrap=4, sharey = False)
     g.map(sns.lineplot, 'Time', 'Median')
     g.map(sns.lineplot, 'Time', 'fivePerc')
     g.map(sns.lineplot, 'Time', 'ninetyfivePerc')
     for ax in g.axes.flat:
-        ax.fill_between(ax.lines[2].get_xdata(),ax.lines[2].get_ydata(), ax.lines[4].get_ydata(), color = '#6788ee', alpha =0.2)
-        ax.fill_between(ax.lines[3].get_xdata(),ax.lines[3].get_ydata(), ax.lines[5].get_ydata(), color = '#e26952', alpha=0.2)
+        ax.fill_between(ax.lines[2].get_xdata(),ax.lines[2].get_ydata(), ax.lines[4].get_ydata(),color="#db5f57", alpha =0.2)
+        ax.fill_between(ax.lines[3].get_xdata(),ax.lines[3].get_ydata(), ax.lines[5].get_ydata(), color="#57d3db", alpha=0.2)
         ax.set_ylabel('Abundance')
     # add subplot titles
     axes = g.axes.flatten()
@@ -510,8 +511,8 @@ def graph_runs():
     axes[8].set_title("Thorny scrub")
     axes[9].set_title("Bare ground")
     # add filter lines
-    g.axes[0].vlines(x=50,ymin=6,ymax=40, color='r')
-    g.axes[6].vlines(x=50,ymin=49,ymax=90, color='r')
+    g.axes[0].vlines(x=50,ymin=12,ymax=40, color='r')
+    g.axes[6].vlines(x=50,ymin=49,ymax=80, color='r')
     g.axes[7].vlines(x=50,ymin=7,ymax=27, color='r')
     g.axes[8].vlines(x=50,ymin=1,ymax=21, color='r')
     # plot post-reintro lines: April 2015
@@ -759,10 +760,9 @@ def graph_runs():
     g.fig.suptitle('Accepted vs. Rejected Runs')
     plt.tight_layout()
     plt.legend(labels=['Rejected Runs', 'Accepted Runs'],bbox_to_anchor=(2.2, 0), loc='lower right', fontsize=12)
-    plt.savefig('rejected_accepted_runs.png')
+    # plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/one_perc/rejected_accepted_runs.png')
+    plt.savefig('rejected_accepted_runs_10%.png')
     plt.show()
-
-
 
 
 graph_runs()

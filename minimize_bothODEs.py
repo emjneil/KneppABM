@@ -88,9 +88,9 @@ def objectiveFunction(x):
     filtered_result = (
         # pre-reintro model
         ((((list(results.loc[results['Time'] == 49, 'Roe deer'])[0])-23)/23)**2) +
-        (((list(results.loc[results['Time'] == 49, 'Grassland'])[0])-70)**2) +
-        (((list(results.loc[results['Time'] == 49, 'Thorny Scrub'])[0])-13)**2) +
-        (((list(results.loc[results['Time'] == 49, 'Woodland'])[0])-17)**2) +
+        ((((list(results.loc[results['Time'] == 49, 'Grassland'])[0])-70)/70)**2) +
+        ((((list(results.loc[results['Time'] == 49, 'Thorny Scrub'])[0])-13)/13)**2) +
+        ((((list(results.loc[results['Time'] == 49, 'Woodland'])[0])-17)/17)**2) +
         # post-reintro model: April 2015
         ((((list(results.loc[results['Time'] == 123, 'Longhorn cattle'])[0])-115)/115)**2) +
         ((((list(results.loc[results['Time'] == 123, 'Tamworth pigs'])[0])-22)/22)**2) +
@@ -278,7 +278,7 @@ def objectiveFunction(x):
         ((((list(results.loc[results['Time'] == 169, 'Tamworth pigs'])[0])-10)/10)**2) +
         # March 2019
         ((((list(results.loc[results['Time'] == 170, 'Fallow deer'])[0])-278)/278)**2) +
-        ((((list(results.loc[results['Time'] == 170, 'Red deer'])[0])-37)/37)**2) +
+        (((list(results.loc[results['Time'] == 170, 'Red deer'])[0])-37)**2) +
         ((((list(results.loc[results['Time'] == 170, 'Longhorn cattle'])[0])-87)/87)**2) +
         ((((list(results.loc[results['Time'] == 170, 'Tamworth pigs'])[0])-9)/9)**2) +
         # # # April 2019
@@ -328,9 +328,9 @@ def objectiveFunction(x):
         ((((list(results.loc[results['Time'] == 184, 'Tamworth pigs'])[0])-19)/19)**2) +
         ((((list(results.loc[results['Time'] == 184, 'Longhorn cattle'])[0])-81)/81)**2) +
         ((((list(results.loc[results['Time'] == 184, 'Roe deer'])[0])-50)/50)**2) +
-        (((list(results.loc[results['Time'] == 184, 'Grassland'])[0])-57)**2) +
-        (((list(results.loc[results['Time'] == 184, 'Thorny Scrub'])[0])-26)**2) +
-        (((list(results.loc[results['Time'] == 184, 'Woodland'])[0])-19)**2)
+        ((((list(results.loc[results['Time'] == 184, 'Grassland'])[0])-57)/57)**2) +
+        ((((list(results.loc[results['Time'] == 184, 'Thorny Scrub'])[0])-26)/26)**2) +
+        ((((list(results.loc[results['Time'] == 184, 'Woodland'])[0])-19)/19)**2)
         )
 
     # only print the last year's result if it's reasonably close to the filters
@@ -355,31 +355,31 @@ def run_optimizer():
         (0.0063,0.0072),(0.002,0.0027), # saplings
         (0.0068,0.0072),(0.0063,0.0072), # young scrub  
         # roe deer parameters
-        (0.17,0.19),(0.92,0.94),(0.85,0.9),(0.75,0.9),(0.15,0.23),(0.15,0.19),
+        (0.17,0.19),(0.92,0.94),(0.85,0.92),(0.75,0.92),(0.17,0.23),(0.17,0.19),
         # fallow deer parameters
-        (0.31,0.32),(0.85,0.9),(0.85,0.9),(0.82,0.9),(0.16,0.21),(0.14,0.18),
+        (0.31,0.32),(0.85,0.93),(0.85,0.9),(0.82,0.9),(0.17,0.21),(0.15,0.18),
         # red deer parameters
-        (0.34,0.354),(0.8,0.9),(0.75,0.9),(0.8,0.9),(0.16,0.21),(0.1,0.2),
+        (0.34,0.36),(0.84,0.9),(0.85,0.9),(0.8,0.9),(0.17,0.21),(0.15,0.18),
         # exmoor pony parameters
-        (0.78,0.9),(0.8,0.9),(0.8,0.9),(0.1,0.2),(0.12,0.2),
+        (0.84,0.9),(0.8,0.9),(0.8,0.9),(0.16,0.18),(0.14,0.2),
         # cattle parameters
-        (0.18,0.21),(0.8,0.9),(0.83,0.85),(0.75,0.8),(0.15,0.2),(0.12,0.2),
+        (0.19,0.21),(0.84,0.86),(0.83,0.85),(0.76,0.77),(0.16,0.17),(0.14,0.16),
         # pig parameters
-        (0.29,0.31),(0.85,0.9),(0.75,0.8),(0.8,0.9),(0.15,0.2),(0.12,0.2)]
+        (0.29,0.31),(0.8,0.85),(0.75,0.8),(0.8,0.9),(0.15,0.2),(0.12,0.2)]
 
     initial_guess = [ 
-        0.00343921, 0.00286694, 0.01370997, 0.00216677, 0.00688862,
-        0.00250284, 0.09477964, 0.09324057, 0.00659929, 0.0025277 ,
-        0.0071571 , 0.00678152, 0.18923164, 0.93754233, 0.86254277,
-        0.76995751, 0.15023144, 0.1864662 , 0.31754374, 0.88889968,
-        0.87295007, 0.82661655, 0.20743892, 0.16278938, 0.34744397,
-        0.82144955, 0.78679743, 0.83430401, 0.20124478, 0.13118939,
-        0.78419006, 0.81936392, 0.85486149, 0.10538719, 0.17409406,
-        0.20263491, 0.84586451, 0.84974846, 0.76330363, 0.16746166,
-        0.1594834 , 0.30226554, 0.86050269, 0.75187031, 0.82761534,
-        0.16790254, 0.17434808]
+       0.00343921, 0.00286694, 0.01370997, 0.00216677, 0.00688862,
+       0.00250284, 0.09477964, 0.09324057, 0.00659929, 0.0025277 ,
+       0.0071571 , 0.00678152, 0.18923164, 0.93754233, 0.9       ,
+       0.76995751, 0.18      , 0.1864662 , 0.31754374, 0.88889968,
+       0.87295007, 0.82661655, 0.20743892, 0.16278938, 0.34744397,
+       0.82144955, 0.8       , 0.83430401, 0.20124478, 0.15      ,
+       0.84      , 0.81936392, 0.85486149, 0.16      , 0.17409406,
+       0.20263491, 0.84586451, 0.84974846, 0.76330363, 0.16746166,
+       0.1594834 , 0.30226554, 0.85      , 0.75187031, 0.82761534,
+       0.16790254, 0.17434808]
 
-    res = minimize(objectiveFunction, initial_guess, method='Nelder-Mead', bounds=bds, options={'maxiter': 50})
+    res = minimize(objectiveFunction, initial_guess, method='Nelder-Mead', bounds=bds, options={'maxiter': 5})
     
     # save the results to a txt file
     with open('/Users/emilyneil/Desktop/KneppABM/outputs/post_reintro/minimization_outputs.txt', 'w') as f:
@@ -532,244 +532,242 @@ def graph_results():
     f.axes[6].vlines(x=50,ymin=49,ymax=90, color='r')
     f.axes[7].vlines(x=50,ymin=7,ymax=27, color='r')
     f.axes[8].vlines(x=50,ymin=1,ymax=21, color='r')
-    # plot post-reintro lines: April 2015
     f.axes[1].vlines(x=123,ymin=9,ymax=11, color='r')
-    f.axes[3].vlines(x=123,ymin=104,ymax=127, color='r')
-    f.axes[5].vlines(x=123,ymin=20,ymax=24, color='r')
+    f.axes[3].vlines(x=123,ymin=90,ymax=140, color='r')
+    f.axes[5].vlines(x=123,ymin=12,ymax=32, color='r')
     # May 2015
-    f.axes[3].vlines(x=124,ymin=116,ymax=142, color='r')
-    f.axes[5].vlines(x=124,ymin=13,ymax=15, color='r')
+    f.axes[3].vlines(x=124,ymin=104,ymax=154, color='r')
+    f.axes[5].vlines(x=124,ymin=4,ymax=24, color='r')
     f.axes[1].vlines(x=124,ymin=9,ymax=11, color='r')
     # June 2015
-    f.axes[3].vlines(x=125,ymin=116,ymax=142, color='r')
+    f.axes[3].vlines(x=125,ymin=104,ymax=154, color='r')
     f.axes[1].vlines(x=125,ymin=9,ymax=11, color='r')
-    f.axes[5].vlines(x=125,ymin=13,ymax=15, color='r')
+    f.axes[5].vlines(x=125,ymin=4,ymax=24, color='r')
     # July 2015
-    f.axes[3].vlines(x=126,ymin=116,ymax=142, color='r')
+    f.axes[3].vlines(x=126,ymin=104,ymax=154, color='r')
     f.axes[1].vlines(x=126,ymin=9,ymax=11, color='r')
-    f.axes[5].vlines(x=126,ymin=13,ymax=15, color='r')
+    f.axes[5].vlines(x=126,ymin=4,ymax=24, color='r')
     # Aug 2015
-    f.axes[3].vlines(x=127,ymin=116,ymax=142, color='r')
+    f.axes[3].vlines(x=127,ymin=104,ymax=154, color='r')
     f.axes[1].vlines(x=127,ymin=9,ymax=11, color='r')
-    f.axes[5].vlines(x=127,ymin=13,ymax=15, color='r')
+    f.axes[5].vlines(x=127,ymin=4,ymax=24, color='r')
     # Sept 2015
-    f.axes[3].vlines(x=128,ymin=117,ymax=143, color='r')
+    f.axes[3].vlines(x=128,ymin=105,ymax=155, color='r')
     f.axes[1].vlines(x=128,ymin=9,ymax=11, color='r')
-    f.axes[5].vlines(x=128,ymin=13,ymax=15, color='r')
+    f.axes[5].vlines(x=128,ymin=4,ymax=24, color='r')
     # Oct 2015
-    f.axes[3].vlines(x=129,ymin=82,ymax=100, color='r')
+    f.axes[3].vlines(x=129,ymin=66,ymax=116, color='r')
     f.axes[1].vlines(x=129,ymin=9,ymax=11, color='r')
-    f.axes[5].vlines(x=129,ymin=13,ymax=15, color='r')
+    f.axes[5].vlines(x=129,ymin=4,ymax=24, color='r')
     # Nov 2015
-    f.axes[3].vlines(x=130,ymin=82,ymax=100, color='r')
+    f.axes[3].vlines(x=130,ymin=66,ymax=116, color='r')
     f.axes[1].vlines(x=130,ymin=9,ymax=11, color='r')
-    f.axes[5].vlines(x=130,ymin=12,ymax=14, color='r')
+    f.axes[5].vlines(x=130,ymin=3,ymax=23, color='r')
     # Dec 2015
-    f.axes[3].vlines(x=131,ymin=77,ymax=94, color='r')
+    f.axes[3].vlines(x=131,ymin=61,ymax=111, color='r')
     f.axes[1].vlines(x=131,ymin=9,ymax=11, color='r')
-    f.axes[5].vlines(x=131,ymin=12,ymax=14, color='r')
+    f.axes[5].vlines(x=131,ymin=3,ymax=23, color='r')
     # Jan 2016
-    f.axes[3].vlines(x=132,ymin=77,ymax=94, color='r')
+    f.axes[3].vlines(x=132,ymin=61,ymax=111, color='r')
     f.axes[1].vlines(x=132,ymin=9,ymax=11, color='r')
-    f.axes[5].vlines(x=132,ymin=9,ymax=11, color='r')
+    f.axes[5].vlines(x=132,ymin=1,ymax=20, color='r')
     # Feb 2016
     f.axes[1].vlines(x=133,ymin=9,ymax=11, color='r')
-    f.axes[3].vlines(x=133,ymin=77,ymax=94, color='r')
-    f.axes[5].vlines(x=133,ymin=7,ymax=9, color='r')
+    f.axes[3].vlines(x=133,ymin=61,ymax=111, color='r')
+    f.axes[5].vlines(x=133,ymin=1,ymax=20, color='r')
     # March 2016
     f.axes[1].vlines(x=134,ymin=10,ymax=12, color='r')
-    f.axes[3].vlines(x=134,ymin=77,ymax=94, color='r')
-    f.axes[2].vlines(x=134,ymin=126,ymax=154, color='r')
-    f.axes[4].vlines(x=134,ymin=23,ymax=29, color='r')
-    f.axes[5].vlines(x=134,ymin=8,ymax=10, color='r')
+    f.axes[3].vlines(x=134,ymin=61,ymax=111, color='r')
+    f.axes[2].vlines(x=134,ymin=90,ymax=190, color='r')
+    f.axes[4].vlines(x=134,ymin=21,ymax=31, color='r')
+    f.axes[5].vlines(x=134,ymin=1,ymax=19, color='r')
     # April 2016
     f.axes[1].vlines(x=135,ymin=10,ymax=12, color='r')
-    f.axes[3].vlines(x=135,ymin=93,ymax=113, color='r')
-    f.axes[5].vlines(x=135,ymin=8,ymax=10, color='r')
+    f.axes[3].vlines(x=135,ymin=78,ymax=128, color='r')
+    f.axes[5].vlines(x=135,ymin=1,ymax=19, color='r')
     # May 2016
     f.axes[1].vlines(x=136,ymin=10,ymax=12, color='r')
-    f.axes[3].vlines(x=136,ymin=97,ymax=119, color='r')
-    f.axes[5].vlines(x=136,ymin=15,ymax=19, color='r')
+    f.axes[3].vlines(x=136,ymin=83,ymax=133, color='r')
+    f.axes[5].vlines(x=136,ymin=7,ymax=27, color='r')
     # June 2016
     f.axes[1].vlines(x=137,ymin=10,ymax=12, color='r')
-    f.axes[3].vlines(x=137,ymin=80,ymax=98, color='r')
-    f.axes[5].vlines(x=137,ymin=15,ymax=19, color='r')
+    f.axes[3].vlines(x=137,ymin=64,ymax=114, color='r')
+    f.axes[5].vlines(x=137,ymin=7,ymax=27, color='r')
     # July 2016
     f.axes[1].vlines(x=138,ymin=10,ymax=12, color='r')
-    f.axes[3].vlines(x=138,ymin=78,ymax=96, color='r')
-    f.axes[5].vlines(x=138,ymin=15,ymax=19, color='r')
+    f.axes[3].vlines(x=138,ymin=62,ymax=112, color='r')
+    f.axes[5].vlines(x=138,ymin=7,ymax=27, color='r')
     # Aug 2016
     f.axes[1].vlines(x=139,ymin=10,ymax=12, color='r')
-    f.axes[3].vlines(x=139,ymin=78,ymax=96, color='r')
-    f.axes[5].vlines(x=139,ymin=15,ymax=19, color='r')
+    f.axes[3].vlines(x=139,ymin=62,ymax=112, color='r')
+    f.axes[5].vlines(x=139,ymin=7,ymax=27, color='r')
     # Sept 2016
     f.axes[1].vlines(x=140,ymin=10,ymax=12, color='r')
-    f.axes[3].vlines(x=140,ymin=87,ymax=107, color='r')
-    f.axes[5].vlines(x=140,ymin=15,ymax=19, color='r')
+    f.axes[3].vlines(x=140,ymin=72,ymax=122, color='r')
+    f.axes[5].vlines(x=140,ymin=7,ymax=27, color='r')
     # Oct 2016
     f.axes[1].vlines(x=141,ymin=10,ymax=12, color='r')
-    f.axes[3].vlines(x=141,ymin=87,ymax=107, color='r')
-    f.axes[5].vlines(x=141,ymin=15,ymax=19, color='r')
+    f.axes[3].vlines(x=141,ymin=72,ymax=122, color='r')
+    f.axes[5].vlines(x=141,ymin=7,ymax=27, color='r')
     # Nov 2016
     f.axes[1].vlines(x=142,ymin=10,ymax=12, color='r')
-    f.axes[3].vlines(x=142,ymin=83,ymax=101, color='r')
-    f.axes[5].vlines(x=142,ymin=15,ymax=19, color='r')
+    f.axes[3].vlines(x=142,ymin=67,ymax=117, color='r')
+    f.axes[5].vlines(x=142,ymin=7,ymax=27, color='r')
     # Dec 2016
     f.axes[1].vlines(x=143,ymin=10,ymax=12, color='r')
-    f.axes[3].vlines(x=143,ymin=71,ymax=87, color='r')
-    f.axes[5].vlines(x=143,ymin=12,ymax=14, color='r')
+    f.axes[3].vlines(x=143,ymin=54,ymax=104, color='r')
+    f.axes[5].vlines(x=143,ymin=3,ymax=23, color='r')
     # Jan 2017
     f.axes[1].vlines(x=144,ymin=10,ymax=12, color='r')
-    f.axes[3].vlines(x=144,ymin=71,ymax=87, color='r')
-    f.axes[5].vlines(x=144,ymin=8,ymax=10, color='r')
+    f.axes[3].vlines(x=144,ymin=54,ymax=104, color='r')
+    f.axes[5].vlines(x=144,ymin=1,ymax=19, color='r')
     # Feb 2017
     f.axes[1].vlines(x=145,ymin=10,ymax=12, color='r')
-    f.axes[3].vlines(x=145,ymin=71,ymax=87, color='r')
-    f.axes[5].vlines(x=145,ymin=6,ymax=8, color='r')
+    f.axes[3].vlines(x=145,ymin=54,ymax=104, color='r')
+    f.axes[5].vlines(x=145,ymin=1,ymax=17, color='r')
     # March 2017
     f.axes[1].vlines(x=146,ymin=9,ymax=11, color='r')
-    f.axes[2].vlines(x=146,ymin=149,ymax=182, color='r')
-    f.axes[3].vlines(x=146,ymin=71,ymax=87, color='r')
-    f.axes[5].vlines(x=146,ymin=6,ymax=8, color='r')
+    f.axes[2].vlines(x=146,ymin=115,ymax=200, color='r')
+    f.axes[3].vlines(x=146,ymin=54,ymax=104, color='r')
+    f.axes[5].vlines(x=146,ymin=1,ymax=17, color='r')
     # April 2017
     f.axes[1].vlines(x=147,ymin=9,ymax=11, color='r')
-    f.axes[3].vlines(x=147,ymin=90,ymax=110, color='r')
-    f.axes[5].vlines(x=147,ymin=20,ymax=24, color='r')
+    f.axes[3].vlines(x=147,ymin=75,ymax=125, color='r')
+    f.axes[5].vlines(x=147,ymin=12,ymax=32, color='r')
     # May 2017
     f.axes[1].vlines(x=148,ymin=9,ymax=11, color='r')
-    f.axes[3].vlines(x=148,ymin=98,ymax=120, color='r')
-    f.axes[5].vlines(x=148,ymin=20,ymax=24, color='r')
+    f.axes[3].vlines(x=148,ymin=84,ymax=134, color='r')
+    f.axes[5].vlines(x=148,ymin=12,ymax=32, color='r')
     # June 2017
     f.axes[1].vlines(x=149,ymin=9,ymax=11, color='r')
-    f.axes[3].vlines(x=149,ymin=85,ymax=103, color='r')
-    f.axes[5].vlines(x=149,ymin=20,ymax=24, color='r')
+    f.axes[3].vlines(x=149,ymin=69,ymax=119, color='r')
+    f.axes[5].vlines(x=149,ymin=12,ymax=32, color='r')
     # July 2017
     f.axes[1].vlines(x=150,ymin=9,ymax=11, color='r')
-    f.axes[3].vlines(x=150,ymin=85,ymax=103, color='r')
-    f.axes[5].vlines(x=150,ymin=20,ymax=24, color='r')
+    f.axes[3].vlines(x=150,ymin=69,ymax=119, color='r')
+    f.axes[5].vlines(x=150,ymin=12,ymax=32, color='r')
     # Aug 2017
     f.axes[1].vlines(x=151,ymin=9,ymax=11, color='r')
-    f.axes[3].vlines(x=151,ymin=85,ymax=103, color='r')
-    f.axes[5].vlines(x=151,ymin=20,ymax=24, color='r')
+    f.axes[3].vlines(x=151,ymin=69,ymax=119, color='r')
+    f.axes[5].vlines(x=151,ymin=12,ymax=32, color='r')
     # Sept 2017
     f.axes[1].vlines(x=152,ymin=9,ymax=11, color='r')
-    f.axes[3].vlines(x=152,ymin=81,ymax=99, color='r')
+    f.axes[3].vlines(x=152,ymin=65,ymax=115, color='r')
     f.axes[5].vlines(x=152,ymin=20,ymax=24, color='r')
     # Oct 2017
     f.axes[1].vlines(x=153,ymin=9,ymax=11, color='r')
-    f.axes[3].vlines(x=153,ymin=79,ymax=97, color='r')
-    f.axes[5].vlines(x=153,ymin=20,ymax=24, color='r')
+    f.axes[3].vlines(x=153,ymin=63,ymax=113, color='r')
+    f.axes[5].vlines(x=153,ymin=12,ymax=32, color='r')
     # Nov 2017
     f.axes[1].vlines(x=154,ymin=9,ymax=11, color='r')
-    f.axes[3].vlines(x=154,ymin=79,ymax=97, color='r')
-    f.axes[5].vlines(x=154,ymin=20,ymax=24, color='r')
+    f.axes[3].vlines(x=154,ymin=63,ymax=113, color='r')
+    f.axes[5].vlines(x=154,ymin=12,ymax=32, color='r')
     # Dec 2017
     f.axes[1].vlines(x=155,ymin=9,ymax=11, color='r')
-    f.axes[3].vlines(x=155,ymin=79,ymax=97, color='r')
-    f.axes[5].vlines(x=155,ymin=16,ymax=20, color='r')
+    f.axes[3].vlines(x=155,ymin=63,ymax=113, color='r')
+    f.axes[5].vlines(x=155,ymin=8,ymax=28, color='r')
     # Jan 2018
     f.axes[1].vlines(x=156,ymin=9,ymax=11, color='r')
-    f.axes[3].vlines(x=156,ymin=79,ymax=97, color='r')
-    f.axes[5].vlines(x=156,ymin=10,ymax=12, color='r')
+    f.axes[3].vlines(x=156,ymin=63,ymax=113, color='r')
+    f.axes[5].vlines(x=156,ymin=1,ymax=21, color='r')
     # Feb 2018
     f.axes[1].vlines(x=157,ymin=9,ymax=11, color='r')
-    f.axes[3].vlines(x=157,ymin=79,ymax=97, color='r')
-    f.axes[5].vlines(x=157,ymin=14,ymax=18, color='r')
+    f.axes[3].vlines(x=157,ymin=63,ymax=113, color='r')
+    f.axes[5].vlines(x=157,ymin=6,ymax=26, color='r')
     # March 2018
     f.axes[1].vlines(x=158,ymin=8,ymax=10, color='r')
-    f.axes[2].vlines(x=158,ymin=226,ymax=276, color='r')
-    f.axes[3].vlines(x=158,ymin=79,ymax=97, color='r')
-    f.axes[4].vlines(x=158,ymin=22,ymax=26, color='r')
-    f.axes[5].vlines(x=158,ymin=14,ymax=18, color='r')
+    f.axes[3].vlines(x=158,ymin=63,ymax=113, color='r')
+    f.axes[4].vlines(x=158,ymin=19,ymax=29, color='r')
+    f.axes[5].vlines(x=158,ymin=6,ymax=26, color='r')
     # April 2018
     f.axes[1].vlines(x=159,ymin=8,ymax=10, color='r')
-    f.axes[3].vlines(x=159,ymin=91,ymax=111, color='r')
-    f.axes[5].vlines(x=159,ymin=14,ymax=18, color='r')
+    f.axes[3].vlines(x=159,ymin=76,ymax=126, color='r')
+    f.axes[5].vlines(x=159,ymin=6,ymax=26, color='r')
     # May 2018
     f.axes[1].vlines(x=160,ymin=8,ymax=10, color='r')
-    f.axes[3].vlines(x=160,ymin=105,ymax=129, color='r')
-    f.axes[5].vlines(x=160,ymin=21,ymax=25, color='r')
+    f.axes[3].vlines(x=160,ymin=92,ymax=142, color='r')
+    f.axes[5].vlines(x=160,ymin=13,ymax=33, color='r')
     # June 2018
     f.axes[1].vlines(x=161,ymin=8,ymax=10, color='r')
-    f.axes[3].vlines(x=161,ymin=93,ymax=113, color='r')
-    f.axes[5].vlines(x=161,ymin=21,ymax=25, color='r')
+    f.axes[3].vlines(x=161,ymin=78,ymax=128, color='r')
+    f.axes[5].vlines(x=161,ymin=13,ymax=33, color='r')
     # July 2018
     f.axes[1].vlines(x=162,ymin=8,ymax=10, color='r')
-    f.axes[3].vlines(x=162,ymin=93,ymax=113, color='r')
-    f.axes[5].vlines(x=162,ymin=20,ymax=24, color='r')
+    f.axes[3].vlines(x=162,ymin=78,ymax=128, color='r')
+    f.axes[5].vlines(x=162,ymin=12,ymax=32, color='r')
     # Aug 2018
-    f.axes[3].vlines(x=163,ymin=92,ymax=112, color='r')
-    f.axes[5].vlines(x=163,ymin=20,ymax=24, color='r')
+    f.axes[3].vlines(x=163,ymin=77,ymax=127, color='r')
+    f.axes[5].vlines(x=163,ymin=12,ymax=32, color='r')
     # Sept 2018
-    f.axes[3].vlines(x=164,ymin=95,ymax=117, color='r')
-    f.axes[5].vlines(x=164,ymin=20,ymax=24, color='r')
+    f.axes[3].vlines(x=164,ymin=81,ymax=131, color='r')
+    f.axes[5].vlines(x=164,ymin=12,ymax=32, color='r')
     # Oct 2018
-    f.axes[3].vlines(x=165,ymin=91,ymax=111, color='r')
-    f.axes[5].vlines(x=165,ymin=19,ymax=23, color='r')
+    f.axes[3].vlines(x=165,ymin=76,ymax=126, color='r')
+    f.axes[5].vlines(x=165,ymin=11,ymax=31, color='r')
     # Nov 2018
-    f.axes[3].vlines(x=166,ymin=84,ymax=102, color='r')
-    f.axes[5].vlines(x=166,ymin=8,ymax=10, color='r')
+    f.axes[3].vlines(x=166,ymin=68,ymax=118, color='r')
+    f.axes[5].vlines(x=166,ymin=1,ymax=19, color='r')
     # Dec 2018
-    f.axes[3].vlines(x=167,ymin=80,ymax=98, color='r')
-    f.axes[5].vlines(x=167,ymin=8,ymax=10, color='r')
+    f.axes[3].vlines(x=167,ymin=64,ymax=114, color='r')
+    f.axes[5].vlines(x=167,ymin=1,ymax=19, color='r')
     # Jan 2019
-    f.axes[3].vlines(x=168,ymin=80,ymax=98, color='r')
-    f.axes[5].vlines(x=168,ymin=8,ymax=10, color='r')
+    f.axes[3].vlines(x=168,ymin=64,ymax=114, color='r')
+    f.axes[5].vlines(x=168,ymin=1,ymax=19, color='r')
     # Feb 2019
-    f.axes[3].vlines(x=169,ymin=78,ymax=96, color='r')
-    f.axes[5].vlines(x=169,ymin=9,ymax=11, color='r')
+    f.axes[3].vlines(x=169,ymin=62,ymax=112, color='r')
+    f.axes[5].vlines(x=169,ymin=1,ymax=20, color='r')
     # March 2019
-    f.axes[2].vlines(x=170,ymin=250,ymax=306, color='r')
-    f.axes[3].vlines(x=170,ymin=78,ymax=96, color='r')
-    f.axes[4].vlines(x=170,ymin=33,ymax=41, color='r')
-    f.axes[5].vlines(x=170,ymin=8,ymax=10, color='r')
+    f.axes[2].vlines(x=170,ymin=253,ymax=303, color='r')
+    f.axes[3].vlines(x=170,ymin=62,ymax=112, color='r')
+    f.axes[4].vlines(x=170,ymin=32,ymax=42, color='r')
+    f.axes[5].vlines(x=170,ymin=1,ymax=19, color='r')
     # April 2019
-    f.axes[3].vlines(x=171,ymin=91,ymax=111, color='r')
-    f.axes[5].vlines(x=171,ymin=7,ymax=9, color='r')
+    f.axes[3].vlines(x=171,ymin=76,ymax=126, color='r')
+    f.axes[5].vlines(x=171,ymin=1,ymax=18, color='r')
     # May 2019
-    f.axes[3].vlines(x=172,ymin=99,ymax=121, color='r')
-    f.axes[5].vlines(x=172,ymin=7,ymax=9, color='r')
+    f.axes[3].vlines(x=172,ymin=85,ymax=135, color='r')
+    f.axes[5].vlines(x=172,ymin=1,ymax=18, color='r')
     # June 2019
-    f.axes[3].vlines(x=173,ymin=80,ymax=98, color='r')
-    f.axes[5].vlines(x=173,ymin=7,ymax=9, color='r')
+    f.axes[3].vlines(x=173,ymin=64,ymax=114, color='r')
+    f.axes[5].vlines(x=173,ymin=1,ymax=18, color='r')
     # July 2019
-    f.axes[3].vlines(x=174,ymin=82,ymax=100, color='r')
-    f.axes[5].vlines(x=174,ymin=8,ymax=10, color='r')
+    f.axes[3].vlines(x=174,ymin=66,ymax=116, color='r')
+    f.axes[5].vlines(x=174,ymin=1,ymax=19, color='r')
     # Aug 2019
-    f.axes[3].vlines(x=175,ymin=82,ymax=100, color='r')
-    f.axes[5].vlines(x=175,ymin=8,ymax=10, color='r')  
+    f.axes[3].vlines(x=175,ymin=66,ymax=116, color='r')
+    f.axes[5].vlines(x=175,ymin=1,ymax=19, color='r')  
     # Sept 2019
-    f.axes[3].vlines(x=176,ymin=84,ymax=102, color='r')
-    f.axes[5].vlines(x=176,ymin=8,ymax=10, color='r')
+    f.axes[3].vlines(x=176,ymin=68,ymax=118, color='r')
+    f.axes[5].vlines(x=176,ymin=1,ymax=19, color='r')
     # Oct 2019
-    f.axes[3].vlines(x=177,ymin=79,ymax=97, color='r')
-    f.axes[5].vlines(x=177,ymin=8,ymax=10, color='r')
+    f.axes[3].vlines(x=177,ymin=63,ymax=113, color='r')
+    f.axes[5].vlines(x=177,ymin=1,ymax=19, color='r')
     # Nov 2019
-    f.axes[3].vlines(x=178,ymin=78,ymax=96, color='r')
-    f.axes[5].vlines(x=178,ymin=8,ymax=10, color='r')
+    f.axes[3].vlines(x=178,ymin=62,ymax=112, color='r')
+    f.axes[5].vlines(x=178,ymin=1,ymax=19, color='r')
     # Dec 2019
-    f.axes[3].vlines(x=179,ymin=72,ymax=88, color='r')
-    f.axes[5].vlines(x=179,ymin=9,ymax=11, color='r')
+    f.axes[3].vlines(x=179,ymin=55,ymax=105, color='r')
+    f.axes[5].vlines(x=179,ymin=1,ymax=20, color='r')
     # Jan 2020
-    f.axes[3].vlines(x=180,ymin=72,ymax=88, color='r')
-    f.axes[5].vlines(x=180,ymin=9,ymax=11, color='r')
+    f.axes[3].vlines(x=180,ymin=55,ymax=105, color='r')
+    f.axes[5].vlines(x=180,ymin=1,ymax=20, color='r')
     # Feb 2020
-    f.axes[3].vlines(x=181,ymin=71,ymax=87, color='r')
-    f.axes[5].vlines(x=181,ymin=7,ymax=9, color='r')
+    f.axes[3].vlines(x=181,ymin=54,ymax=104, color='r')
+    f.axes[5].vlines(x=181,ymin=1,ymax=18, color='r')
     # March 2020
     f.axes[2].vlines(x=182,ymin=222,ymax=272, color='r')
-    f.axes[4].vlines(x=182,ymin=32,ymax=39, color='r')
-    f.axes[3].vlines(x=182,ymin=73,ymax=89, color='r')
-    f.axes[5].vlines(x=182,ymin=6,ymax=8, color='r')
+    f.axes[4].vlines(x=182,ymin=30,ymax=40, color='r')
+    f.axes[3].vlines(x=182,ymin=56,ymax=106, color='r')
+    f.axes[5].vlines(x=182,ymin=1,ymax=17, color='r')
     # April 2020
     f.axes[1].vlines(x=183,ymin=14,ymax=17, color='r')
-    f.axes[3].vlines(x=183,ymin=73,ymax=89, color='r')
-    f.axes[5].vlines(x=183,ymin=6,ymax=8, color='r')
+    f.axes[3].vlines(x=183,ymin=56,ymax=106, color='r')
+    f.axes[5].vlines(x=183,ymin=1,ymax=17, color='r')
     # plot next set of filter lines
     f.axes[0].vlines(x=184,ymin=20,ymax=80, color='r')
     f.axes[1].vlines(x=184,ymin=14,ymax=17, color='r')
-    f.axes[3].vlines(x=184,ymin=73,ymax=89, color='r')
-    f.axes[5].vlines(x=184,ymin=17,ymax=21, color='r')
+    f.axes[3].vlines(x=184,ymin=56,ymax=106, color='r')
+    f.axes[5].vlines(x=184,ymin=9,ymax=29, color='r')
     f.axes[6].vlines(x=184,ymin=49,ymax=69, color='r')
     f.axes[7].vlines(x=184,ymin=9,ymax=29, color='r')
     f.axes[8].vlines(x=184,ymin=21,ymax=35, color='r')
