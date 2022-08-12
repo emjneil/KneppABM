@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 import sys
 
 
-
 chance_reproduceSapling = 0.10689392
 chance_reproduceYoungScrub = 0.24015217
 chance_regrowGrass = 0.30423892

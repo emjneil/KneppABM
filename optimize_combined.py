@@ -404,67 +404,161 @@ def run_optimizer():
 
 
 def graph_results():
-    output_parameters = run_optimizer()
+    # output_parameters = run_optimizer()
     
+    # # define the parameters
+    # chance_reproduceSapling =output_parameters["variable"][0]
+    # chance_reproduceYoungScrub = output_parameters["variable"][1]
+    # chance_regrowGrass =output_parameters["variable"][2]
+    # chance_saplingBecomingTree = output_parameters["variable"][3]
+    # chance_youngScrubMatures = output_parameters["variable"][4]
+    # chance_scrubOutcompetedByTree =output_parameters["variable"][5]
+    # chance_grassOutcompetedByTree =output_parameters["variable"][6]
+    # chance_grassOutcompetedByScrub = output_parameters["variable"][7]
+    # chance_saplingOutcompetedByTree = output_parameters["variable"][8]
+    # chance_saplingOutcompetedByScrub = output_parameters["variable"][9]
+    # chance_youngScrubOutcompetedByScrub =output_parameters["variable"][10]
+    # chance_youngScrubOutcompetedByTree =output_parameters["variable"][11]
+    # # initial values
+    # initial_roeDeer = 0.12
+    # initial_grassland = 0.8
+    # initial_woodland = 0.14
+    # initial_scrubland = 0.01
+    # roeDeer_reproduce = output_parameters["variable"][12]
+    # roeDeer_gain_from_grass = output_parameters["variable"][13]
+    # roeDeer_gain_from_Trees = output_parameters["variable"][14]
+    # roeDeer_gain_from_Scrub = output_parameters["variable"][15]
+    # roeDeer_gain_from_Saplings =output_parameters["variable"][16]
+    # roeDeer_gain_from_YoungScrub =output_parameters["variable"][17]
+
+    # fallowDeer_reproduce = output_parameters["variable"][18]
+    # fallowDeer_gain_from_grass = output_parameters["variable"][19]
+    # fallowDeer_gain_from_Trees =output_parameters["variable"][20]
+    # fallowDeer_gain_from_Scrub = output_parameters["variable"][21]
+    # fallowDeer_gain_from_Saplings = output_parameters["variable"][22]
+    # fallowDeer_gain_from_YoungScrub = output_parameters["variable"][23]
+
+    # redDeer_reproduce =output_parameters["variable"][24]
+    # redDeer_gain_from_grass = output_parameters["variable"][25]
+    # redDeer_gain_from_Trees = output_parameters["variable"][26]
+    # redDeer_gain_from_Scrub = output_parameters["variable"][27]
+    # redDeer_gain_from_Saplings = output_parameters["variable"][28]
+    # redDeer_gain_from_YoungScrub = output_parameters["variable"][29]
+
+    # ponies_gain_from_grass = output_parameters["variable"][30]
+    # ponies_gain_from_Trees = output_parameters["variable"][31]
+    # ponies_gain_from_Scrub = output_parameters["variable"][32]
+    # ponies_gain_from_Saplings = output_parameters["variable"][33]
+    # ponies_gain_from_YoungScrub = output_parameters["variable"][34]
+
+    # cows_reproduce = output_parameters["variable"][35]
+    # cows_gain_from_grass = output_parameters["variable"][36]
+    # cows_gain_from_Trees = output_parameters["variable"][37]
+    # cows_gain_from_Scrub = output_parameters["variable"][38]
+    # cows_gain_from_Saplings = output_parameters["variable"][39]
+    # cows_gain_from_YoungScrub = output_parameters["variable"][40]
+
+    # pigs_reproduce = output_parameters["variable"][41]
+    # pigs_gain_from_grass = output_parameters["variable"][42]
+    # pigs_gain_from_Trees = output_parameters["variable"][43]
+    # pigs_gain_from_Scrub = output_parameters["variable"][44]
+    # pigs_gain_from_Saplings =output_parameters["variable"][45]
+    # pigs_gain_from_YoungScrub =output_parameters["variable"][46]
+
+    # max_start_saplings = 0.1
+    # max_start_youngScrub = 0.1
+
     # define the parameters
-    chance_reproduceSapling =output_parameters["variable"][0]
-    chance_reproduceYoungScrub = output_parameters["variable"][1]
-    chance_regrowGrass =output_parameters["variable"][2]
-    chance_saplingBecomingTree = output_parameters["variable"][3]
-    chance_youngScrubMatures = output_parameters["variable"][4]
-    chance_scrubOutcompetedByTree =output_parameters["variable"][5]
-    chance_grassOutcompetedByTree =output_parameters["variable"][6]
-    chance_grassOutcompetedByScrub = output_parameters["variable"][7]
-    chance_saplingOutcompetedByTree = output_parameters["variable"][8]
-    chance_saplingOutcompetedByScrub = output_parameters["variable"][9]
-    chance_youngScrubOutcompetedByScrub =output_parameters["variable"][10]
-    chance_youngScrubOutcompetedByTree =output_parameters["variable"][11]
+    chance_reproduceSapling = 0.04206406
+    chance_reproduceYoungScrub =0.1109531
+    chance_regrowGrass = 0.24463218
+    chance_saplingBecomingTree = 0.00289472
+    chance_youngScrubMatures = 0.00601638
+    chance_scrubOutcompetedByTree = 0.03450849
+    chance_grassOutcompetedByTree = 0.28874493
+    chance_grassOutcompetedByScrub = 0.29790348
+    chance_saplingOutcompetedByTree = 0.35425409
+    chance_saplingOutcompetedByScrub =0.25885052
+    chance_youngScrubOutcompetedByScrub = 0.37929889
+    chance_youngScrubOutcompetedByTree = 0.3982258
+
     # initial values
     initial_roeDeer = 0.12
-    initial_grassland = 0.8
-    initial_woodland = 0.14
-    initial_scrubland = 0.01
-    roeDeer_reproduce = output_parameters["variable"][12]
-    roeDeer_gain_from_grass = output_parameters["variable"][13]
-    roeDeer_gain_from_Trees = output_parameters["variable"][14]
-    roeDeer_gain_from_Scrub = output_parameters["variable"][15]
-    roeDeer_gain_from_Saplings =output_parameters["variable"][16]
-    roeDeer_gain_from_YoungScrub =output_parameters["variable"][17]
+    initial_grassland = 0.1
+    initial_woodland = 0.01
+    initial_scrubland = 0.005
 
-    fallowDeer_reproduce = output_parameters["variable"][18]
-    fallowDeer_gain_from_grass = output_parameters["variable"][19]
-    fallowDeer_gain_from_Trees =output_parameters["variable"][20]
-    fallowDeer_gain_from_Scrub = output_parameters["variable"][21]
-    fallowDeer_gain_from_Saplings = output_parameters["variable"][22]
-    fallowDeer_gain_from_YoungScrub = output_parameters["variable"][23]
-
-    redDeer_reproduce =output_parameters["variable"][24]
-    redDeer_gain_from_grass = output_parameters["variable"][25]
-    redDeer_gain_from_Trees = output_parameters["variable"][26]
-    redDeer_gain_from_Scrub = output_parameters["variable"][27]
-    redDeer_gain_from_Saplings = output_parameters["variable"][28]
-    redDeer_gain_from_YoungScrub = output_parameters["variable"][29]
-
-    ponies_gain_from_grass = output_parameters["variable"][30]
-    ponies_gain_from_Trees = output_parameters["variable"][31]
-    ponies_gain_from_Scrub = output_parameters["variable"][32]
-    ponies_gain_from_Saplings = output_parameters["variable"][33]
-    ponies_gain_from_YoungScrub = output_parameters["variable"][34]
-
-    cows_reproduce = output_parameters["variable"][35]
-    cows_gain_from_grass = output_parameters["variable"][36]
-    cows_gain_from_Trees = output_parameters["variable"][37]
-    cows_gain_from_Scrub = output_parameters["variable"][38]
-    cows_gain_from_Saplings = output_parameters["variable"][39]
-    cows_gain_from_YoungScrub = output_parameters["variable"][40]
-
-    pigs_reproduce = output_parameters["variable"][41]
-    pigs_gain_from_grass = output_parameters["variable"][42]
-    pigs_gain_from_Trees = output_parameters["variable"][43]
-    pigs_gain_from_Scrub = output_parameters["variable"][44]
-    pigs_gain_from_Saplings =output_parameters["variable"][45]
-    pigs_gain_from_YoungScrub =output_parameters["variable"][46]
-
+    # roe deer
+    roeDeer_reproduce = 0.18215313
+    roeDeer_gain_from_grass = 0.69330732
+    roeDeer_gain_from_Trees = 0.6982617
+    roeDeer_gain_from_Scrub = 0.46792347
+    roeDeer_gain_from_Saplings =0.14360982
+    roeDeer_gain_from_YoungScrub =0.10447744
+    # Fallow deer
+    fallowDeer_reproduce = 0.28586154
+    fallowDeer_gain_from_grass =0.60193723
+    fallowDeer_gain_from_Trees = 0.62907582
+    fallowDeer_gain_from_Scrub = 0.41669232
+    fallowDeer_gain_from_Saplings = 0.13022322
+    fallowDeer_gain_from_YoungScrub = 0.07403832
+    # Red deer
+    redDeer_reproduce = 0.3065381
+    redDeer_gain_from_grass = 0.5464753
+    redDeer_gain_from_Trees = 0.57759807
+    redDeer_gain_from_Scrub = 0.39375145
+    redDeer_gain_from_Saplings = 0.11916663
+    redDeer_gain_from_YoungScrub = 0.06335441
+    # Exmoor ponies
+    ponies_gain_from_grass = 0.46791793
+    ponies_gain_from_Trees = 0.50082365
+    ponies_gain_from_Scrub = 0.34385853
+    ponies_gain_from_Saplings = 0.10451826
+    ponies_gain_from_YoungScrub =0.05673449
+    # Longhorn cattle
+    cows_reproduce = 0.20204395
+    cows_gain_from_grass = 0.44058728
+    cows_gain_from_Trees = 0.45394087
+    cows_gain_from_Scrub = 0.2761602
+    cows_gain_from_Saplings = 0.08643107
+    cows_gain_from_YoungScrub = 0.04245426
+    # Tamworth pigs
+    pigs_reproduce = 0.33496453
+    pigs_gain_from_grass =0.39056552
+    pigs_gain_from_Trees = 0.6909069
+    pigs_gain_from_Scrub = 0.47493354
+    pigs_gain_from_Saplings = 0.07887992
+    pigs_gain_from_YoungScrub = 0.08125611
+    # # stocking values
+    fallowDeer_stocking = 247
+    cattle_stocking = 81
+    redDeer_stocking = 35
+    tamworthPig_stocking = 7
+    exmoor_stocking = 15
+    # # euro bison parameters
+    reproduce_bison = 0
+    # bison should have higher impact than any other consumer
+    bison_gain_from_grass =  0
+    bison_gain_from_Trees =0
+    bison_gain_from_Scrub =0
+    bison_gain_from_Saplings = 0
+    bison_gain_from_YoungScrub = 0  
+    # euro elk parameters
+    reproduce_elk = 0
+    # bison should have higher impact than any other consumer
+    elk_gain_from_grass =  0
+    elk_gain_from_Trees = 0
+    elk_gain_from_Scrub = 0
+    elk_gain_from_Saplings =  0
+    elk_gain_from_YoungScrub =  0
+    # reindeer parameters
+    reproduce_reindeer = 0
+    # reindeer should have impacts between red and fallow deer
+    reindeer_gain_from_grass = 0
+    reindeer_gain_from_Trees =0
+    reindeer_gain_from_Scrub =0
+    reindeer_gain_from_Saplings = 0
+    reindeer_gain_from_YoungScrub = 0
     max_start_saplings = 0.1
     max_start_youngScrub = 0.1
 
@@ -478,360 +572,363 @@ def graph_results():
         fallowDeer_reproduce, fallowDeer_gain_from_grass, fallowDeer_gain_from_Trees, fallowDeer_gain_from_Scrub, fallowDeer_gain_from_Saplings, fallowDeer_gain_from_YoungScrub, 
         redDeer_reproduce, redDeer_gain_from_grass, redDeer_gain_from_Trees, redDeer_gain_from_Scrub, redDeer_gain_from_Saplings, redDeer_gain_from_YoungScrub, 
         pigs_reproduce, pigs_gain_from_grass, pigs_gain_from_Trees, pigs_gain_from_Scrub, pigs_gain_from_Saplings, pigs_gain_from_YoungScrub, 
-        max_start_saplings, max_start_youngScrub,
-        width = 25, height = 18, max_time = 184, reintroduction = True, 
-        RC1_noFood = False, RC2_noTreesScrub = False, RC3_noTrees = False, RC4_noScrub = False)
-    model.run_model()
-
+        fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
+        reproduce_bison, bison_gain_from_grass, bison_gain_from_Trees, bison_gain_from_Scrub, bison_gain_from_Saplings, bison_gain_from_YoungScrub,
+        reproduce_elk, elk_gain_from_grass, elk_gain_from_Trees, elk_gain_from_Scrub, elk_gain_from_Saplings, elk_gain_from_YoungScrub,
+        reproduce_reindeer, reindeer_gain_from_grass, reindeer_gain_from_Trees, reindeer_gain_from_Scrub, reindeer_gain_from_Saplings, reindeer_gain_from_YoungScrub,
+        width = 25, height = 18, max_time = 184, reintroduction = True,
+        introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
     # first graph:  does it pass the filters? looking at the number of individual trees, etc.
+    model.run_model()
     final_results = model.datacollector.get_model_vars_dataframe()
 
-# y values - number of trees, scrub, etc. 
-    y_values = final_results.drop(['Time', "Bare ground","Grassland", "Woodland", "Thorny Scrub", "Saplings grown up", "Saplings Outcompeted by Trees", "Saplings Outcompeted by Scrub", "Saplings eaten by roe deer", "Saplings eaten by Exmoor pony", "Saplings eaten by Fallow deer", "Saplings eaten by longhorn cattle", "Saplings eaten by red deer",  "Saplings eaten by pigs", "Young scrub grown up", "Young Scrub Outcompeted by Trees", "Young Scrub Outcompeted by Scrub", "Young Scrub eaten by roe deer", "Young Scrub eaten by Exmoor pony", 
-    "Young Scrub eaten by Fallow deer", "Young Scrub eaten by longhorn cattle", "Young Scrub eaten by red deer", "Young Scrub eaten by pigs", 
-    "Grass Outcompeted by Trees", "Grass Outcompeted by Scrub", "Grass eaten by roe deer", "Grass eaten by Exmoor pony", "Grass eaten by Fallow deer", "Grass eaten by longhorn cattle", "Grass eaten by red deer", "Grass eaten by pigs", 
-    "Scrub Outcompeted by Trees", "Scrub eaten by roe deer", "Scrub eaten by Exmoor pony", "Scrub eaten by Fallow deer", "Scrub eaten by longhorn cattle", 
-    "Scrub eaten by red deer", "Scrub eaten by pigs", "Trees eaten by roe deer", "Trees eaten by Exmoor pony", "Trees eaten by Fallow deer", "Trees eaten by longhorn cattle",  "Trees eaten by red deer", "Trees eaten by pigs", "Boars", "Sow", "Piglet"], axis=1).values.flatten()           
-    species_list = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas"], 185) 
-    indices = np.repeat(final_results['Time'], 12)
-    final_df = pd.DataFrame(
-    {'Abundance': y_values, 'Ecosystem Element': species_list, 'Time': indices})
-    colors = ["#6788ee"]
-    g = sns.FacetGrid(final_df, col="Ecosystem Element", palette = colors, col_wrap=4, sharey = False)
-    g.map(sns.lineplot, 'Time', 'Abundance')
-    # add subplot titles
-    axes = g.axes.flatten()
-    # fill between the quantiles
-    axes = g.axes.flatten()
-    axes[0].set_title("Roe deer")
-    axes[1].set_title("Exmoor pony")
-    axes[2].set_title("Fallow deer")
-    axes[3].set_title("Longhorn cattle")
-    axes[4].set_title("Red deer")
-    axes[5].set_title("Tamworth pigs")
-    axes[6].set_title("Grass")
-    axes[7].set_title("Mature Trees")
-    axes[8].set_title("Mature Scrub")
-    axes[9].set_title("Saplings")
-    axes[10].set_title("Young Scrub")
-    axes[11].set_title("Bare ground")
-    # stop the plots from overlapping
-    g.fig.suptitle("Optimizer Outputs")
-    plt.tight_layout()
-    plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/post_reintro/OptimOutputs_PostReintro_numbers.png')
-    plt.show()
 
-    # does it pass the filters - conditions?
-    y_values_conditions = final_results.drop(['Time', "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas", "Saplings grown up", "Saplings Outcompeted by Trees", "Saplings Outcompeted by Scrub", "Saplings eaten by roe deer", "Saplings eaten by Exmoor pony", "Saplings eaten by Fallow deer", "Saplings eaten by longhorn cattle", "Saplings eaten by red deer",  "Saplings eaten by pigs", "Young scrub grown up", "Young Scrub Outcompeted by Trees", "Young Scrub Outcompeted by Scrub", "Young Scrub eaten by roe deer", "Young Scrub eaten by Exmoor pony", 
-    "Young Scrub eaten by Fallow deer", "Young Scrub eaten by longhorn cattle", "Young Scrub eaten by red deer", "Young Scrub eaten by pigs", 
-    "Grass Outcompeted by Trees", "Grass Outcompeted by Scrub", "Grass eaten by roe deer", "Grass eaten by Exmoor pony", "Grass eaten by Fallow deer", "Grass eaten by longhorn cattle", "Grass eaten by red deer", "Grass eaten by pigs", 
-     "Scrub Outcompeted by Trees", "Scrub eaten by roe deer", "Scrub eaten by Exmoor pony", "Scrub eaten by Fallow deer", "Scrub eaten by longhorn cattle", 
-     "Scrub eaten by red deer", "Scrub eaten by pigs", "Trees eaten by roe deer", "Trees eaten by Exmoor pony", "Trees eaten by Fallow deer", "Trees eaten by longhorn cattle",  "Trees eaten by red deer", "Trees eaten by pigs", "Boars", "Sow", "Piglet"], axis=1).values.flatten()            
-    # species list. this should be +1 the number of simulations
-    species_list_conditions = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"], 185) 
-    # indices
-    indices_conditions = np.repeat(final_results['Time'], 10)
-    final_df_condit = pd.DataFrame(
-    {'Abundance': y_values_conditions, 'Ecosystem Element': species_list_conditions, 'Time': indices_conditions})
-    colors = ["#6788ee"]
-    # first graph: counterfactual & forecasting
-    f = sns.FacetGrid(final_df_condit, col="Ecosystem Element", palette = colors, col_wrap=4, sharey = False)
-    f.map(sns.lineplot, 'Time', 'Abundance')
-    # add subplot titles
-    axes = f.axes.flatten()
-    # fill between the quantiles
-    axes = f.axes.flatten()
-    axes[0].set_title("Roe deer")
-    axes[1].set_title("Exmoor pony")
-    axes[2].set_title("Fallow deer")
-    axes[3].set_title("Longhorn cattle")
-    axes[4].set_title("Red deer")
-    axes[5].set_title("Tamworth pigs")
-    axes[6].set_title("Grassland")
-    axes[7].set_title("Woodland")
-    axes[8].set_title("Thorny scrub")
-    axes[9].set_title("Bare ground")
-    # add filter lines
-    f.axes[0].vlines(x=50,ymin=6,ymax=40, color='r')
-    f.axes[6].vlines(x=50,ymin=49,ymax=90, color='r')
-    f.axes[7].vlines(x=50,ymin=7,ymax=27, color='r')
-    f.axes[8].vlines(x=50,ymin=1,ymax=21, color='r')
-    # plot post-reintro lines: April 2015
-    f.axes[1].vlines(x=123,ymin=9,ymax=11, color='r')
-    f.axes[3].vlines(x=123,ymin=104,ymax=127, color='r')
-    f.axes[5].vlines(x=123,ymin=20,ymax=24, color='r')
-    # May 2015
-    f.axes[3].vlines(x=124,ymin=116,ymax=142, color='r')
-    f.axes[5].vlines(x=124,ymin=13,ymax=15, color='r')
-    f.axes[1].vlines(x=124,ymin=9,ymax=11, color='r')
-    # June 2015
-    f.axes[3].vlines(x=125,ymin=116,ymax=142, color='r')
-    f.axes[1].vlines(x=125,ymin=9,ymax=11, color='r')
-    f.axes[5].vlines(x=125,ymin=13,ymax=15, color='r')
-    # July 2015
-    f.axes[3].vlines(x=126,ymin=116,ymax=142, color='r')
-    f.axes[1].vlines(x=126,ymin=9,ymax=11, color='r')
-    f.axes[5].vlines(x=126,ymin=13,ymax=15, color='r')
-    # Aug 2015
-    f.axes[3].vlines(x=127,ymin=116,ymax=142, color='r')
-    f.axes[1].vlines(x=127,ymin=9,ymax=11, color='r')
-    f.axes[5].vlines(x=127,ymin=13,ymax=15, color='r')
-    # Sept 2015
-    f.axes[3].vlines(x=128,ymin=117,ymax=143, color='r')
-    f.axes[1].vlines(x=128,ymin=9,ymax=11, color='r')
-    f.axes[5].vlines(x=128,ymin=13,ymax=15, color='r')
-    # Oct 2015
-    f.axes[3].vlines(x=129,ymin=82,ymax=100, color='r')
-    f.axes[1].vlines(x=129,ymin=9,ymax=11, color='r')
-    f.axes[5].vlines(x=129,ymin=13,ymax=15, color='r')
-    # Nov 2015
-    f.axes[3].vlines(x=130,ymin=82,ymax=100, color='r')
-    f.axes[1].vlines(x=130,ymin=9,ymax=11, color='r')
-    f.axes[5].vlines(x=130,ymin=12,ymax=14, color='r')
-    # Dec 2015
-    f.axes[3].vlines(x=131,ymin=77,ymax=94, color='r')
-    f.axes[1].vlines(x=131,ymin=9,ymax=11, color='r')
-    f.axes[5].vlines(x=131,ymin=12,ymax=14, color='r')
-    # Jan 2016
-    f.axes[3].vlines(x=132,ymin=77,ymax=94, color='r')
-    f.axes[1].vlines(x=132,ymin=9,ymax=11, color='r')
-    f.axes[5].vlines(x=132,ymin=9,ymax=11, color='r')
-    # Feb 2016
-    f.axes[1].vlines(x=133,ymin=9,ymax=11, color='r')
-    f.axes[3].vlines(x=133,ymin=77,ymax=94, color='r')
-    f.axes[5].vlines(x=133,ymin=7,ymax=9, color='r')
-    # March 2016
-    f.axes[1].vlines(x=134,ymin=10,ymax=12, color='r')
-    f.axes[3].vlines(x=134,ymin=77,ymax=94, color='r')
-    f.axes[2].vlines(x=134,ymin=126,ymax=154, color='r')
-    f.axes[4].vlines(x=134,ymin=23,ymax=29, color='r')
-    f.axes[5].vlines(x=134,ymin=8,ymax=10, color='r')
-    # April 2016
-    f.axes[1].vlines(x=135,ymin=10,ymax=12, color='r')
-    f.axes[3].vlines(x=135,ymin=93,ymax=113, color='r')
-    f.axes[5].vlines(x=135,ymin=8,ymax=10, color='r')
-    # May 2016
-    f.axes[1].vlines(x=136,ymin=10,ymax=12, color='r')
-    f.axes[3].vlines(x=136,ymin=97,ymax=119, color='r')
-    f.axes[5].vlines(x=136,ymin=15,ymax=19, color='r')
-    # June 2016
-    f.axes[1].vlines(x=137,ymin=10,ymax=12, color='r')
-    f.axes[3].vlines(x=137,ymin=80,ymax=98, color='r')
-    f.axes[5].vlines(x=137,ymin=15,ymax=19, color='r')
-    # July 2016
-    f.axes[1].vlines(x=138,ymin=10,ymax=12, color='r')
-    f.axes[3].vlines(x=138,ymin=78,ymax=96, color='r')
-    f.axes[5].vlines(x=138,ymin=15,ymax=19, color='r')
-    # Aug 2016
-    f.axes[1].vlines(x=139,ymin=10,ymax=12, color='r')
-    f.axes[3].vlines(x=139,ymin=78,ymax=96, color='r')
-    f.axes[5].vlines(x=139,ymin=15,ymax=19, color='r')
-    # Sept 2016
-    f.axes[1].vlines(x=140,ymin=10,ymax=12, color='r')
-    f.axes[3].vlines(x=140,ymin=87,ymax=107, color='r')
-    f.axes[5].vlines(x=140,ymin=15,ymax=19, color='r')
-    # Oct 2016
-    f.axes[1].vlines(x=141,ymin=10,ymax=12, color='r')
-    f.axes[3].vlines(x=141,ymin=87,ymax=107, color='r')
-    f.axes[5].vlines(x=141,ymin=15,ymax=19, color='r')
-    # Nov 2016
-    f.axes[1].vlines(x=142,ymin=10,ymax=12, color='r')
-    f.axes[3].vlines(x=142,ymin=83,ymax=101, color='r')
-    f.axes[5].vlines(x=142,ymin=15,ymax=19, color='r')
-    # Dec 2016
-    f.axes[1].vlines(x=143,ymin=10,ymax=12, color='r')
-    f.axes[3].vlines(x=143,ymin=71,ymax=87, color='r')
-    f.axes[5].vlines(x=143,ymin=12,ymax=14, color='r')
-    # Jan 2017
-    f.axes[1].vlines(x=144,ymin=10,ymax=12, color='r')
-    f.axes[3].vlines(x=144,ymin=71,ymax=87, color='r')
-    f.axes[5].vlines(x=144,ymin=8,ymax=10, color='r')
-    # Feb 2017
-    f.axes[1].vlines(x=145,ymin=10,ymax=12, color='r')
-    f.axes[3].vlines(x=145,ymin=71,ymax=87, color='r')
-    f.axes[5].vlines(x=145,ymin=6,ymax=8, color='r')
-    # March 2017
-    f.axes[1].vlines(x=146,ymin=9,ymax=11, color='r')
-    f.axes[2].vlines(x=146,ymin=149,ymax=182, color='r')
-    f.axes[3].vlines(x=146,ymin=71,ymax=87, color='r')
-    f.axes[5].vlines(x=146,ymin=6,ymax=8, color='r')
-    # April 2017
-    f.axes[1].vlines(x=147,ymin=9,ymax=11, color='r')
-    f.axes[3].vlines(x=147,ymin=90,ymax=110, color='r')
-    f.axes[5].vlines(x=147,ymin=20,ymax=24, color='r')
-    # May 2017
-    f.axes[1].vlines(x=148,ymin=9,ymax=11, color='r')
-    f.axes[3].vlines(x=148,ymin=98,ymax=120, color='r')
-    f.axes[5].vlines(x=148,ymin=20,ymax=24, color='r')
-    # June 2017
-    f.axes[1].vlines(x=149,ymin=9,ymax=11, color='r')
-    f.axes[3].vlines(x=149,ymin=85,ymax=103, color='r')
-    f.axes[5].vlines(x=149,ymin=20,ymax=24, color='r')
-    # July 2017
-    f.axes[1].vlines(x=150,ymin=9,ymax=11, color='r')
-    f.axes[3].vlines(x=150,ymin=85,ymax=103, color='r')
-    f.axes[5].vlines(x=150,ymin=20,ymax=24, color='r')
-    # Aug 2017
-    f.axes[1].vlines(x=151,ymin=9,ymax=11, color='r')
-    f.axes[3].vlines(x=151,ymin=85,ymax=103, color='r')
-    f.axes[5].vlines(x=151,ymin=20,ymax=24, color='r')
-    # Sept 2017
-    f.axes[1].vlines(x=152,ymin=9,ymax=11, color='r')
-    f.axes[3].vlines(x=152,ymin=81,ymax=99, color='r')
-    f.axes[5].vlines(x=152,ymin=20,ymax=24, color='r')
-    # Oct 2017
-    f.axes[1].vlines(x=153,ymin=9,ymax=11, color='r')
-    f.axes[3].vlines(x=153,ymin=79,ymax=97, color='r')
-    f.axes[5].vlines(x=153,ymin=20,ymax=24, color='r')
-    # Nov 2017
-    f.axes[1].vlines(x=154,ymin=9,ymax=11, color='r')
-    f.axes[3].vlines(x=154,ymin=79,ymax=97, color='r')
-    f.axes[5].vlines(x=154,ymin=20,ymax=24, color='r')
-    # Dec 2017
-    f.axes[1].vlines(x=155,ymin=9,ymax=11, color='r')
-    f.axes[3].vlines(x=155,ymin=79,ymax=97, color='r')
-    f.axes[5].vlines(x=155,ymin=16,ymax=20, color='r')
-    # Jan 2018
-    f.axes[1].vlines(x=156,ymin=9,ymax=11, color='r')
-    f.axes[3].vlines(x=156,ymin=79,ymax=97, color='r')
-    f.axes[5].vlines(x=156,ymin=10,ymax=12, color='r')
-    # Feb 2018
-    f.axes[1].vlines(x=157,ymin=9,ymax=11, color='r')
-    f.axes[3].vlines(x=157,ymin=79,ymax=97, color='r')
-    f.axes[5].vlines(x=157,ymin=14,ymax=18, color='r')
-    # March 2018
-    f.axes[1].vlines(x=158,ymin=8,ymax=10, color='r')
-    f.axes[2].vlines(x=158,ymin=226,ymax=276, color='r')
-    f.axes[3].vlines(x=158,ymin=79,ymax=97, color='r')
-    f.axes[4].vlines(x=158,ymin=22,ymax=26, color='r')
-    f.axes[5].vlines(x=158,ymin=14,ymax=18, color='r')
-    # April 2018
-    f.axes[1].vlines(x=159,ymin=8,ymax=10, color='r')
-    f.axes[3].vlines(x=159,ymin=91,ymax=111, color='r')
-    f.axes[5].vlines(x=159,ymin=14,ymax=18, color='r')
-    # May 2018
-    f.axes[1].vlines(x=160,ymin=8,ymax=10, color='r')
-    f.axes[3].vlines(x=160,ymin=105,ymax=129, color='r')
-    f.axes[5].vlines(x=160,ymin=21,ymax=25, color='r')
-    # June 2018
-    f.axes[1].vlines(x=161,ymin=8,ymax=10, color='r')
-    f.axes[3].vlines(x=161,ymin=93,ymax=113, color='r')
-    f.axes[5].vlines(x=161,ymin=21,ymax=25, color='r')
-    # July 2018
-    f.axes[1].vlines(x=162,ymin=8,ymax=10, color='r')
-    f.axes[3].vlines(x=162,ymin=93,ymax=113, color='r')
-    f.axes[5].vlines(x=162,ymin=20,ymax=24, color='r')
-    # Aug 2018
-    f.axes[3].vlines(x=163,ymin=92,ymax=112, color='r')
-    f.axes[5].vlines(x=163,ymin=20,ymax=24, color='r')
-    # Sept 2018
-    f.axes[3].vlines(x=164,ymin=95,ymax=117, color='r')
-    f.axes[5].vlines(x=164,ymin=20,ymax=24, color='r')
-    # Oct 2018
-    f.axes[3].vlines(x=165,ymin=91,ymax=111, color='r')
-    f.axes[5].vlines(x=165,ymin=19,ymax=23, color='r')
-    # Nov 2018
-    f.axes[3].vlines(x=166,ymin=84,ymax=102, color='r')
-    f.axes[5].vlines(x=166,ymin=8,ymax=10, color='r')
-    # Dec 2018
-    f.axes[3].vlines(x=167,ymin=80,ymax=98, color='r')
-    f.axes[5].vlines(x=167,ymin=8,ymax=10, color='r')
-    # Jan 2019
-    f.axes[3].vlines(x=168,ymin=80,ymax=98, color='r')
-    f.axes[5].vlines(x=168,ymin=8,ymax=10, color='r')
-    # Feb 2019
-    f.axes[3].vlines(x=169,ymin=78,ymax=96, color='r')
-    f.axes[5].vlines(x=169,ymin=9,ymax=11, color='r')
-    # March 2019
-    f.axes[2].vlines(x=170,ymin=250,ymax=306, color='r')
-    f.axes[3].vlines(x=170,ymin=78,ymax=96, color='r')
-    f.axes[4].vlines(x=170,ymin=33,ymax=41, color='r')
-    f.axes[5].vlines(x=170,ymin=8,ymax=10, color='r')
-    # April 2019
-    f.axes[3].vlines(x=171,ymin=91,ymax=111, color='r')
-    f.axes[5].vlines(x=171,ymin=7,ymax=9, color='r')
-    # May 2019
-    f.axes[3].vlines(x=172,ymin=99,ymax=121, color='r')
-    f.axes[5].vlines(x=172,ymin=7,ymax=9, color='r')
-    # June 2019
-    f.axes[3].vlines(x=173,ymin=80,ymax=98, color='r')
-    f.axes[5].vlines(x=173,ymin=7,ymax=9, color='r')
-    # July 2019
-    f.axes[3].vlines(x=174,ymin=82,ymax=100, color='r')
-    f.axes[5].vlines(x=174,ymin=8,ymax=10, color='r')
-    # Aug 2019
-    f.axes[3].vlines(x=175,ymin=82,ymax=100, color='r')
-    f.axes[5].vlines(x=175,ymin=8,ymax=10, color='r')  
-    # Sept 2019
-    f.axes[3].vlines(x=176,ymin=84,ymax=102, color='r')
-    f.axes[5].vlines(x=176,ymin=8,ymax=10, color='r')
-    # Oct 2019
-    f.axes[3].vlines(x=177,ymin=79,ymax=97, color='r')
-    f.axes[5].vlines(x=177,ymin=8,ymax=10, color='r')
-    # Nov 2019
-    f.axes[3].vlines(x=178,ymin=78,ymax=96, color='r')
-    f.axes[5].vlines(x=178,ymin=8,ymax=10, color='r')
-    # Dec 2019
-    f.axes[3].vlines(x=179,ymin=72,ymax=88, color='r')
-    f.axes[5].vlines(x=179,ymin=9,ymax=11, color='r')
-    # Jan 2020
-    f.axes[3].vlines(x=180,ymin=72,ymax=88, color='r')
-    f.axes[5].vlines(x=180,ymin=9,ymax=11, color='r')
-    # Feb 2020
-    f.axes[3].vlines(x=181,ymin=71,ymax=87, color='r')
-    f.axes[5].vlines(x=181,ymin=7,ymax=9, color='r')
-    # March 2020
-    f.axes[2].vlines(x=182,ymin=222,ymax=272, color='r')
-    f.axes[4].vlines(x=182,ymin=32,ymax=39, color='r')
-    f.axes[3].vlines(x=182,ymin=73,ymax=89, color='r')
-    f.axes[5].vlines(x=182,ymin=6,ymax=8, color='r')
-    # April 2020
-    f.axes[1].vlines(x=183,ymin=14,ymax=17, color='r')
-    f.axes[3].vlines(x=183,ymin=73,ymax=89, color='r')
-    f.axes[5].vlines(x=183,ymin=6,ymax=8, color='r')
-    # plot next set of filter lines
-    f.axes[0].vlines(x=184,ymin=20,ymax=80, color='r')
-    f.axes[1].vlines(x=184,ymin=14,ymax=17, color='r')
-    f.axes[3].vlines(x=184,ymin=73,ymax=89, color='r')
-    f.axes[5].vlines(x=184,ymin=17,ymax=21, color='r')
-    f.axes[6].vlines(x=184,ymin=49,ymax=69, color='r')
-    f.axes[7].vlines(x=184,ymin=9,ymax=29, color='r')
-    f.axes[8].vlines(x=184,ymin=21,ymax=35, color='r')
-    # stop the plots from overlapping
-    f.fig.suptitle("Optimizer Outputs")
-    plt.tight_layout()
-    plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/post_reintro/OptimOutputs_PostReintro_conditions.png')
-    plt.show()
+# # y values - number of trees, scrub, etc. 
+#     y_values = final_results.drop(['Time', "Bare ground","Grassland", "Woodland", "Thorny Scrub", "Saplings grown up", "Saplings Outcompeted by Trees", "Saplings Outcompeted by Scrub", "Saplings eaten by roe deer", "Saplings eaten by Exmoor pony", "Saplings eaten by Fallow deer", "Saplings eaten by longhorn cattle", "Saplings eaten by red deer",  "Saplings eaten by pigs", "Young scrub grown up", "Young Scrub Outcompeted by Trees", "Young Scrub Outcompeted by Scrub", "Young Scrub eaten by roe deer", "Young Scrub eaten by Exmoor pony", 
+#     "Young Scrub eaten by Fallow deer", "Young Scrub eaten by longhorn cattle", "Young Scrub eaten by red deer", "Young Scrub eaten by pigs", 
+#     "Grass Outcompeted by Trees", "Grass Outcompeted by Scrub", "Grass eaten by roe deer", "Grass eaten by Exmoor pony", "Grass eaten by Fallow deer", "Grass eaten by longhorn cattle", "Grass eaten by red deer", "Grass eaten by pigs", 
+#     "Scrub Outcompeted by Trees", "Scrub eaten by roe deer", "Scrub eaten by Exmoor pony", "Scrub eaten by Fallow deer", "Scrub eaten by longhorn cattle", 
+#     "Scrub eaten by red deer", "Scrub eaten by pigs", "Trees eaten by roe deer", "Trees eaten by Exmoor pony", "Trees eaten by Fallow deer", "Trees eaten by longhorn cattle",  "Trees eaten by red deer", "Trees eaten by pigs", "Boars", "Sow", "Piglet"], axis=1).values.flatten()           
+#     species_list = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas"], 185) 
+#     indices = np.repeat(final_results['Time'], 12)
+#     final_df = pd.DataFrame(
+#     {'Abundance': y_values, 'Ecosystem Element': species_list, 'Time': indices})
+#     colors = ["#6788ee"]
+#     g = sns.FacetGrid(final_df, col="Ecosystem Element", palette = colors, col_wrap=4, sharey = False)
+#     g.map(sns.lineplot, 'Time', 'Abundance')
+#     # add subplot titles
+#     axes = g.axes.flatten()
+#     # fill between the quantiles
+#     axes = g.axes.flatten()
+#     axes[0].set_title("Roe deer")
+#     axes[1].set_title("Exmoor pony")
+#     axes[2].set_title("Fallow deer")
+#     axes[3].set_title("Longhorn cattle")
+#     axes[4].set_title("Red deer")
+#     axes[5].set_title("Tamworth pigs")
+#     axes[6].set_title("Grass")
+#     axes[7].set_title("Mature Trees")
+#     axes[8].set_title("Mature Scrub")
+#     axes[9].set_title("Saplings")
+#     axes[10].set_title("Young Scrub")
+#     axes[11].set_title("Bare ground")
+#     # stop the plots from overlapping
+#     g.fig.suptitle("Optimizer Outputs")
+#     plt.tight_layout()
+#     plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/post_reintro/OptimOutputs_PostReintro_numbers.png')
+#     plt.show()
+
+#     # does it pass the filters - conditions?
+#     y_values_conditions = final_results.drop(['Time', "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas", "Saplings grown up", "Saplings Outcompeted by Trees", "Saplings Outcompeted by Scrub", "Saplings eaten by roe deer", "Saplings eaten by Exmoor pony", "Saplings eaten by Fallow deer", "Saplings eaten by longhorn cattle", "Saplings eaten by red deer",  "Saplings eaten by pigs", "Young scrub grown up", "Young Scrub Outcompeted by Trees", "Young Scrub Outcompeted by Scrub", "Young Scrub eaten by roe deer", "Young Scrub eaten by Exmoor pony", 
+#     "Young Scrub eaten by Fallow deer", "Young Scrub eaten by longhorn cattle", "Young Scrub eaten by red deer", "Young Scrub eaten by pigs", 
+#     "Grass Outcompeted by Trees", "Grass Outcompeted by Scrub", "Grass eaten by roe deer", "Grass eaten by Exmoor pony", "Grass eaten by Fallow deer", "Grass eaten by longhorn cattle", "Grass eaten by red deer", "Grass eaten by pigs", 
+#      "Scrub Outcompeted by Trees", "Scrub eaten by roe deer", "Scrub eaten by Exmoor pony", "Scrub eaten by Fallow deer", "Scrub eaten by longhorn cattle", 
+#      "Scrub eaten by red deer", "Scrub eaten by pigs", "Trees eaten by roe deer", "Trees eaten by Exmoor pony", "Trees eaten by Fallow deer", "Trees eaten by longhorn cattle",  "Trees eaten by red deer", "Trees eaten by pigs", "Boars", "Sow", "Piglet"], axis=1).values.flatten()            
+#     # species list. this should be +1 the number of simulations
+#     species_list_conditions = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"], 185) 
+#     # indices
+#     indices_conditions = np.repeat(final_results['Time'], 10)
+#     final_df_condit = pd.DataFrame(
+#     {'Abundance': y_values_conditions, 'Ecosystem Element': species_list_conditions, 'Time': indices_conditions})
+#     colors = ["#6788ee"]
+#     # first graph: counterfactual & forecasting
+#     f = sns.FacetGrid(final_df_condit, col="Ecosystem Element", palette = colors, col_wrap=4, sharey = False)
+#     f.map(sns.lineplot, 'Time', 'Abundance')
+#     # add subplot titles
+#     axes = f.axes.flatten()
+#     # fill between the quantiles
+#     axes = f.axes.flatten()
+#     axes[0].set_title("Roe deer")
+#     axes[1].set_title("Exmoor pony")
+#     axes[2].set_title("Fallow deer")
+#     axes[3].set_title("Longhorn cattle")
+#     axes[4].set_title("Red deer")
+#     axes[5].set_title("Tamworth pigs")
+#     axes[6].set_title("Grassland")
+#     axes[7].set_title("Woodland")
+#     axes[8].set_title("Thorny scrub")
+#     axes[9].set_title("Bare ground")
+#     # add filter lines
+#     f.axes[0].vlines(x=50,ymin=6,ymax=40, color='r')
+#     f.axes[6].vlines(x=50,ymin=49,ymax=90, color='r')
+#     f.axes[7].vlines(x=50,ymin=7,ymax=27, color='r')
+#     f.axes[8].vlines(x=50,ymin=1,ymax=21, color='r')
+#     # plot post-reintro lines: April 2015
+#     f.axes[1].vlines(x=123,ymin=9,ymax=11, color='r')
+#     f.axes[3].vlines(x=123,ymin=104,ymax=127, color='r')
+#     f.axes[5].vlines(x=123,ymin=20,ymax=24, color='r')
+#     # May 2015
+#     f.axes[3].vlines(x=124,ymin=116,ymax=142, color='r')
+#     f.axes[5].vlines(x=124,ymin=13,ymax=15, color='r')
+#     f.axes[1].vlines(x=124,ymin=9,ymax=11, color='r')
+#     # June 2015
+#     f.axes[3].vlines(x=125,ymin=116,ymax=142, color='r')
+#     f.axes[1].vlines(x=125,ymin=9,ymax=11, color='r')
+#     f.axes[5].vlines(x=125,ymin=13,ymax=15, color='r')
+#     # July 2015
+#     f.axes[3].vlines(x=126,ymin=116,ymax=142, color='r')
+#     f.axes[1].vlines(x=126,ymin=9,ymax=11, color='r')
+#     f.axes[5].vlines(x=126,ymin=13,ymax=15, color='r')
+#     # Aug 2015
+#     f.axes[3].vlines(x=127,ymin=116,ymax=142, color='r')
+#     f.axes[1].vlines(x=127,ymin=9,ymax=11, color='r')
+#     f.axes[5].vlines(x=127,ymin=13,ymax=15, color='r')
+#     # Sept 2015
+#     f.axes[3].vlines(x=128,ymin=117,ymax=143, color='r')
+#     f.axes[1].vlines(x=128,ymin=9,ymax=11, color='r')
+#     f.axes[5].vlines(x=128,ymin=13,ymax=15, color='r')
+#     # Oct 2015
+#     f.axes[3].vlines(x=129,ymin=82,ymax=100, color='r')
+#     f.axes[1].vlines(x=129,ymin=9,ymax=11, color='r')
+#     f.axes[5].vlines(x=129,ymin=13,ymax=15, color='r')
+#     # Nov 2015
+#     f.axes[3].vlines(x=130,ymin=82,ymax=100, color='r')
+#     f.axes[1].vlines(x=130,ymin=9,ymax=11, color='r')
+#     f.axes[5].vlines(x=130,ymin=12,ymax=14, color='r')
+#     # Dec 2015
+#     f.axes[3].vlines(x=131,ymin=77,ymax=94, color='r')
+#     f.axes[1].vlines(x=131,ymin=9,ymax=11, color='r')
+#     f.axes[5].vlines(x=131,ymin=12,ymax=14, color='r')
+#     # Jan 2016
+#     f.axes[3].vlines(x=132,ymin=77,ymax=94, color='r')
+#     f.axes[1].vlines(x=132,ymin=9,ymax=11, color='r')
+#     f.axes[5].vlines(x=132,ymin=9,ymax=11, color='r')
+#     # Feb 2016
+#     f.axes[1].vlines(x=133,ymin=9,ymax=11, color='r')
+#     f.axes[3].vlines(x=133,ymin=77,ymax=94, color='r')
+#     f.axes[5].vlines(x=133,ymin=7,ymax=9, color='r')
+#     # March 2016
+#     f.axes[1].vlines(x=134,ymin=10,ymax=12, color='r')
+#     f.axes[3].vlines(x=134,ymin=77,ymax=94, color='r')
+#     f.axes[2].vlines(x=134,ymin=126,ymax=154, color='r')
+#     f.axes[4].vlines(x=134,ymin=23,ymax=29, color='r')
+#     f.axes[5].vlines(x=134,ymin=8,ymax=10, color='r')
+#     # April 2016
+#     f.axes[1].vlines(x=135,ymin=10,ymax=12, color='r')
+#     f.axes[3].vlines(x=135,ymin=93,ymax=113, color='r')
+#     f.axes[5].vlines(x=135,ymin=8,ymax=10, color='r')
+#     # May 2016
+#     f.axes[1].vlines(x=136,ymin=10,ymax=12, color='r')
+#     f.axes[3].vlines(x=136,ymin=97,ymax=119, color='r')
+#     f.axes[5].vlines(x=136,ymin=15,ymax=19, color='r')
+#     # June 2016
+#     f.axes[1].vlines(x=137,ymin=10,ymax=12, color='r')
+#     f.axes[3].vlines(x=137,ymin=80,ymax=98, color='r')
+#     f.axes[5].vlines(x=137,ymin=15,ymax=19, color='r')
+#     # July 2016
+#     f.axes[1].vlines(x=138,ymin=10,ymax=12, color='r')
+#     f.axes[3].vlines(x=138,ymin=78,ymax=96, color='r')
+#     f.axes[5].vlines(x=138,ymin=15,ymax=19, color='r')
+#     # Aug 2016
+#     f.axes[1].vlines(x=139,ymin=10,ymax=12, color='r')
+#     f.axes[3].vlines(x=139,ymin=78,ymax=96, color='r')
+#     f.axes[5].vlines(x=139,ymin=15,ymax=19, color='r')
+#     # Sept 2016
+#     f.axes[1].vlines(x=140,ymin=10,ymax=12, color='r')
+#     f.axes[3].vlines(x=140,ymin=87,ymax=107, color='r')
+#     f.axes[5].vlines(x=140,ymin=15,ymax=19, color='r')
+#     # Oct 2016
+#     f.axes[1].vlines(x=141,ymin=10,ymax=12, color='r')
+#     f.axes[3].vlines(x=141,ymin=87,ymax=107, color='r')
+#     f.axes[5].vlines(x=141,ymin=15,ymax=19, color='r')
+#     # Nov 2016
+#     f.axes[1].vlines(x=142,ymin=10,ymax=12, color='r')
+#     f.axes[3].vlines(x=142,ymin=83,ymax=101, color='r')
+#     f.axes[5].vlines(x=142,ymin=15,ymax=19, color='r')
+#     # Dec 2016
+#     f.axes[1].vlines(x=143,ymin=10,ymax=12, color='r')
+#     f.axes[3].vlines(x=143,ymin=71,ymax=87, color='r')
+#     f.axes[5].vlines(x=143,ymin=12,ymax=14, color='r')
+#     # Jan 2017
+#     f.axes[1].vlines(x=144,ymin=10,ymax=12, color='r')
+#     f.axes[3].vlines(x=144,ymin=71,ymax=87, color='r')
+#     f.axes[5].vlines(x=144,ymin=8,ymax=10, color='r')
+#     # Feb 2017
+#     f.axes[1].vlines(x=145,ymin=10,ymax=12, color='r')
+#     f.axes[3].vlines(x=145,ymin=71,ymax=87, color='r')
+#     f.axes[5].vlines(x=145,ymin=6,ymax=8, color='r')
+#     # March 2017
+#     f.axes[1].vlines(x=146,ymin=9,ymax=11, color='r')
+#     f.axes[2].vlines(x=146,ymin=149,ymax=182, color='r')
+#     f.axes[3].vlines(x=146,ymin=71,ymax=87, color='r')
+#     f.axes[5].vlines(x=146,ymin=6,ymax=8, color='r')
+#     # April 2017
+#     f.axes[1].vlines(x=147,ymin=9,ymax=11, color='r')
+#     f.axes[3].vlines(x=147,ymin=90,ymax=110, color='r')
+#     f.axes[5].vlines(x=147,ymin=20,ymax=24, color='r')
+#     # May 2017
+#     f.axes[1].vlines(x=148,ymin=9,ymax=11, color='r')
+#     f.axes[3].vlines(x=148,ymin=98,ymax=120, color='r')
+#     f.axes[5].vlines(x=148,ymin=20,ymax=24, color='r')
+#     # June 2017
+#     f.axes[1].vlines(x=149,ymin=9,ymax=11, color='r')
+#     f.axes[3].vlines(x=149,ymin=85,ymax=103, color='r')
+#     f.axes[5].vlines(x=149,ymin=20,ymax=24, color='r')
+#     # July 2017
+#     f.axes[1].vlines(x=150,ymin=9,ymax=11, color='r')
+#     f.axes[3].vlines(x=150,ymin=85,ymax=103, color='r')
+#     f.axes[5].vlines(x=150,ymin=20,ymax=24, color='r')
+#     # Aug 2017
+#     f.axes[1].vlines(x=151,ymin=9,ymax=11, color='r')
+#     f.axes[3].vlines(x=151,ymin=85,ymax=103, color='r')
+#     f.axes[5].vlines(x=151,ymin=20,ymax=24, color='r')
+#     # Sept 2017
+#     f.axes[1].vlines(x=152,ymin=9,ymax=11, color='r')
+#     f.axes[3].vlines(x=152,ymin=81,ymax=99, color='r')
+#     f.axes[5].vlines(x=152,ymin=20,ymax=24, color='r')
+#     # Oct 2017
+#     f.axes[1].vlines(x=153,ymin=9,ymax=11, color='r')
+#     f.axes[3].vlines(x=153,ymin=79,ymax=97, color='r')
+#     f.axes[5].vlines(x=153,ymin=20,ymax=24, color='r')
+#     # Nov 2017
+#     f.axes[1].vlines(x=154,ymin=9,ymax=11, color='r')
+#     f.axes[3].vlines(x=154,ymin=79,ymax=97, color='r')
+#     f.axes[5].vlines(x=154,ymin=20,ymax=24, color='r')
+#     # Dec 2017
+#     f.axes[1].vlines(x=155,ymin=9,ymax=11, color='r')
+#     f.axes[3].vlines(x=155,ymin=79,ymax=97, color='r')
+#     f.axes[5].vlines(x=155,ymin=16,ymax=20, color='r')
+#     # Jan 2018
+#     f.axes[1].vlines(x=156,ymin=9,ymax=11, color='r')
+#     f.axes[3].vlines(x=156,ymin=79,ymax=97, color='r')
+#     f.axes[5].vlines(x=156,ymin=10,ymax=12, color='r')
+#     # Feb 2018
+#     f.axes[1].vlines(x=157,ymin=9,ymax=11, color='r')
+#     f.axes[3].vlines(x=157,ymin=79,ymax=97, color='r')
+#     f.axes[5].vlines(x=157,ymin=14,ymax=18, color='r')
+#     # March 2018
+#     f.axes[1].vlines(x=158,ymin=8,ymax=10, color='r')
+#     f.axes[2].vlines(x=158,ymin=226,ymax=276, color='r')
+#     f.axes[3].vlines(x=158,ymin=79,ymax=97, color='r')
+#     f.axes[4].vlines(x=158,ymin=22,ymax=26, color='r')
+#     f.axes[5].vlines(x=158,ymin=14,ymax=18, color='r')
+#     # April 2018
+#     f.axes[1].vlines(x=159,ymin=8,ymax=10, color='r')
+#     f.axes[3].vlines(x=159,ymin=91,ymax=111, color='r')
+#     f.axes[5].vlines(x=159,ymin=14,ymax=18, color='r')
+#     # May 2018
+#     f.axes[1].vlines(x=160,ymin=8,ymax=10, color='r')
+#     f.axes[3].vlines(x=160,ymin=105,ymax=129, color='r')
+#     f.axes[5].vlines(x=160,ymin=21,ymax=25, color='r')
+#     # June 2018
+#     f.axes[1].vlines(x=161,ymin=8,ymax=10, color='r')
+#     f.axes[3].vlines(x=161,ymin=93,ymax=113, color='r')
+#     f.axes[5].vlines(x=161,ymin=21,ymax=25, color='r')
+#     # July 2018
+#     f.axes[1].vlines(x=162,ymin=8,ymax=10, color='r')
+#     f.axes[3].vlines(x=162,ymin=93,ymax=113, color='r')
+#     f.axes[5].vlines(x=162,ymin=20,ymax=24, color='r')
+#     # Aug 2018
+#     f.axes[3].vlines(x=163,ymin=92,ymax=112, color='r')
+#     f.axes[5].vlines(x=163,ymin=20,ymax=24, color='r')
+#     # Sept 2018
+#     f.axes[3].vlines(x=164,ymin=95,ymax=117, color='r')
+#     f.axes[5].vlines(x=164,ymin=20,ymax=24, color='r')
+#     # Oct 2018
+#     f.axes[3].vlines(x=165,ymin=91,ymax=111, color='r')
+#     f.axes[5].vlines(x=165,ymin=19,ymax=23, color='r')
+#     # Nov 2018
+#     f.axes[3].vlines(x=166,ymin=84,ymax=102, color='r')
+#     f.axes[5].vlines(x=166,ymin=8,ymax=10, color='r')
+#     # Dec 2018
+#     f.axes[3].vlines(x=167,ymin=80,ymax=98, color='r')
+#     f.axes[5].vlines(x=167,ymin=8,ymax=10, color='r')
+#     # Jan 2019
+#     f.axes[3].vlines(x=168,ymin=80,ymax=98, color='r')
+#     f.axes[5].vlines(x=168,ymin=8,ymax=10, color='r')
+#     # Feb 2019
+#     f.axes[3].vlines(x=169,ymin=78,ymax=96, color='r')
+#     f.axes[5].vlines(x=169,ymin=9,ymax=11, color='r')
+#     # March 2019
+#     f.axes[2].vlines(x=170,ymin=250,ymax=306, color='r')
+#     f.axes[3].vlines(x=170,ymin=78,ymax=96, color='r')
+#     f.axes[4].vlines(x=170,ymin=33,ymax=41, color='r')
+#     f.axes[5].vlines(x=170,ymin=8,ymax=10, color='r')
+#     # April 2019
+#     f.axes[3].vlines(x=171,ymin=91,ymax=111, color='r')
+#     f.axes[5].vlines(x=171,ymin=7,ymax=9, color='r')
+#     # May 2019
+#     f.axes[3].vlines(x=172,ymin=99,ymax=121, color='r')
+#     f.axes[5].vlines(x=172,ymin=7,ymax=9, color='r')
+#     # June 2019
+#     f.axes[3].vlines(x=173,ymin=80,ymax=98, color='r')
+#     f.axes[5].vlines(x=173,ymin=7,ymax=9, color='r')
+#     # July 2019
+#     f.axes[3].vlines(x=174,ymin=82,ymax=100, color='r')
+#     f.axes[5].vlines(x=174,ymin=8,ymax=10, color='r')
+#     # Aug 2019
+#     f.axes[3].vlines(x=175,ymin=82,ymax=100, color='r')
+#     f.axes[5].vlines(x=175,ymin=8,ymax=10, color='r')  
+#     # Sept 2019
+#     f.axes[3].vlines(x=176,ymin=84,ymax=102, color='r')
+#     f.axes[5].vlines(x=176,ymin=8,ymax=10, color='r')
+#     # Oct 2019
+#     f.axes[3].vlines(x=177,ymin=79,ymax=97, color='r')
+#     f.axes[5].vlines(x=177,ymin=8,ymax=10, color='r')
+#     # Nov 2019
+#     f.axes[3].vlines(x=178,ymin=78,ymax=96, color='r')
+#     f.axes[5].vlines(x=178,ymin=8,ymax=10, color='r')
+#     # Dec 2019
+#     f.axes[3].vlines(x=179,ymin=72,ymax=88, color='r')
+#     f.axes[5].vlines(x=179,ymin=9,ymax=11, color='r')
+#     # Jan 2020
+#     f.axes[3].vlines(x=180,ymin=72,ymax=88, color='r')
+#     f.axes[5].vlines(x=180,ymin=9,ymax=11, color='r')
+#     # Feb 2020
+#     f.axes[3].vlines(x=181,ymin=71,ymax=87, color='r')
+#     f.axes[5].vlines(x=181,ymin=7,ymax=9, color='r')
+#     # March 2020
+#     f.axes[2].vlines(x=182,ymin=222,ymax=272, color='r')
+#     f.axes[4].vlines(x=182,ymin=32,ymax=39, color='r')
+#     f.axes[3].vlines(x=182,ymin=73,ymax=89, color='r')
+#     f.axes[5].vlines(x=182,ymin=6,ymax=8, color='r')
+#     # April 2020
+#     f.axes[1].vlines(x=183,ymin=14,ymax=17, color='r')
+#     f.axes[3].vlines(x=183,ymin=73,ymax=89, color='r')
+#     f.axes[5].vlines(x=183,ymin=6,ymax=8, color='r')
+#     # plot next set of filter lines
+#     f.axes[0].vlines(x=184,ymin=20,ymax=80, color='r')
+#     f.axes[1].vlines(x=184,ymin=14,ymax=17, color='r')
+#     f.axes[3].vlines(x=184,ymin=73,ymax=89, color='r')
+#     f.axes[5].vlines(x=184,ymin=17,ymax=21, color='r')
+#     f.axes[6].vlines(x=184,ymin=49,ymax=69, color='r')
+#     f.axes[7].vlines(x=184,ymin=9,ymax=29, color='r')
+#     f.axes[8].vlines(x=184,ymin=21,ymax=35, color='r')
+#     # stop the plots from overlapping
+#     f.fig.suptitle("Optimizer Outputs")
+#     plt.tight_layout()
+#     plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/post_reintro/OptimOutputs_PostReintro_conditions.png')
+#     plt.show()
 
 
 
 
-    # How many pigs? 
-    # y values - number of trees, scrub, etc. 
-    y_values = final_results.drop(['Time', "Bare ground","Grassland", "Woodland", "Thorny Scrub", "Saplings grown up", "Saplings Outcompeted by Trees", "Saplings Outcompeted by Scrub", "Saplings eaten by roe deer", "Saplings eaten by Exmoor pony", "Saplings eaten by Fallow deer", "Saplings eaten by longhorn cattle", "Saplings eaten by red deer",  "Saplings eaten by pigs", "Young scrub grown up", "Young Scrub Outcompeted by Trees", "Young Scrub Outcompeted by Scrub", "Young Scrub eaten by roe deer", "Young Scrub eaten by Exmoor pony", 
-    "Young Scrub eaten by Fallow deer", "Young Scrub eaten by longhorn cattle", "Young Scrub eaten by red deer", "Young Scrub eaten by pigs", 
-    "Grass Outcompeted by Trees", "Grass Outcompeted by Scrub", "Grass eaten by roe deer", "Grass eaten by Exmoor pony", "Grass eaten by Fallow deer", "Grass eaten by longhorn cattle", "Grass eaten by red deer", "Grass eaten by pigs", 
-    "Scrub Outcompeted by Trees", "Scrub eaten by roe deer", "Scrub eaten by Exmoor pony", "Scrub eaten by Fallow deer", "Scrub eaten by longhorn cattle", 
-    "Scrub eaten by red deer", "Scrub eaten by pigs", "Trees eaten by roe deer", "Trees eaten by Exmoor pony", "Trees eaten by Fallow deer", "Trees eaten by longhorn cattle",  "Trees eaten by red deer", "Trees eaten by pigs", "Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas"], axis=1).values.flatten()           
-    species_list = np.tile(["Boars", "Sow", "Piglet"], 185) 
-    indices = np.repeat(final_results['Time'], 3)
-    final_df = pd.DataFrame(
-    {'Abundance': y_values, 'Ecosystem Element': species_list, 'Time': indices})
-    colors = ["#6788ee"]
-    g = sns.FacetGrid(final_df, col="Ecosystem Element", palette = colors, col_wrap=2, sharey = False)
-    g.map(sns.lineplot, 'Time', 'Abundance')
-    # add subplot titles
-    axes = g.axes.flatten()
-    # fill between the quantiles
-    axes = g.axes.flatten()
-    axes[0].set_title("Boars")
-    axes[1].set_title("Sow")
-    axes[2].set_title("Piglet")
-    # stop the plots from overlapping
-    g.fig.suptitle("How many pigs")
-    plt.tight_layout()
-    plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/post_reintro/how_many_pigs.png')
-    plt.show()
+#     # How many pigs? 
+#     # y values - number of trees, scrub, etc. 
+#     y_values = final_results.drop(['Time', "Bare ground","Grassland", "Woodland", "Thorny Scrub", "Saplings grown up", "Saplings Outcompeted by Trees", "Saplings Outcompeted by Scrub", "Saplings eaten by roe deer", "Saplings eaten by Exmoor pony", "Saplings eaten by Fallow deer", "Saplings eaten by longhorn cattle", "Saplings eaten by red deer",  "Saplings eaten by pigs", "Young scrub grown up", "Young Scrub Outcompeted by Trees", "Young Scrub Outcompeted by Scrub", "Young Scrub eaten by roe deer", "Young Scrub eaten by Exmoor pony", 
+#     "Young Scrub eaten by Fallow deer", "Young Scrub eaten by longhorn cattle", "Young Scrub eaten by red deer", "Young Scrub eaten by pigs", 
+#     "Grass Outcompeted by Trees", "Grass Outcompeted by Scrub", "Grass eaten by roe deer", "Grass eaten by Exmoor pony", "Grass eaten by Fallow deer", "Grass eaten by longhorn cattle", "Grass eaten by red deer", "Grass eaten by pigs", 
+#     "Scrub Outcompeted by Trees", "Scrub eaten by roe deer", "Scrub eaten by Exmoor pony", "Scrub eaten by Fallow deer", "Scrub eaten by longhorn cattle", 
+#     "Scrub eaten by red deer", "Scrub eaten by pigs", "Trees eaten by roe deer", "Trees eaten by Exmoor pony", "Trees eaten by Fallow deer", "Trees eaten by longhorn cattle",  "Trees eaten by red deer", "Trees eaten by pigs", "Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas"], axis=1).values.flatten()           
+#     species_list = np.tile(["Boars", "Sow", "Piglet"], 185) 
+#     indices = np.repeat(final_results['Time'], 3)
+#     final_df = pd.DataFrame(
+#     {'Abundance': y_values, 'Ecosystem Element': species_list, 'Time': indices})
+#     colors = ["#6788ee"]
+#     g = sns.FacetGrid(final_df, col="Ecosystem Element", palette = colors, col_wrap=2, sharey = False)
+#     g.map(sns.lineplot, 'Time', 'Abundance')
+#     # add subplot titles
+#     axes = g.axes.flatten()
+#     # fill between the quantiles
+#     axes = g.axes.flatten()
+#     axes[0].set_title("Boars")
+#     axes[1].set_title("Sow")
+#     axes[2].set_title("Piglet")
+#     # stop the plots from overlapping
+#     g.fig.suptitle("How many pigs")
+#     plt.tight_layout()
+#     plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/post_reintro/how_many_pigs.png')
+#     plt.show()
 
 
     # # # # # # REALITY CHECKS # # # # # # 
@@ -840,7 +937,7 @@ def graph_results():
     sapling_df = pd.DataFrame(
     {'Time': final_results['Time'], 'Grown up': final_results['Saplings grown up'], 'Outcompeted by Trees': final_results['Saplings Outcompeted by Trees'], 'Outcompeted by Scrub': final_results['Saplings Outcompeted by Scrub'], "Eaten by roe deer": final_results['Saplings eaten by roe deer'],
     "Eaten by Fallow deer": final_results['Saplings eaten by Fallow deer'],"Eaten by Exmoor pony": final_results['Saplings eaten by Exmoor pony'], "Eaten by longhorn cattle": final_results['Saplings eaten by longhorn cattle'], "Eaten by red deer": final_results['Saplings eaten by red deer'], "Eaten by pigs": final_results['Saplings eaten by pigs']})
-    sapling_df.plot.bar(x='Time', stacked=True)
+    sapling_df.plot.bar(x='Time', stacked=True, width=1.0)
     plt.xticks([25, 50, 75, 100, 125, 150, 175])
     plt.ylabel('Amount Died')
     plt.title('What kills saplings?')
@@ -851,7 +948,7 @@ def graph_results():
     youngscrub_df = pd.DataFrame(
     {'Time': final_results['Time'], 'Grown up': final_results['Young scrub grown up'], 'Outcompeted by Trees': final_results['Young Scrub Outcompeted by Trees'], 'Outcompeted by Scrub': final_results['Young Scrub Outcompeted by Scrub'], "Eaten by roe deer": final_results['Young Scrub eaten by roe deer'],
     "Eaten by Fallow deer": final_results['Young Scrub eaten by Fallow deer'],"Eaten by Exmoor pony": final_results['Young Scrub eaten by Exmoor pony'], "Eaten by longhorn cattle": final_results['Young Scrub eaten by longhorn cattle'], "Eaten by red deer": final_results['Young Scrub eaten by red deer'], "Eaten by pigs": final_results['Young Scrub eaten by pigs']})
-    youngscrub_df.plot.bar(x='Time', stacked=True)
+    youngscrub_df.plot.bar(x='Time', stacked=True, width=1.0)
     plt.xticks([25, 50, 75, 100, 125, 150, 175])
     plt.ylabel('Amount Died')
     plt.title('What kills young scrub?')
@@ -862,7 +959,7 @@ def graph_results():
     grass_df = pd.DataFrame(
     {'Time': final_results['Time'], 'Outcompeted by Trees': final_results['Grass Outcompeted by Trees'], 'Outcompeted by Scrub': final_results['Grass Outcompeted by Scrub'], "Eaten by roe deer": final_results['Grass eaten by roe deer'],
     "Eaten by Fallow deer": final_results['Grass eaten by Fallow deer'],"Eaten by Exmoor pony": final_results['Grass eaten by Exmoor pony'], "Eaten by longhorn cattle": final_results['Grass eaten by longhorn cattle'], "Eaten by red deer": final_results['Grass eaten by red deer'], "Eaten by pigs": final_results['Grass eaten by pigs']})
-    grass_df.plot.bar(x='Time', stacked=True)
+    grass_df.plot.bar(x='Time', stacked=True, width=1.0)
     plt.xticks([25, 50, 75, 100, 125, 150, 175])
     plt.ylabel('Amount Died')
     plt.title('What kills grass?')
@@ -873,7 +970,7 @@ def graph_results():
     scrub_df = pd.DataFrame(
     {'Time': final_results['Time'], 'Outcompeted by Trees': final_results['Scrub Outcompeted by Trees'], "Eaten by roe deer": final_results['Scrub eaten by roe deer'],
     "Eaten by Fallow deer": final_results['Scrub eaten by Fallow deer'],"Eaten by Exmoor pony": final_results['Scrub eaten by Exmoor pony'], "Eaten by longhorn cattle": final_results['Scrub eaten by longhorn cattle'], "Eaten by red deer": final_results['Scrub eaten by red deer'], "Eaten by pigs": final_results['Scrub eaten by pigs']})
-    scrub_df.plot.bar(x='Time', stacked=True)
+    scrub_df.plot.bar(x='Time', stacked=True, width=1.0)
     plt.xticks([25, 50, 75, 100, 125, 150, 175])
     plt.ylabel('Amount Died')
     plt.title('What kills scrub?')
@@ -884,7 +981,7 @@ def graph_results():
     trees_df = pd.DataFrame(
     {'Time': final_results['Time'], "Eaten by roe deer": final_results['Trees eaten by roe deer'],
     "Eaten by Fallow deer": final_results['Trees eaten by Fallow deer'],"Eaten by Exmoor pony": final_results['Trees eaten by Exmoor pony'], "Eaten by longhorn cattle": final_results['Trees eaten by longhorn cattle'], "Eaten by red deer": final_results['Trees eaten by red deer'], "Eaten by pigs": final_results['Trees eaten by pigs']})
-    trees_df.plot.bar(x='Time', stacked=True)
+    trees_df.plot.bar(x='Time', stacked=True, width=1.0)
     plt.xticks([25, 50, 75, 100, 125, 150, 175])
     plt.ylabel('Amount Died')
     plt.title('What kills trees?')

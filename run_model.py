@@ -1,19 +1,21 @@
 # ------ ABM of the Knepp Estate (2005-2046) --------
 from KneppModel_ABM import KneppModel 
-from differentialEvolution import graph_results
 import numpy as np
 import random
 import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 
 # # # # Run the model # # # # 
 
 
 def run_all_models():
-    output_parameters = graph_results()
+    
+    print("now doing run 49")
 
     # define number of simulations
-    number_simulations =  50
+    number_simulations =  10000
     # make list of variables
     final_results_list = []
     final_parameters = []
@@ -21,78 +23,115 @@ def run_all_models():
 
 
     for _ in range(number_simulations):
-        # keep track of the runs
-        run_number +=1
+        # keep track of the runs 
+        run_number += 1
         print(run_number)
         # choose my percent above/below number
-        perc_aboveBelow = 0.01
+        perc_aboveBelow = 0.5
 
         # define the parameters
-        chance_reproduceSapling = random.uniform(output_parameters[0]-(output_parameters[0]*perc_aboveBelow), output_parameters[0]+(output_parameters[0]*perc_aboveBelow))
-        chance_reproduceYoungScrub = random.uniform(output_parameters[1]-(output_parameters[1]*perc_aboveBelow), output_parameters[1]+(output_parameters[1]*perc_aboveBelow))
-        chance_regrowGrass = random.uniform(output_parameters[2]-(output_parameters[2]*perc_aboveBelow), output_parameters[2]+(output_parameters[2]*perc_aboveBelow))
-        chance_saplingBecomingTree = random.uniform(output_parameters[3]-(output_parameters[3]*perc_aboveBelow), output_parameters[3]+(output_parameters[3]*perc_aboveBelow))
-        chance_youngScrubMatures = random.uniform(output_parameters[4]-(output_parameters[4]*perc_aboveBelow), output_parameters[4]+(output_parameters[4]*perc_aboveBelow))
-        chance_scrubOutcompetedByTree = random.uniform(output_parameters[5]-(output_parameters[5]*perc_aboveBelow), output_parameters[5]+(output_parameters[5]*perc_aboveBelow))
-        chance_grassOutcompetedByTree = random.uniform(output_parameters[6]-(output_parameters[6]*perc_aboveBelow),output_parameters[6]+(output_parameters[6]*perc_aboveBelow))
-        chance_grassOutcompetedByScrub = random.uniform(output_parameters[7]-(output_parameters[7]*perc_aboveBelow), output_parameters[7]+(output_parameters[7]*perc_aboveBelow))
-        chance_saplingOutcompetedByTree = random.uniform(output_parameters[8]-(output_parameters[8]*perc_aboveBelow), output_parameters[8]+(output_parameters[8]*perc_aboveBelow))
-        chance_saplingOutcompetedByScrub = random.uniform(output_parameters[9]-(output_parameters[9]*perc_aboveBelow), output_parameters[9]+(output_parameters[9]*perc_aboveBelow))
-        chance_youngScrubOutcompetedByScrub = random.uniform(output_parameters[10]-(output_parameters[10]*perc_aboveBelow), output_parameters[10]+(output_parameters[10]*perc_aboveBelow))
-        chance_youngScrubOutcompetedByTree = random.uniform(output_parameters[11]-(output_parameters[11]*perc_aboveBelow), output_parameters[11]+(output_parameters[11]*perc_aboveBelow))
+        chance_reproduceSapling = random.uniform(0.04206406-(0.04206406*perc_aboveBelow), 0.04206406+(0.04206406*perc_aboveBelow))
+        chance_reproduceYoungScrub = random.uniform(0.1109531-(0.1109531*perc_aboveBelow), 0.1109531+(0.1109531*perc_aboveBelow))
+        chance_regrowGrass = random.uniform(0.24463218-(0.24463218*perc_aboveBelow), 0.24463218+(0.24463218*perc_aboveBelow))
+        chance_saplingBecomingTree = random.uniform(0.00289472-(0.00289472*perc_aboveBelow), 0.00289472+(0.00289472*perc_aboveBelow))
+        chance_youngScrubMatures =random.uniform(0.00601638-(0.00601638*perc_aboveBelow), 0.00601638+(0.00601638*perc_aboveBelow))
+        chance_scrubOutcompetedByTree = random.uniform(0.03450849-(0.03450849*perc_aboveBelow), 0.03450849+(0.03450849*perc_aboveBelow))
+        chance_grassOutcompetedByTree = random.uniform(0.28874493-(0.28874493*perc_aboveBelow), 0.28874493+(0.28874493*perc_aboveBelow))
+        chance_grassOutcompetedByScrub = random.uniform(0.29790348-(0.29790348*perc_aboveBelow), 0.29790348+(0.29790348*perc_aboveBelow))
+        chance_saplingOutcompetedByTree = random.uniform(0.35425409-(0.35425409*perc_aboveBelow), 0.35425409+(0.35425409*perc_aboveBelow))
+        chance_saplingOutcompetedByScrub = random.uniform(0.25885052-(0.25885052*perc_aboveBelow), 0.25885052+(0.25885052*perc_aboveBelow))
+        chance_youngScrubOutcompetedByScrub =random.uniform(0.37929889-(0.37929889*perc_aboveBelow), 0.37929889+(0.37929889*perc_aboveBelow))
+        chance_youngScrubOutcompetedByTree = random.uniform(0.3982258-(0.3982258*perc_aboveBelow), 0.3982258+(0.3982258*perc_aboveBelow))
 
         # initial values
         initial_roeDeer = 0.12
         initial_grassland = 0.8
         initial_woodland = 0.14
         initial_scrubland = 0.01
+
         # roe deer
-        roeDeer_reproduce = random.uniform((output_parameters[12]-(output_parameters[12]*perc_aboveBelow)), (output_parameters[12]+(output_parameters[12]*perc_aboveBelow)))
-        roeDeer_gain_from_grass = random.uniform((output_parameters[13]-(output_parameters[13]*perc_aboveBelow)), (output_parameters[13]+(output_parameters[13]*perc_aboveBelow)))
-        roeDeer_gain_from_Trees = random.uniform((output_parameters[14]-(output_parameters[14]*perc_aboveBelow)), (output_parameters[14]+(output_parameters[14]*perc_aboveBelow)))
-        roeDeer_gain_from_Scrub = random.uniform((output_parameters[15]-(output_parameters[15]*perc_aboveBelow)), (output_parameters[15]+(output_parameters[15]*perc_aboveBelow)))
-        roeDeer_gain_from_Saplings = random.uniform((output_parameters[16]-(output_parameters[16]*perc_aboveBelow)), (output_parameters[16]+(output_parameters[16]*perc_aboveBelow)))
-        roeDeer_gain_from_YoungScrub = random.uniform((output_parameters[17]-(output_parameters[17]*perc_aboveBelow)), (output_parameters[17]+(output_parameters[17]*perc_aboveBelow)))
+        roeDeer_reproduce = random.uniform(0.18215313-(0.18215313*perc_aboveBelow), 0.18215313+(0.18215313*perc_aboveBelow))
+        roeDeer_gain_from_grass = random.uniform(0.69330732-(0.69330732*perc_aboveBelow), 0.69330732+(0.69330732*perc_aboveBelow))
+        roeDeer_gain_from_Trees =random.uniform(0.6982617-(0.6982617*perc_aboveBelow), 0.6982617+(0.6982617*perc_aboveBelow))
+        roeDeer_gain_from_Scrub =random.uniform(0.46792347-(0.46792347*perc_aboveBelow), 0.46792347+(0.46792347*perc_aboveBelow))
+        roeDeer_gain_from_Saplings = random.uniform(0.14360982-(0.14360982*perc_aboveBelow), 0.14360982+(0.14360982*perc_aboveBelow))
+        roeDeer_gain_from_YoungScrub = random.uniform(0.10447744-(0.10447744*perc_aboveBelow), 0.10447744+(0.10447744*perc_aboveBelow))
+
         # Fallow deer
-        fallowDeer_reproduce = random.uniform((output_parameters[18]-(output_parameters[18]*perc_aboveBelow)), (output_parameters[18]+(output_parameters[18]*perc_aboveBelow)))
-        fallowDeer_gain_from_grass = random.uniform((output_parameters[19]-(output_parameters[19]*perc_aboveBelow)), (output_parameters[19]+(output_parameters[19]*perc_aboveBelow)))
-        fallowDeer_gain_from_Trees = random.uniform((output_parameters[20]-(output_parameters[20]*perc_aboveBelow)), (output_parameters[20]+(output_parameters[20]*perc_aboveBelow)))
-        fallowDeer_gain_from_Scrub = random.uniform((output_parameters[21]-(output_parameters[21]*perc_aboveBelow)), (output_parameters[21]+(output_parameters[21]*perc_aboveBelow)))
-        fallowDeer_gain_from_Saplings = random.uniform((output_parameters[22]-(output_parameters[22]*perc_aboveBelow)), (output_parameters[22]+(output_parameters[22]*perc_aboveBelow)))
-        fallowDeer_gain_from_YoungScrub = random.uniform((output_parameters[23]-(output_parameters[23]*perc_aboveBelow)), (output_parameters[23]+(output_parameters[23]*perc_aboveBelow)))
+        fallowDeer_reproduce = random.uniform(0.28586154-(0.28586154*perc_aboveBelow), 0.28586154+(0.28586154*perc_aboveBelow))
+        fallowDeer_gain_from_grass = random.uniform(0.60193723-(0.60193723*perc_aboveBelow), 0.60193723+(0.60193723*perc_aboveBelow))
+        fallowDeer_gain_from_Trees = random.uniform(0.62907582-(0.62907582*perc_aboveBelow), 0.62907582+(0.62907582*perc_aboveBelow))
+        fallowDeer_gain_from_Scrub = random.uniform(0.41669232-(0.41669232*perc_aboveBelow), 0.41669232+(0.41669232*perc_aboveBelow))
+        fallowDeer_gain_from_Saplings = random.uniform(0.13022322-(0.13022322*perc_aboveBelow), 0.13022322+(0.13022322*perc_aboveBelow))
+        fallowDeer_gain_from_YoungScrub = random.uniform(0.07403832-(0.07403832*perc_aboveBelow), 0.07403832+(0.07403832*perc_aboveBelow))
         # Red deer
-        redDeer_reproduce = random.uniform((output_parameters[24]-(output_parameters[24]*perc_aboveBelow)), (output_parameters[24]+(output_parameters[24]*perc_aboveBelow)))
-        redDeer_gain_from_grass = random.uniform((output_parameters[25]-(output_parameters[25]*perc_aboveBelow)), (output_parameters[25]+(output_parameters[25]*perc_aboveBelow)))
-        redDeer_gain_from_Trees = random.uniform((output_parameters[26]-(output_parameters[26]*perc_aboveBelow)), (output_parameters[26]+(output_parameters[26]*perc_aboveBelow)))
-        redDeer_gain_from_Scrub = random.uniform((output_parameters[27]-(output_parameters[27]*perc_aboveBelow)), (output_parameters[27]+(output_parameters[27]*perc_aboveBelow)))
-        redDeer_gain_from_Saplings = random.uniform((output_parameters[28]-(output_parameters[28]*perc_aboveBelow)), (output_parameters[28]+(output_parameters[28]*perc_aboveBelow)))
-        redDeer_gain_from_YoungScrub = random.uniform((output_parameters[29]-(output_parameters[29]*perc_aboveBelow)), (output_parameters[29]+(output_parameters[29]*perc_aboveBelow)))
+        redDeer_reproduce = random.uniform(0.3065381-(0.3065381*perc_aboveBelow), 0.3065381+(0.3065381*perc_aboveBelow))
+        redDeer_gain_from_grass = random.uniform(0.5464753-(0.5464753*perc_aboveBelow), 0.5464753+(0.5464753*perc_aboveBelow))
+        redDeer_gain_from_Trees = random.uniform(0.57759807-(0.57759807*perc_aboveBelow), 0.57759807+(0.57759807*perc_aboveBelow))
+        redDeer_gain_from_Scrub = random.uniform(0.39375145-(0.39375145*perc_aboveBelow), 0.39375145+(0.39375145*perc_aboveBelow))
+        redDeer_gain_from_Saplings = random.uniform(0.11916663-(0.11916663*perc_aboveBelow), 0.11916663+(0.11916663*perc_aboveBelow))
+        redDeer_gain_from_YoungScrub = random.uniform(0.06335441-(0.06335441*perc_aboveBelow), 0.06335441+(0.06335441*perc_aboveBelow))
         # Exmoor ponies
-        ponies_gain_from_grass = random.uniform((output_parameters[30]-(output_parameters[30]*perc_aboveBelow)), (output_parameters[30]+(output_parameters[30]*perc_aboveBelow)))
-        ponies_gain_from_Trees = random.uniform((output_parameters[31]-(output_parameters[31]*perc_aboveBelow)), (output_parameters[31]+(output_parameters[31]*perc_aboveBelow)))
-        ponies_gain_from_Scrub = random.uniform((output_parameters[32]-(output_parameters[32]*perc_aboveBelow)), (output_parameters[32]+(output_parameters[32]*perc_aboveBelow)))
-        ponies_gain_from_Saplings = random.uniform((output_parameters[33]-(output_parameters[33]*perc_aboveBelow)), (output_parameters[33]+(output_parameters[33]*perc_aboveBelow)))
-        ponies_gain_from_YoungScrub = random.uniform((output_parameters[34]-(output_parameters[34]*perc_aboveBelow)), (output_parameters[34]+(output_parameters[34]*perc_aboveBelow)))
+        ponies_gain_from_grass = random.uniform(0.46791793-(0.46791793*perc_aboveBelow), 0.46791793+(0.46791793*perc_aboveBelow))
+        ponies_gain_from_Trees = random.uniform(0.50082365-(0.50082365*perc_aboveBelow), 0.50082365+(0.50082365*perc_aboveBelow)) 
+        ponies_gain_from_Scrub = random.uniform(0.34385853-(0.34385853*perc_aboveBelow), 0.34385853+(0.34385853*perc_aboveBelow))
+        ponies_gain_from_Saplings = random.uniform(0.10451826-(0.10451826*perc_aboveBelow), 0.10451826+(0.10451826*perc_aboveBelow))
+        ponies_gain_from_YoungScrub = random.uniform(0.05673449-(0.05673449*perc_aboveBelow), 0.05673449+(0.05673449*perc_aboveBelow))
         # Longhorn cattle
-        cows_reproduce = random.uniform((output_parameters[35]-(output_parameters[35]*perc_aboveBelow)), (output_parameters[35]+(output_parameters[35]*perc_aboveBelow)))
-        cows_gain_from_grass = random.uniform((output_parameters[36]-(output_parameters[36]*perc_aboveBelow)), (output_parameters[36]+(output_parameters[36]*perc_aboveBelow)))
-        cows_gain_from_Trees = random.uniform((output_parameters[37]-(output_parameters[37]*perc_aboveBelow)), (output_parameters[37]+(output_parameters[37]*perc_aboveBelow)))
-        cows_gain_from_Scrub = random.uniform((output_parameters[38]-(output_parameters[38]*perc_aboveBelow)), (output_parameters[38]+(output_parameters[38]*perc_aboveBelow)))
-        cows_gain_from_Saplings = random.uniform((output_parameters[39]-(output_parameters[39]*perc_aboveBelow)), (output_parameters[39]+(output_parameters[39]*perc_aboveBelow)))
-        cows_gain_from_YoungScrub = random.uniform((output_parameters[40]-(output_parameters[40]*perc_aboveBelow)), (output_parameters[40]+(output_parameters[40]*perc_aboveBelow)))
+        cows_reproduce = random.uniform(0.20204395-(0.20204395*perc_aboveBelow), 0.20204395+(0.20204395*perc_aboveBelow))
+        cows_gain_from_grass = random.uniform(0.44058728-(0.44058728*perc_aboveBelow), 0.44058728+(0.44058728*perc_aboveBelow))
+        cows_gain_from_Trees = random.uniform(0.45394087-(0.45394087*perc_aboveBelow), 0.45394087+(0.45394087*perc_aboveBelow))
+        cows_gain_from_Scrub = random.uniform(0.2761602-(0.2761602*perc_aboveBelow), 0.2761602+(0.2761602*perc_aboveBelow))
+        cows_gain_from_Saplings = random.uniform(0.08643107-(0.08643107*perc_aboveBelow), 0.08643107+(0.08643107*perc_aboveBelow))
+        cows_gain_from_YoungScrub = random.uniform(0.04245426-(0.04245426*perc_aboveBelow), 0.04245426+(0.04245426*perc_aboveBelow))
         # Tamworth pigs
-        pigs_reproduce = random.uniform((output_parameters[41]-(output_parameters[41]*perc_aboveBelow)), (output_parameters[41]+(output_parameters[41]*perc_aboveBelow)))
-        pigs_gain_from_grass = random.uniform((output_parameters[42]-(output_parameters[42]*perc_aboveBelow)), (output_parameters[42]+(output_parameters[42]*perc_aboveBelow)))
-        pigs_gain_from_Trees = random.uniform((output_parameters[43]-(output_parameters[43]*perc_aboveBelow)), (output_parameters[43]+(output_parameters[43]*perc_aboveBelow)))
-        pigs_gain_from_Scrub = random.uniform((output_parameters[44]-(output_parameters[44]*perc_aboveBelow)), (output_parameters[44]+(output_parameters[44]*perc_aboveBelow)))
-        pigs_gain_from_Saplings = random.uniform((output_parameters[45]-(output_parameters[45]*perc_aboveBelow)), (output_parameters[45]+(output_parameters[45]*perc_aboveBelow)))
-        pigs_gain_from_YoungScrub = random.uniform((output_parameters[46]-(output_parameters[46]*perc_aboveBelow)), (output_parameters[46]+(output_parameters[46]*perc_aboveBelow)))
-        # starting conditions for saplings and young scrub
-        max_start_saplings = 0.1
-        max_start_youngScrub = 0.1
-
-
+        pigs_reproduce = random.uniform(0.33496453-(0.33496453*perc_aboveBelow), 0.33496453+(0.33496453*perc_aboveBelow))
+        pigs_gain_from_grass = random.uniform(0.39056552-(0.39056552*perc_aboveBelow), 0.39056552+(0.39056552*perc_aboveBelow))
+        pigs_gain_from_Trees =random.uniform(0.6909069-(0.6909069*perc_aboveBelow), 0.6909069+(0.6909069*perc_aboveBelow))
+        pigs_gain_from_Scrub = random.uniform(0.47493354-(0.47493354*perc_aboveBelow), 0.47493354+(0.47493354*perc_aboveBelow))
+        pigs_gain_from_Saplings = random.uniform(0.07887992-(0.07887992*perc_aboveBelow), 0.07887992+(0.07887992*perc_aboveBelow))
+        pigs_gain_from_YoungScrub = random.uniform(0.08125611-(0.08125611*perc_aboveBelow), 0.08125611+(0.08125611*perc_aboveBelow))
         
+        # stocking values
+        fallowDeer_stocking = 247
+        cattle_stocking = 81
+        redDeer_stocking = 35
+        tamworthPig_stocking = 7
+        exmoor_stocking = 15
+
+        # euro bison parameters
+        reproduce_bison = 0
+        # bison should have higher impact than any other consumer
+        bison_gain_from_grass =  0
+        bison_gain_from_Trees =0
+        bison_gain_from_Scrub =0
+        bison_gain_from_Saplings = 0
+        bison_gain_from_YoungScrub = 0  
+        # euro elk parameters
+        reproduce_elk = 0
+        # bison should have higher impact than any other consumer
+        elk_gain_from_grass =  0
+        elk_gain_from_Trees = 0
+        elk_gain_from_Scrub = 0
+        elk_gain_from_Saplings =  0
+        elk_gain_from_YoungScrub =  0
+        # reindeer parameters
+        reproduce_reindeer = 0
+        # reindeer should have impacts between red and fallow deer
+        reindeer_gain_from_grass = 0
+        reindeer_gain_from_Trees =0
+        reindeer_gain_from_Scrub =0
+        reindeer_gain_from_Saplings = 0
+        reindeer_gain_from_YoungScrub = 0
+        # forecasting parameters
+        fallowDeer_stocking_forecast = 247
+        cattle_stocking_forecast = 81
+        redDeer_stocking_forecast = 35
+        tamworthPig_stocking_forecast = 7
+        exmoor_stocking_forecast = 15
+        reindeer_stocking_forecast = 0
+        roeDeer_stocking_forecast = 0
+
         # keep track of my parameters
         parameters_used = [
         chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
@@ -103,13 +142,15 @@ def run_all_models():
         cows_reproduce, cows_gain_from_grass, cows_gain_from_Trees, cows_gain_from_Scrub, cows_gain_from_Saplings, cows_gain_from_YoungScrub, 
         fallowDeer_reproduce, fallowDeer_gain_from_grass, fallowDeer_gain_from_Trees, fallowDeer_gain_from_Scrub, fallowDeer_gain_from_Saplings, fallowDeer_gain_from_YoungScrub, 
         redDeer_reproduce, redDeer_gain_from_grass, redDeer_gain_from_Trees, redDeer_gain_from_Scrub, redDeer_gain_from_Saplings, redDeer_gain_from_YoungScrub, 
-        pigs_reproduce, pigs_gain_from_grass, pigs_gain_from_Trees, pigs_gain_from_Scrub, pigs_gain_from_Saplings, pigs_gain_from_YoungScrub, 
-        max_start_saplings, max_start_youngScrub, run_number]
-
+        pigs_reproduce, pigs_gain_from_grass, pigs_gain_from_Trees, pigs_gain_from_Scrub, pigs_gain_from_Saplings, pigs_gain_from_YoungScrub, fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
+        reproduce_bison, bison_gain_from_grass, bison_gain_from_Trees, bison_gain_from_Scrub, bison_gain_from_Saplings, bison_gain_from_YoungScrub,
+        reproduce_elk, elk_gain_from_grass, elk_gain_from_Trees, elk_gain_from_Scrub, elk_gain_from_Saplings, elk_gain_from_YoungScrub,
+        reproduce_reindeer, reindeer_gain_from_grass, reindeer_gain_from_Trees, reindeer_gain_from_Scrub, reindeer_gain_from_Saplings, reindeer_gain_from_YoungScrub,
+        fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, reindeer_stocking_forecast, roeDeer_stocking_forecast,
+        run_number]
 
         # append to dataframe
         final_parameters.append(parameters_used)
-
 
         model = KneppModel(
             chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
@@ -121,9 +162,13 @@ def run_all_models():
             fallowDeer_reproduce, fallowDeer_gain_from_grass, fallowDeer_gain_from_Trees, fallowDeer_gain_from_Scrub, fallowDeer_gain_from_Saplings, fallowDeer_gain_from_YoungScrub, 
             redDeer_reproduce, redDeer_gain_from_grass, redDeer_gain_from_Trees, redDeer_gain_from_Scrub, redDeer_gain_from_Saplings, redDeer_gain_from_YoungScrub, 
             pigs_reproduce, pigs_gain_from_grass, pigs_gain_from_Trees, pigs_gain_from_Scrub, pigs_gain_from_Saplings, pigs_gain_from_YoungScrub, 
-            max_start_saplings, max_start_youngScrub,
-            width = 25, height = 18, max_time = 184, reintroduction = True, 
-            RC1_noFood = False, RC2_noTreesScrub = False, RC3_noTrees = False, RC4_noScrub = False)
+            fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
+            reproduce_bison, bison_gain_from_grass, bison_gain_from_Trees, bison_gain_from_Scrub, bison_gain_from_Saplings, bison_gain_from_YoungScrub,
+            reproduce_elk, elk_gain_from_grass, elk_gain_from_Trees, elk_gain_from_Scrub, elk_gain_from_Saplings, elk_gain_from_YoungScrub,
+            reproduce_reindeer, reindeer_gain_from_grass, reindeer_gain_from_Trees, reindeer_gain_from_Scrub, reindeer_gain_from_Saplings, reindeer_gain_from_YoungScrub,
+            fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, reindeer_stocking_forecast, roeDeer_stocking_forecast,
+            width = 25, height = 18, max_time = 184, reintroduction = True,
+            introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False, cull_roe = False)
 
         model.run_model()
 
@@ -145,472 +190,558 @@ def run_all_models():
         "fallowDeer_reproduce", "fallowDeer_gain_from_grass", "fallowDeer_gain_from_Trees", "fallowDeer_gain_from_Scrub", "fallowDeer_gain_from_Saplings", "fallowDeer_gain_from_YoungScrub", 
         "redDeer_reproduce", "redDeer_gain_from_grass", "redDeer_gain_from_Trees", "redDeer_gain_from_Scrub", "redDeer_gain_from_Saplings", "redDeer_gain_from_YoungScrub", 
         "pigs_reproduce", "pigs_gain_from_grass", "pigs_gain_from_Trees", "pigs_gain_from_Scrub", "pigs_gain_from_Saplings", "pigs_gain_from_YoungScrub", 
-        "max_start_saplings", "max_start_youngScrub", "run_number"]
-
+        "fallowDeer_stocking", "cattle_stocking", "redDeer_stocking", "tamworthPig_stocking", "exmoor_stocking",
+        "reproduce_bison", "bison_gain_from_grass", "bison_gain_from_Trees", "bison_gain_from_Scrub", "bison_gain_from_Saplings", "bison_gain_from_YoungScrub",
+        "reproduce_elk", "elk_gain_from_grass", "elk_gain_from_Trees", "elk_gain_from_Scrub", "elk_gain_from_Saplings", "elk_gain_from_YoungScrub",
+        "reproduce_reindeer", "reindeer_gain_from_grass", "reindeer_gain_from_Trees", "reindeer_gain_from_Scrub", "reindeer_gain_from_Saplings", "reindeer_gain_from_YoungScrub",
+        "fallowDeer_stocking_forecast", "cattle_stocking_forecast", "redDeer_stocking_forecast", "tamworthPig_stocking_forecast", "exmoor_stocking_forecast", "reindeer_stocking_forecast", "roeDeer_stocking_forecast",
+        "run_number"]
     # check out the parameters used
     final_parameters = pd.DataFrame(data=final_parameters, columns=variables)
 
+    # which filters were the most difficult to pass?
+    difficult_filters = pd.DataFrame({
+    'filter_number': np.arange(0,63),
+    'times_passed': np.zeros(63)})
 
-    # filter the runs and tag the dataframe
+    # filter the runs and tag the dataframe; keep track of how many filters passed
+    final_results["passed_filters"] = 0
     # pre-reintroduction model
-    accepted_preReintro = final_results[(final_results["Time"] == 50) &
-    (final_results["Roe deer"] <= 40) & (final_results["Roe deer"] >= 6) &
-    (final_results["Grassland"] <= 90) & (final_results["Grassland"] >= 49) & 
-    (final_results["Woodland"] <= 27) & (final_results["Woodland"] >= 7) & 
-    (final_results["Thorny Scrub"] <= 21) & (final_results["Thorny Scrub"] >= 1)]
-    print("number passed pre-reintro filters:", len(accepted_preReintro))
-    filtered_preReintro = final_results[final_results['run_number'].isin(accepted_preReintro['run_number'])]
+    my_time = final_results.loc[final_results['Time'] == 50]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Roe deer"] <= 40) & (row["Roe deer"] >= 12) & (row["Grassland"] <= 80) & (row["Grassland"] >= 49) & (row["Woodland"] <= 27) & (row["Woodland"] >= 7) & (row["Thorny Scrub"] <= 21) & (row["Thorny Scrub"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[0,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    
     # April 2015
-    # accepted_April2015 = filtered_preReintro[(filtered_preReintro["Time"] == 123) &
-    # (filtered_preReintro["Exmoor pony"] <= 11) & (filtered_preReintro["Exmoor pony"] >= 9) &
-    # (filtered_preReintro["Longhorn cattle"] <= 127) & (filtered_preReintro["Longhorn cattle"] >= 104)]
-    # # (filtered_preReintro["Tamworth pigs"] <= 24) & (filtered_preReintro["Tamworth pigs"] >= 20)]
-    # print("number passed April 2015 filters:", len(accepted_April2015))
-    # filtered_April2015 = filtered_preReintro[filtered_preReintro['run_number'].isin(accepted_April2015['run_number'])]
-    # # May 2015
-    # accepted_May2015 = filtered_April2015[(filtered_April2015["Time"] == 124) &
-    # (filtered_April2015["Longhorn cattle"] <= 142) & (filtered_April2015["Longhorn cattle"] >= 116) &
-    # # (filtered_April2015["Tamworth pigs"] <= 15) & (filtered_April2015["Tamworth pigs"] >= 13) &
-    # (filtered_April2015["Exmoor pony"] <= 11) & (filtered_April2015["Exmoor pony"] >= 9)]
-    # print("number passed May 2015 filters:", len(accepted_May2015))
-    # filtered_May2015 = filtered_April2015[filtered_April2015['run_number'].isin(accepted_May2015['run_number'])]
-    # # June 2015
-    # accepted_June2015 = filtered_May2015[(filtered_May2015["Time"] == 125) &
-    # (filtered_May2015["Longhorn cattle"] <= 142) & (filtered_May2015["Longhorn cattle"] >= 116) &
-    # (filtered_May2015["Exmoor pony"] <= 11) & (filtered_May2015["Exmoor pony"] >= 9)]
-    # # (filtered_May2015["Tamworth pigs"] <= 15) & (filtered_May2015["Tamworth pigs"] >= 13)]
-    # print("number passed June 2015 filters:", len(accepted_June2015))
-    # filtered_June2015 = filtered_May2015[filtered_May2015['run_number'].isin(accepted_June2015['run_number'])]
-    # # July 2015
-    # accepted_July2015 = filtered_June2015[(filtered_June2015["Time"] == 126) &
-    # (filtered_June2015["Longhorn cattle"] <= 142) & (filtered_June2015["Longhorn cattle"] >= 116) &
-    # (filtered_June2015["Exmoor pony"] <= 11) & (filtered_June2015["Exmoor pony"] >= 9)]
-    # # (filtered_June2015["Tamworth pigs"] <= 15) & (filtered_June2015["Tamworth pigs"] >= 13)]
-    # print("number passed July 2015 filters:", len(accepted_July2015))
-    # filtered_July2015 = filtered_June2015[filtered_June2015['run_number'].isin(accepted_July2015['run_number'])]
-    # # Aug 2015
-    # accepted_Aug2015 = filtered_July2015[(filtered_July2015["Time"] == 127) &
-    # (filtered_July2015["Longhorn cattle"] <= 142) & (filtered_July2015["Longhorn cattle"] >= 116) &
-    # (filtered_July2015["Exmoor pony"] <= 11) & (filtered_July2015["Exmoor pony"] >= 9)]
-    # # (filtered_July2015["Tamworth pigs"] <= 15) & (filtered_July2015["Tamworth pigs"] >= 13)]
-    # print("number passed Aug 2015 filters:", len(accepted_Aug2015))
-    # filtered_Aug2015 = filtered_July2015[filtered_July2015['run_number'].isin(accepted_Aug2015['run_number'])]
-    # # Sept 2015
-    # accepted_Sept2015 = filtered_Aug2015[(filtered_Aug2015["Time"] == 128) &
-    # (filtered_Aug2015["Longhorn cattle"] <= 143) & (filtered_Aug2015["Longhorn cattle"] >= 117) &
-    # (filtered_Aug2015["Exmoor pony"] <= 11) & (filtered_Aug2015["Exmoor pony"] >= 9)]
-    # # (filtered_Aug2015["Tamworth pigs"] <= 15) & (filtered_Aug2015["Tamworth pigs"] >= 13)]
-    # print("number passed Sept 2015 filters:", len(accepted_Sept2015))
-    # filtered_Sept2015 = filtered_Aug2015[filtered_Aug2015['run_number'].isin(accepted_Sept2015['run_number'])]
-    # # Oct 2015
-    # accepted_Oct2015 = filtered_Sept2015[(filtered_Sept2015["Time"] == 129) &
-    # (filtered_Sept2015["Longhorn cattle"] <= 100) & (filtered_Sept2015["Longhorn cattle"] >= 82) &
-    # (filtered_Sept2015["Exmoor pony"] <= 11) & (filtered_Sept2015["Exmoor pony"] >= 9)]
-    # # (filtered_Sept2015["Tamworth pigs"] <= 15) & (filtered_Sept2015["Tamworth pigs"] >= 13)]
-    # print("number passed Oct 2015 filters:", len(accepted_Oct2015))
-    # filtered_Oct2015 = filtered_Sept2015[filtered_Sept2015['run_number'].isin(accepted_Oct2015['run_number'])]
-    # # Nov 2015
-    # accepted_Nov2015 = filtered_Oct2015[(filtered_Oct2015["Time"] == 130) &
-    # (filtered_Oct2015["Longhorn cattle"] <= 100) & (filtered_Oct2015["Longhorn cattle"] >= 82) &
-    # (filtered_Oct2015["Exmoor pony"] <= 11) & (filtered_Oct2015["Exmoor pony"] >= 9)]
-    # # (filtered_Oct2015["Tamworth pigs"] <= 14) & (filtered_Oct2015["Tamworth pigs"] >= 12)]
-    # print("number passed Nov 2015 filters:", len(accepted_Nov2015))
-    # filtered_Nov2015 = filtered_Oct2015[filtered_Oct2015['run_number'].isin(accepted_Nov2015['run_number'])]
-    # # Dec 2015
-    # accepted_Dec2015 = filtered_Nov2015[(filtered_Nov2015["Time"] == 131) &
-    # (filtered_Nov2015["Longhorn cattle"] <= 94) & (filtered_Nov2015["Longhorn cattle"] >= 77) &
-    # (filtered_Nov2015["Exmoor pony"] <= 11) & (filtered_Nov2015["Exmoor pony"] >= 9)]
-    # # (filtered_Nov2015["Tamworth pigs"] <= 14) & (filtered_Nov2015["Tamworth pigs"] >= 12)]
-    # print("number passed Dec 2015 filters:", len(accepted_Dec2015))
-    # filtered_Dec2015 = filtered_Nov2015[filtered_Nov2015['run_number'].isin(accepted_Dec2015['run_number'])]
-    # # Jan 2016
-    # accepted_Jan2016 = filtered_Dec2015[(filtered_Dec2015["Time"] == 132) &
-    # (filtered_Dec2015["Longhorn cattle"] <= 94) & (filtered_Dec2015["Longhorn cattle"] >= 77) &
-    # (filtered_Dec2015["Exmoor pony"] <= 11) & (filtered_Dec2015["Exmoor pony"] >= 9)]
-    # # (filtered_Dec2015["Tamworth pigs"] <= 11) & (filtered_Dec2015["Tamworth pigs"] >= 9)]
-    # print("number passed Jan 2016 filters:", len(accepted_Jan2016))
-    # filtered_Jan2016 = filtered_Dec2015[filtered_Dec2015['run_number'].isin(accepted_Jan2016['run_number'])]
-    # # Feb 2016
-    # accepted_Feb2016 = filtered_Jan2016[(filtered_Jan2016["Time"] == 133) &
-    # (filtered_Jan2016["Exmoor pony"] <= 11) & (filtered_Jan2016["Exmoor pony"] >= 9) &
-    # (filtered_Jan2016["Longhorn cattle"] <= 94) & (filtered_Jan2016["Longhorn cattle"] >= 77)]
-    # # (filtered_Jan2016["Tamworth pigs"] <= 9) & (filtered_Jan2016["Tamworth pigs"] >= 7)]
-    # print("number passed February 2016 filters:", len(accepted_Feb2016))
-    # filtered_Feb2016 = filtered_Jan2016[filtered_Jan2016['run_number'].isin(accepted_Feb2016['run_number'])]
-    # # March 2016
-    # accepted_March2016 = filtered_Feb2016[(filtered_Feb2016["Time"] == 134) &
-    # (filtered_Feb2016["Exmoor pony"] <= 12) & (filtered_Feb2016["Exmoor pony"] >= 10) &
-    # (filtered_Feb2016["Longhorn cattle"] <= 94) & (filtered_Feb2016["Longhorn cattle"] >= 77) &
-    # (filtered_Feb2016["Fallow deer"] <= 154) & (filtered_Feb2016["Fallow deer"] >= 126) &
-    # (filtered_Feb2016["Red deer"] <= 29) & (filtered_Feb2016["Red deer"] >= 23)]
-    # # (filtered_Feb2016["Tamworth pigs"] <= 10) & (filtered_Feb2016["Tamworth pigs"] >= 8)]
-    # print("number passed March 2016 filters:", len(accepted_March2016))
-    # filtered_March2016 = filtered_Feb2016[filtered_Feb2016['run_number'].isin(accepted_March2016['run_number'])]
-    # # April 2016
-    # accepted_April2016 = filtered_March2016[(filtered_March2016["Time"] == 135) &
-    # (filtered_March2016["Exmoor pony"] <= 12) & (filtered_March2016["Exmoor pony"] >= 10) &
-    # (filtered_March2016["Longhorn cattle"] <= 113) & (filtered_March2016["Longhorn cattle"] >= 93)]
-    # # (filtered_March2016["Tamworth pigs"] <= 10) & (filtered_March2016["Tamworth pigs"] >= 8)]
-    # print("number passed April 2016 filters:", len(accepted_April2016))
-    # filtered_April2016 = filtered_March2016[filtered_March2016['run_number'].isin(accepted_April2016['run_number'])]
-    # # May 2016
-    # accepted_May2016 = filtered_April2016[(filtered_April2016["Time"] == 136) &
-    # (filtered_April2016["Exmoor pony"] <= 12) & (filtered_April2016["Exmoor pony"] >= 10) &
-    # (filtered_April2016["Longhorn cattle"] <= 119) & (filtered_April2016["Longhorn cattle"] >= 97)]
-    # # (filtered_April2016["Tamworth pigs"] <= 19) & (filtered_April2016["Tamworth pigs"] >= 15)]
-    # print("number passed May 2016 filters:", len(accepted_May2016))
-    # filtered_May2016 = filtered_April2016[filtered_April2016['run_number'].isin(accepted_May2016['run_number'])]
-    # # June 2016
-    # accepted_June2016 = filtered_May2016[(filtered_May2016["Time"] == 137) &
-    # (filtered_May2016["Exmoor pony"] <= 12) & (filtered_May2016["Exmoor pony"] >= 10) &
-    # (filtered_May2016["Longhorn cattle"] <= 98) & (filtered_May2016["Longhorn cattle"] >= 80)]
-    # # (filtered_May2016["Tamworth pigs"] <= 19) & (filtered_May2016["Tamworth pigs"] >= 15)]
-    # print("number passed June 2016 filters:", len(accepted_June2016))
-    # filtered_June2016 = filtered_May2016[filtered_May2016['run_number'].isin(accepted_June2016['run_number'])]
-    # # July 2016
-    # accepted_July2016 = filtered_June2016[(filtered_June2016["Time"] == 138) &
-    # (filtered_June2016["Exmoor pony"] <= 12) & (filtered_June2016["Exmoor pony"] >= 10) &
-    # (filtered_June2016["Longhorn cattle"] <= 96) & (filtered_June2016["Longhorn cattle"] >= 78)]
-    # # (filtered_June2016["Tamworth pigs"] <= 19) & (filtered_June2016["Tamworth pigs"] >= 15)]
-    # print("number passed July 2016 filters:", len(accepted_July2016))
-    # filtered_July2016 = filtered_June2016[filtered_June2016['run_number'].isin(accepted_July2016['run_number'])]
-    # # Aug 2016
-    # accepted_Aug2016 = filtered_July2016[(filtered_July2016["Time"] == 139) &
-    # (filtered_July2016["Exmoor pony"] <= 12) & (filtered_July2016["Exmoor pony"] >= 10) &
-    # (filtered_July2016["Longhorn cattle"] <= 96) & (filtered_July2016["Longhorn cattle"] >= 78)]
-    # # (filtered_July2016["Tamworth pigs"] <= 19) & (filtered_July2016["Tamworth pigs"] >= 15)]
-    # print("number passed Aug 2016 filters:", len(accepted_Aug2016))
-    # filtered_Aug2016 = filtered_July2016[filtered_July2016['run_number'].isin(accepted_Aug2016['run_number'])]
-    # # Sept 2016
-    # accepted_Sept2016 = filtered_Aug2016[(filtered_Aug2016["Time"] == 140) &
-    # (filtered_Aug2016["Exmoor pony"] <= 12) & (filtered_Aug2016["Exmoor pony"] >= 10) &
-    # (filtered_Aug2016["Longhorn cattle"] <= 107) & (filtered_Aug2016["Longhorn cattle"] >= 87)]
-    # # (filtered_Aug2016["Tamworth pigs"] <= 19) & (filtered_Aug2016["Tamworth pigs"] >= 15)]
-    # print("number passed Sept 2016 filters:", len(accepted_Sept2016))
-    # filtered_Sept2016 = filtered_Aug2016[filtered_Aug2016['run_number'].isin(accepted_Sept2016['run_number'])]
-    # # Oct 2016
-    # accepted_Oct2016 = filtered_Sept2016[(filtered_Sept2016["Time"] == 141) &
-    # (filtered_Sept2016["Exmoor pony"] <= 12) & (filtered_Sept2016["Exmoor pony"] >= 10) &
-    # (filtered_Sept2016["Longhorn cattle"] <= 107) & (filtered_Sept2016["Longhorn cattle"] >= 87)]
-    # # (filtered_Sept2016["Tamworth pigs"] <= 19) & (filtered_Sept2016["Tamworth pigs"] >= 15)]
-    # print("number passed Oct 2016 filters:", len(accepted_Oct2016))
-    # filtered_Oct2016 = filtered_Aug2016[filtered_Aug2016['run_number'].isin(accepted_Oct2016['run_number'])]
-    # # Nov 2016
-    # accepted_Nov2016 = filtered_Oct2016[(filtered_Oct2016["Time"] == 142) &
-    # (filtered_Oct2016["Exmoor pony"] <= 12) & (filtered_Oct2016["Exmoor pony"] >= 10) &
-    # (filtered_Oct2016["Longhorn cattle"] <= 101) & (filtered_Oct2016["Longhorn cattle"] >= 83)]
-    # # (filtered_Oct2016["Tamworth pigs"] <= 19) & (filtered_Oct2016["Tamworth pigs"] >= 15)]
-    # print("number passed Nov 2016 filters:", len(accepted_Nov2016))
-    # filtered_Nov2016 = filtered_Oct2016[filtered_Oct2016['run_number'].isin(accepted_Nov2016['run_number'])]
-    # # Dec 2016
-    # accepted_Dec2016 = filtered_Nov2016[(filtered_Nov2016["Time"] == 143) &
-    # (filtered_Nov2016["Exmoor pony"] <= 12) & (filtered_Nov2016["Exmoor pony"] >= 10) &
-    # (filtered_Nov2016["Longhorn cattle"] <= 87) & (filtered_Nov2016["Longhorn cattle"] >= 71)]
-    # # (filtered_Nov2016["Tamworth pigs"] <= 14) & (filtered_Nov2016["Tamworth pigs"] >= 12)]
-    # print("number passed Dec 2016 filters:", len(accepted_Dec2016))
-    # filtered_Dec2016 = filtered_Nov2016[filtered_Nov2016['run_number'].isin(accepted_Dec2016['run_number'])]
-    # # Jan 2017
-    # accepted_Jan2017= filtered_Dec2016[(filtered_Dec2016["Time"] == 144) &
-    # (filtered_Dec2016["Exmoor pony"] <= 12) & (filtered_Dec2016["Exmoor pony"] >= 10) &
-    # (filtered_Dec2016["Longhorn cattle"] <= 87) & (filtered_Dec2016["Longhorn cattle"] >= 71)]
-    # # (filtered_Dec2016["Tamworth pigs"] <= 10) & (filtered_Dec2016["Tamworth pigs"] >= 8)]
-    # print("number passed Jan 2017 filters:", len(accepted_Jan2017))
-    # filtered_Jan2017 = filtered_Dec2016[filtered_Dec2016['run_number'].isin(accepted_Jan2017['run_number'])]
-    # # Feb 2017
-    # accepted_Feb2017 = filtered_Jan2017[(filtered_Jan2017["Time"] == 145) &
-    # (filtered_Jan2017["Exmoor pony"] <= 12) & (filtered_Jan2017["Exmoor pony"] >= 10) &
-    # (filtered_Jan2017["Longhorn cattle"] <= 87) & (filtered_Jan2017["Longhorn cattle"] >= 71)]
-    # # (filtered_Jan2017["Tamworth pigs"] <= 8) & (filtered_Jan2017["Tamworth pigs"] >= 6)]
-    # print("number passed Feb 2017 filters:", len(accepted_Feb2017))
-    # filtered_Feb2017 = filtered_Jan2017[filtered_Jan2017['run_number'].isin(accepted_Feb2017['run_number'])]
-    # # March 2017
-    # accepted_March2017 = filtered_Feb2017[(filtered_Feb2017["Time"] == 146) &
-    # (filtered_Feb2017["Exmoor pony"] <= 11) & (filtered_Feb2017["Exmoor pony"] >= 9) &
-    # (filtered_Feb2017["Fallow deer"] <= 182) & (filtered_Feb2017["Fallow deer"] >= 149) &
-    # (filtered_Feb2017["Longhorn cattle"] <= 87) & (filtered_Feb2017["Longhorn cattle"] >= 71)]
-    # # (filtered_Feb2017["Tamworth pigs"] <= 8) & (filtered_Feb2017["Tamworth pigs"] >= 6)]
-    # print("number passed March 2017 filters:", len(accepted_March2017))
-    # filtered_March2017 = filtered_Feb2017[filtered_Feb2017['run_number'].isin(accepted_March2017['run_number'])]
-    # # April 2017
-    # accepted_April2017 = filtered_March2017[(filtered_March2017["Time"] == 147) &
-    # (filtered_March2017["Exmoor pony"] <= 11) & (filtered_March2017["Exmoor pony"] >= 9) &
-    # (filtered_March2017["Longhorn cattle"] <= 110) & (filtered_March2017["Longhorn cattle"] >= 90)]
-    # # (filtered_March2017["Tamworth pigs"] <= 24) & (filtered_March2017["Tamworth pigs"] >= 20)]
-    # print("number passed April 2017 filters:", len(accepted_April2017))
-    # filtered_April2017 = filtered_March2017[filtered_March2017['run_number'].isin(accepted_April2017['run_number'])]
-    # # May 2017
-    # accepted_May2017 = filtered_April2017[(filtered_April2017["Time"] == 148) &
-    # (filtered_April2017["Exmoor pony"] <= 11) & (filtered_April2017["Exmoor pony"] >= 9) &
-    # (filtered_April2017["Longhorn cattle"] <= 120) & (filtered_April2017["Longhorn cattle"] >= 98)]
-    # # (filtered_April2017["Tamworth pigs"] <= 24) & (filtered_April2017["Tamworth pigs"] >= 20)]
-    # print("number passed May 2017 filters:", len(accepted_May2017))
-    # filtered_May2017 = filtered_April2017[filtered_April2017['run_number'].isin(accepted_May2017['run_number'])]
-    # # June 2017
-    # accepted_June2017 = filtered_May2017[(filtered_May2017["Time"] == 149) &
-    # (filtered_May2017["Exmoor pony"] <= 11) & (filtered_May2017["Exmoor pony"] >= 9) &
-    # (filtered_May2017["Longhorn cattle"] <= 103) & (filtered_May2017["Longhorn cattle"] >= 85)]
-    # # (filtered_May2017["Tamworth pigs"] <= 24) & (filtered_May2017["Tamworth pigs"] >= 20)]
-    # print("number passed June 2017 filters:", len(accepted_June2017))
-    # filtered_June2017 = filtered_May2017[filtered_May2017['run_number'].isin(accepted_June2017['run_number'])]
-    # # July 2017
-    # accepted_July2017 = filtered_June2017[(filtered_June2017["Time"] == 150) &
-    # (filtered_June2017["Exmoor pony"] <= 11) & (filtered_June2017["Exmoor pony"] >= 9) &
-    # (filtered_June2017["Longhorn cattle"] <= 103) & (filtered_June2017["Longhorn cattle"] >= 85)]
-    # # (filtered_June2017["Tamworth pigs"] <= 24) & (filtered_June2017["Tamworth pigs"] >= 20)]
-    # print("number passed July 2017 filters:", len(accepted_July2017))
-    # filtered_July2017 = filtered_June2017[filtered_June2017['run_number'].isin(accepted_July2017['run_number'])]
-    # # Aug 2017
-    # accepted_Aug2017 = filtered_July2017[(filtered_July2017["Time"] == 151) &
-    # (filtered_July2017["Exmoor pony"] <= 11) & (filtered_July2017["Exmoor pony"] >= 9) &
-    # (filtered_July2017["Longhorn cattle"] <= 103) & (filtered_July2017["Longhorn cattle"] >= 85)]
-    # # (filtered_July2017["Tamworth pigs"] <= 24) & (filtered_July2017["Tamworth pigs"] >= 20)]
-    # print("number passed Aug 2017 filters:", len(accepted_Aug2017))
-    # filtered_Aug2017 = filtered_July2017[filtered_July2017['run_number'].isin(accepted_Aug2017['run_number'])]
-    # # Sept 2017
-    # accepted_Sept2017 = filtered_Aug2017[(filtered_Aug2017["Time"] == 152) &
-    # (filtered_Aug2017["Exmoor pony"] <= 11) & (filtered_Aug2017["Exmoor pony"] >= 9) &
-    # (filtered_Aug2017["Longhorn cattle"] <= 99) & (filtered_Aug2017["Longhorn cattle"] >= 81)]
-    # # (filtered_Aug2017["Tamworth pigs"] <= 24) & (filtered_Aug2017["Tamworth pigs"] >= 20)]
-    # print("number passed Sept 2017 filters:", len(accepted_Sept2017))
-    # filtered_Sept2017 = filtered_Aug2017[filtered_Aug2017['run_number'].isin(accepted_Sept2017['run_number'])]
-    # # Oct 2017
-    # accepted_Oct2017 = filtered_Sept2017[(filtered_Sept2017["Time"] == 153) &
-    # (filtered_Sept2017["Exmoor pony"] <= 11) & (filtered_Sept2017["Exmoor pony"] >= 9) &
-    # (filtered_Sept2017["Longhorn cattle"] <= 97) & (filtered_Sept2017["Longhorn cattle"] >= 79)]
-    # # (filtered_Sept2017["Tamworth pigs"] <= 24) & (filtered_Sept2017["Tamworth pigs"] >= 20)]
-    # print("number passed Oct 2017 filters:", len(accepted_Oct2017))
-    # filtered_Oct2017 = filtered_Sept2017[filtered_Sept2017['run_number'].isin(accepted_Oct2017['run_number'])]
-    # # Nov 2017
-    # accepted_Nov2017 = filtered_Oct2017[(filtered_Oct2017["Time"] == 154) &
-    # (filtered_Oct2017["Exmoor pony"] <= 11) & (filtered_Oct2017["Exmoor pony"] >= 9) &
-    # (filtered_Oct2017["Longhorn cattle"] <= 97) & (filtered_Oct2017["Longhorn cattle"] >= 79)]
-    # # (filtered_Oct2017["Tamworth pigs"] <= 24) & (filtered_Oct2017["Tamworth pigs"] >= 20)]
-    # print("number passed Nov 2017 filters:", len(accepted_Nov2017))
-    # filtered_Nov2017 = filtered_Oct2017[filtered_Oct2017['run_number'].isin(accepted_Nov2017['run_number'])]
-    # # Dec 2017
-    # accepted_Dec2017 = filtered_Nov2017[(filtered_Nov2017["Time"] == 155) &
-    # (filtered_Nov2017["Exmoor pony"] <= 11) & (filtered_Nov2017["Exmoor pony"] >= 9) &
-    # (filtered_Nov2017["Longhorn cattle"] <= 97) & (filtered_Nov2017["Longhorn cattle"] >= 79)]
-    # # (filtered_Nov2017["Tamworth pigs"] <= 20) & (filtered_Nov2017["Tamworth pigs"] >= 16)]
-    # print("number passed Dec 2017 filters:", len(accepted_Dec2017))
-    # filtered_Dec2017 = filtered_Nov2017[filtered_Nov2017['run_number'].isin(accepted_Dec2017['run_number'])]
-    # # January 2018
-    # accepted_Jan2018 = filtered_Dec2017[(filtered_Dec2017["Time"] == 156) &
-    # (filtered_Dec2017["Exmoor pony"] <= 11) & (filtered_Dec2017["Exmoor pony"] >= 9) &
-    # (filtered_Dec2017["Longhorn cattle"] <= 97) & (filtered_Dec2017["Longhorn cattle"] >= 79)]
-    # # (filtered_Dec2017["Tamworth pigs"] <= 12) & (filtered_Dec2017["Tamworth pigs"] >= 10)]
-    # print("number passed January 2018 filters:", len(accepted_Jan2018))
-    # filtered_Jan2018 = filtered_Dec2017[filtered_Dec2017['run_number'].isin(accepted_Jan2018['run_number'])]
-    # # February 2018
-    # accepted_Feb2018 = filtered_Jan2018[(filtered_Jan2018["Time"] == 157) &
-    # (filtered_Jan2018["Exmoor pony"] <= 11) & (filtered_Jan2018["Exmoor pony"] >= 9) &
-    # (filtered_Jan2018["Longhorn cattle"] <= 97) & (filtered_Jan2018["Longhorn cattle"] >= 79)]
-    # # (filtered_Jan2018["Tamworth pigs"] <= 18) & (filtered_Jan2018["Tamworth pigs"] >= 14)]
-    # print("number passed Feb 2018 filters:", len(accepted_Feb2018)) 
-    # filtered_Feb2018 = filtered_Jan2018[filtered_Jan2018['run_number'].isin(accepted_Feb2018['run_number'])]
-    # # March 2018
-    # accepted_March2018 = filtered_Feb2018[(filtered_Feb2018["Time"] == 158) &
-    # (filtered_Feb2018["Exmoor pony"] <= 10) & (filtered_Feb2018["Exmoor pony"] >= 8) &
-    # (filtered_Feb2018["Fallow deer"] <= 276) & (filtered_Feb2018["Fallow deer"] >= 226) &
-    # (filtered_Feb2018["Longhorn cattle"] <= 97) & (filtered_Feb2018["Longhorn cattle"] >= 79) &
-    # (filtered_Feb2018["Red deer"] <= 26) & (filtered_Feb2018["Red deer"] >= 22)]
-    # # (filtered_Feb2018["Tamworth pigs"] <= 18) & (filtered_Feb2018["Tamworth pigs"] >= 14)]
-    # print("number passed March 2018 filters:", len(accepted_March2018)) 
-    # filtered_March2018 = filtered_Feb2018[filtered_Feb2018['run_number'].isin(accepted_March2018['run_number'])]
-    # # April 2018
-    # accepted_April2018 = filtered_March2018[(filtered_March2018["Time"] == 159) &
-    # (filtered_March2018["Exmoor pony"] <= 10) & (filtered_March2018["Exmoor pony"] >= 8) &
-    # (filtered_March2018["Longhorn cattle"] <= 111) & (filtered_March2018["Longhorn cattle"] >= 91)]
-    # # (filtered_March2018["Tamworth pigs"] <= 18) & (filtered_March2018["Tamworth pigs"] >= 14)]
-    # print("number passed April 2018 filters:", len(accepted_April2018)) 
-    # filtered_April2018 = filtered_March2018[filtered_March2018['run_number'].isin(accepted_April2018['run_number'])]
-    # # May 2018
-    # accepted_May2018 = filtered_April2018[(filtered_April2018["Time"] == 160) &
-    # (filtered_April2018["Exmoor pony"] <= 10) & (filtered_April2018["Exmoor pony"] >= 8) &
-    # (filtered_April2018["Longhorn cattle"] <= 129) & (filtered_April2018["Longhorn cattle"] >= 105)]
-    # # (filtered_April2018["Tamworth pigs"] <= 25) & (filtered_April2018["Tamworth pigs"] >= 21)]
-    # print("number passed May 2018 filters:", len(accepted_May2018)) 
-    # filtered_May2018 = filtered_April2018[filtered_April2018['run_number'].isin(accepted_May2018['run_number'])]
-    # # June 2018
-    # accepted_June2018 = filtered_May2018[(filtered_May2018["Time"] == 161) &
-    # (filtered_May2018["Exmoor pony"] <= 10) & (filtered_May2018["Exmoor pony"] >= 8) &
-    # (filtered_May2018["Longhorn cattle"] <= 113) & (filtered_May2018["Longhorn cattle"] >= 93)]
-    # # (filtered_May2018["Tamworth pigs"] <= 25) & (filtered_May2018["Tamworth pigs"] >= 21)]
-    # print("number passed June 2018 filters:", len(accepted_June2018)) 
-    # filtered_June2018 = filtered_May2018[filtered_May2018['run_number'].isin(accepted_June2018['run_number'])]
-    # # July 2018
-    # accepted_July2018 = filtered_June2018[(filtered_June2018["Time"] == 162) &
-    # (filtered_June2018["Exmoor pony"] <= 10) & (filtered_June2018["Exmoor pony"] >= 8) &
-    # (filtered_June2018["Longhorn cattle"] <= 113) & (filtered_June2018["Longhorn cattle"] >= 93)]
-    # # (filtered_June2018["Tamworth pigs"] <= 24) & (filtered_June2018["Tamworth pigs"] >= 20)]
-    # print("number passed July 2018 filters:", len(accepted_July2018)) 
-    # filtered_July2018 = filtered_June2018[filtered_June2018['run_number'].isin(accepted_July2018['run_number'])]
-    # # Aug 2018
-    # accepted_Aug2018 = filtered_July2018[(filtered_July2018["Time"] == 163) &
-    # (filtered_July2018["Longhorn cattle"] <= 112) & (filtered_July2018["Longhorn cattle"] >= 92)]
-    # # (filtered_July2018["Tamworth pigs"] <= 24) & (filtered_July2018["Tamworth pigs"] >= 20)]
-    # print("number passed Aug 2018 filters:", len(accepted_Aug2018)) 
-    # filtered_Aug2018 = filtered_July2018[filtered_July2018['run_number'].isin(accepted_Aug2018['run_number'])]
-    # # Sept 2018
-    # accepted_Sept2018 = filtered_Aug2018[(filtered_Aug2018["Time"] == 164) &
-    # (filtered_Aug2018["Longhorn cattle"] <= 117) & (filtered_Aug2018["Longhorn cattle"] >= 95)]
-    # # (filtered_Aug2018["Tamworth pigs"] <= 24) & (filtered_Aug2018["Tamworth pigs"] >= 20)]
-    # print("number passed Sept 2018 filters:", len(accepted_Sept2018)) 
-    # filtered_Sept2018 = filtered_Aug2018[filtered_Aug2018['run_number'].isin(accepted_Sept2018['run_number'])]
-    # # Oct 2018
-    # accepted_Oct2018 = filtered_Sept2018[(filtered_Sept2018["Time"] == 165) &
-    # (filtered_Sept2018["Longhorn cattle"] <= 111) & (filtered_Sept2018["Longhorn cattle"] >= 91)]
-    # # (filtered_Sept2018["Tamworth pigs"] <= 23) & (filtered_Sept2018["Tamworth pigs"] >= 19)]
-    # print("number passed Oct 2018 filters:", len(accepted_Oct2018))
-    # filtered_Oct2018 = filtered_Sept2018[filtered_Sept2018['run_number'].isin(accepted_Oct2018['run_number'])]
-    # # Nov 2018
-    # accepted_Nov2018 = filtered_Oct2018[(filtered_Oct2018["Time"] == 166) &
-    # (filtered_Oct2018["Longhorn cattle"] <= 102) & (filtered_Oct2018["Longhorn cattle"] >= 84)]
-    # # (filtered_Oct2018["Tamworth pigs"] <= 10) & (filtered_Oct2018["Tamworth pigs"] >= 8)]
-    # print("number passed Nov 2018 filters:", len(accepted_Nov2018)) 
-    # filtered_Nov2018 = filtered_Oct2018[filtered_Oct2018['run_number'].isin(accepted_Nov2018['run_number'])]
-    # # Dec 2018
-    # accepted_Dec2018 = filtered_Nov2018[(filtered_Nov2018["Time"] == 167) &
-    # (filtered_Nov2018["Longhorn cattle"] <= 98) & (filtered_Nov2018["Longhorn cattle"] >= 80)]
-    # # (filtered_Nov2018["Tamworth pigs"] <= 10) & (filtered_Nov2018["Tamworth pigs"] >= 8)]
-    # print("number passed Dec 2018 filters:", len(accepted_Dec2018)) 
-    # filtered_Dec2018 = filtered_Nov2018[filtered_Nov2018['run_number'].isin(accepted_Dec2018['run_number'])]
-    # # Jan 2019
-    # accepted_Jan2019 = filtered_Dec2018[(filtered_Dec2018["Time"] == 168) &
-    # (filtered_Dec2018["Longhorn cattle"] <= 98) & (filtered_Dec2018["Longhorn cattle"] >= 80)]
-    # # (filtered_Dec2018["Tamworth pigs"] <= 10) & (filtered_Dec2018["Tamworth pigs"] >= 8)]
-    # print("number passed Jan 2019 filters:", len(accepted_Jan2019)) 
-    # filtered_Jan2019 = filtered_Dec2018[filtered_Dec2018['run_number'].isin(accepted_Jan2019['run_number'])]
-    # # Feb 2019
-    # accepted_Feb2019 = filtered_Jan2019[(filtered_Jan2019["Time"] == 169) &
-    # (filtered_Jan2019["Longhorn cattle"] <= 96) & (filtered_Jan2019["Longhorn cattle"] >= 78)]
-    # # (filtered_Jan2019["Tamworth pigs"] <= 11) & (filtered_Jan2019["Tamworth pigs"] >= 9)]
-    # print("number passed Feb 2019 filters:", len(accepted_Feb2019)) 
-    # filtered_Feb2019 = filtered_Jan2019[filtered_Jan2019['run_number'].isin(accepted_Feb2019['run_number'])]
-    # # March 2019
-    # accepted_March2019 = filtered_Feb2019[(filtered_Feb2019["Time"] == 170) &
-    # (filtered_Feb2019["Fallow deer"] <= 306) & (filtered_Feb2019["Fallow deer"] >= 250) &
-    # (filtered_Feb2019["Longhorn cattle"] <= 96) & (filtered_Feb2019["Longhorn cattle"] >= 78) &
-    # (filtered_Feb2019["Red deer"] <= 41) & (filtered_Feb2019["Red deer"] >= 33)]
-    # # (filtered_Feb2019["Tamworth pigs"] <= 10) & (filtered_Feb2019["Tamworth pigs"] >= 8)]
-    # print("number passed March 2019 filters:", len(accepted_March2019)) 
-    # filtered_March2019 = filtered_Feb2019[filtered_Feb2019['run_number'].isin(accepted_March2019['run_number'])]
-    # # April 2019
-    # accepted_April2019 = filtered_March2019[(filtered_March2019["Time"] == 171) &
-    # (filtered_March2019["Longhorn cattle"] <= 111) & (filtered_March2019["Longhorn cattle"] >= 91)]
-    # # (filtered_March2019["Tamworth pigs"] <= 9) & (filtered_March2019["Tamworth pigs"] >= 7)]
-    # print("number passed April 2019 filters:", len(accepted_April2019)) 
-    # filtered_April2019 = filtered_March2019[filtered_March2019['run_number'].isin(accepted_April2019['run_number'])]
-    # # May 2019
-    # accepted_May2019 = filtered_April2019[(filtered_April2019["Time"] == 172) &
-    # (filtered_April2019["Longhorn cattle"] <= 121) & (filtered_April2019["Longhorn cattle"] >= 99)]
-    # # (filtered_April2019["Tamworth pigs"] <= 9) & (filtered_April2019["Tamworth pigs"] >= 7)]
-    # print("number passed May 2019 filters:", len(accepted_May2019))
-    # filtered_May2019 = filtered_April2019[filtered_April2019['run_number'].isin(accepted_May2019['run_number'])]
-    # # June 2019
-    # accepted_June2019 = filtered_May2019[(filtered_May2019["Time"] == 173) &
-    # (filtered_May2019["Longhorn cattle"] <= 98) & (filtered_May2019["Longhorn cattle"] >= 80)]
-    # # (filtered_May2019["Tamworth pigs"] <= 9) & (filtered_May2019["Tamworth pigs"] >= 7)]
-    # print("number passed June 2019 filters:", len(accepted_June2019)) 
-    # filtered_June2019 = filtered_May2019[filtered_May2019['run_number'].isin(accepted_June2019['run_number'])]
-    # # July 2019
-    # accepted_July2019 = filtered_June2019[(filtered_June2019["Time"] == 174) &
-    # (filtered_June2019["Longhorn cattle"] <= 100) & (filtered_June2019["Longhorn cattle"] >= 82)]
-    # # (filtered_June2019["Tamworth pigs"] <= 10) & (filtered_June2019["Tamworth pigs"] >= 8)]
-    # print("number passed July 2019 filters:", len(accepted_July2019)) 
-    # filtered_July2019 = filtered_June2019[filtered_June2019['run_number'].isin(accepted_July2019['run_number'])]
-    # # Aug 2019
-    # accepted_Aug2019 = filtered_July2019[(filtered_July2019["Time"] == 175) &
-    # (filtered_July2019["Longhorn cattle"] <= 100) & (filtered_July2019["Longhorn cattle"] >= 82)]
-    # # (filtered_July2019["Tamworth pigs"] <= 10) & (filtered_July2019["Tamworth pigs"] >= 8)]
-    # print("number passed Aug 2019 filters:", len(accepted_Aug2019)) 
-    # filtered_Aug2019 = filtered_July2019[filtered_July2019['run_number'].isin(accepted_Aug2019['run_number'])]
-    # # Sept 2019
-    # accepted_Sept2019 = filtered_Aug2019[(filtered_Aug2019["Time"] == 176) &
-    # (filtered_Aug2019["Longhorn cattle"] <= 102) & (filtered_Aug2019["Longhorn cattle"] >= 84)]
-    # # (filtered_Aug2019["Tamworth pigs"] <= 10) & (filtered_Aug2019["Tamworth pigs"] >= 8)]
-    # print("number passed Sept 2019 filters:", len(accepted_Sept2019)) 
-    # filtered_Sept2019 = filtered_Aug2019[filtered_Aug2019['run_number'].isin(accepted_Sept2019['run_number'])]
-    # # Oct 2019
-    # accepted_Oct2019 = filtered_Sept2019[(filtered_Sept2019["Time"] == 177) &
-    # (filtered_Sept2019["Longhorn cattle"] <= 97) & (filtered_Sept2019["Longhorn cattle"] >= 79)]
-    # # (filtered_Sept2019["Tamworth pigs"] <= 10) & (filtered_Sept2019["Tamworth pigs"] >= 8)]
-    # print("number passed Oct 2019 filters:", len(accepted_Oct2019)) 
-    # filtered_Oct2019 = filtered_Sept2019[filtered_Sept2019['run_number'].isin(accepted_Oct2019['run_number'])]
-    # # Nov 2019
-    # accepted_Nov2019 = filtered_Oct2019[(filtered_Oct2019["Time"] == 178) &
-    # (filtered_Oct2019["Longhorn cattle"] <= 96) & (filtered_Oct2019["Longhorn cattle"] >= 78)]
-    # # (filtered_Oct2019["Tamworth pigs"] <= 10) & (filtered_Oct2019["Tamworth pigs"] >= 8)]
-    # print("number passed Nov 2019 filters:", len(accepted_Nov2019)) 
-    # filtered_Nov2019 = filtered_Oct2019[filtered_Oct2019['run_number'].isin(accepted_Nov2019['run_number'])]
-    # # Dec 2019
-    # accepted_Dec2019 = filtered_Nov2019[(filtered_Nov2019["Time"] == 179) &
-    # (filtered_Nov2019["Longhorn cattle"] <= 88) & (filtered_Nov2019["Longhorn cattle"] >= 72)]
-    # # (filtered_Nov2019["Tamworth pigs"] <= 11) & (filtered_Nov2019["Tamworth pigs"] >= 9)]
-    # print("number passed Dec 2019 filters:", len(accepted_Dec2019))
-    # filtered_Dec2019 = filtered_Nov2019[filtered_Nov2019['run_number'].isin(accepted_Dec2019['run_number'])]
-    # # Jan 2020
-    # accepted_Jan2020 = filtered_Dec2019[(filtered_Dec2019["Time"] == 180) &
-    # (filtered_Dec2019["Longhorn cattle"] <= 88) & (filtered_Dec2019["Longhorn cattle"] >= 72)]
-    # # (filtered_Dec2019["Tamworth pigs"] <= 11) & (filtered_Dec2019["Tamworth pigs"] >= 9)]
-    # print("number passed Jan 2020 filters:", len(accepted_Jan2020))
-    # filtered_Jan2020 = filtered_Dec2019[filtered_Dec2019['run_number'].isin(accepted_Jan2020['run_number'])]
-    # # Feb 2020
-    # accepted_Feb2020 = filtered_Jan2020[(filtered_Jan2020["Time"] == 181) &
-    # (filtered_Jan2020["Longhorn cattle"] <= 87) & (filtered_Jan2020["Longhorn cattle"] >= 71)]
-    # # (filtered_Jan2020["Tamworth pigs"] <= 9) & (filtered_Jan2020["Tamworth pigs"] >= 7)]
-    # print("number passed Feb 2020 filters:", len(accepted_Feb2020))
-    # filtered_Feb2020 = filtered_Jan2020[filtered_Jan2020['run_number'].isin(accepted_Feb2020['run_number'])]
-    # # March 2020
-    # accepted_March2020 = filtered_Feb2020[(filtered_Feb2020["Time"] == 182) &
-    # (filtered_Feb2020["Fallow deer"] <= 272) & (filtered_Feb2020["Fallow deer"] >= 222) &
-    # (filtered_Feb2020["Red deer"] <= 39) & (filtered_Feb2020["Red deer"] >= 32) &
-    # (filtered_Feb2020["Longhorn cattle"] <= 89) & (filtered_Feb2020["Longhorn cattle"] >= 73)]
-    # # (filtered_Feb2020["Tamworth pigs"] <= 8) & (filtered_Feb2020["Tamworth pigs"] >= 6)]
-    # print("number passed March 2020 filters:", len(accepted_March2020)) 
-    # filtered_March2020 = filtered_Feb2020[filtered_Feb2020['run_number'].isin(accepted_March2020['run_number'])]
-    # # April 2020
-    # accepted_April2020 = filtered_March2020[(filtered_March2020["Time"] == 183) &
-    # (filtered_March2020["Exmoor pony"] <= 17) & (filtered_March2020["Exmoor pony"] >= 14) &
-    # (filtered_March2020["Longhorn cattle"] <= 89) & (filtered_March2020["Longhorn cattle"] >= 73)]
-    # # (filtered_March2020["Tamworth pigs"] <= 8) & (filtered_March2020["Tamworth pigs"] >= 6)]
-    # print("number passed April 2020 filters:", len(accepted_April2020)) 
-    # filtered_April2020 = filtered_March2020[filtered_March2020['run_number'].isin(accepted_April2020['run_number'])]
+    my_time = final_results.loc[final_results['Time'] == 123]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) & (row["Longhorn cattle"] <= 140) & (row["Longhorn cattle"] >= 90) & (row["Tamworth pigs"] <= 32) & (row["Tamworth pigs"] >= 12):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[1,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # May 2015
+    my_time = final_results.loc[final_results['Time'] == 124]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 154) & (row["Longhorn cattle"] >= 104) & (row["Tamworth pigs"] <= 24) & (row["Tamworth pigs"] >= 4) & (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[2,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # June 2015
+    my_time = final_results.loc[final_results['Time'] == 125]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 154) & (row["Longhorn cattle"] >= 104) & (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) & (row["Tamworth pigs"] <= 24) & (row["Tamworth pigs"] >= 4):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[3,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # July 2015
+    my_time = final_results.loc[final_results['Time'] == 126]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 154) & (row["Longhorn cattle"] >= 104) & (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) & (row["Tamworth pigs"] <= 24) & (row["Tamworth pigs"] >= 4):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[4,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Aug 2015
+    my_time = final_results.loc[final_results['Time'] == 127]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 154) & (row["Longhorn cattle"] >= 104) & (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) & (row["Tamworth pigs"] <= 24) & (row["Tamworth pigs"] >= 4):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[5,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Sept 2015
+    my_time = final_results.loc[final_results['Time'] == 128]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 155) & (row["Longhorn cattle"] >= 105) & (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) & (row["Tamworth pigs"] <= 24) & (row["Tamworth pigs"] >= 4):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[6,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Oct 2015
+    my_time = final_results.loc[final_results['Time'] == 129]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 116) & (row["Longhorn cattle"] >= 66) & (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) & (row["Tamworth pigs"] <= 24) & (row["Tamworth pigs"] >= 4):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[7,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Nov 2015
+    my_time = final_results.loc[final_results['Time'] == 130]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 116) & (row["Longhorn cattle"] >= 66) & (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) & (row["Tamworth pigs"] <= 23) & (row["Tamworth pigs"] >= 3):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[8,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Dec 2015
+    my_time = final_results.loc[final_results['Time'] == 131]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 111) & (row["Longhorn cattle"] >= 61) &(row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) &(row["Tamworth pigs"] <= 23) & (row["Tamworth pigs"] >= 3):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[9,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Jan 2016
+    my_time = final_results.loc[final_results['Time'] == 132]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 111) & (row["Longhorn cattle"] >= 61) & (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) & (row["Tamworth pigs"] <= 20) & (row["Tamworth pigs"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[10,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Feb 2016
+    my_time = final_results.loc[final_results['Time'] == 133]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) & (row["Longhorn cattle"] <= 111) & (row["Longhorn cattle"] >= 61) &(row["Tamworth pigs"] <= 20) & (row["Tamworth pigs"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[11,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # March 2016
+    my_time = final_results.loc[final_results['Time'] == 134]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 12) & (row["Exmoor pony"] >= 10) & (row["Longhorn cattle"] <= 111) & (row["Longhorn cattle"] >= 61) & (row["Fallow deer"] <= 190) & (row["Fallow deer"] >= 90) & (row["Red deer"] <= 31) & (row["Red deer"] >= 21) & (row["Tamworth pigs"] <= 19) & (row["Tamworth pigs"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[12,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # April 2016
+    my_time = final_results.loc[final_results['Time'] == 135]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 12) & (row["Exmoor pony"] >= 10) & (row["Longhorn cattle"] <= 128) & (row["Longhorn cattle"] >= 78) & (row["Tamworth pigs"] <= 19) & (row["Tamworth pigs"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[13,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # May 2016
+    my_time = final_results.loc[final_results['Time'] == 136]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 12) & (row["Exmoor pony"] >= 10) & (row["Longhorn cattle"] <= 133) & (row["Longhorn cattle"] >= 83) &(row["Tamworth pigs"] <= 27) & (row["Tamworth pigs"] >= 7):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[14,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # June 2016
+    my_time = final_results.loc[final_results['Time'] == 137]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 12) & (row["Exmoor pony"] >= 10) & (row["Longhorn cattle"] <= 114) & (row["Longhorn cattle"] >= 64) & (row["Tamworth pigs"] <= 27) & (row["Tamworth pigs"] >= 7):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[15,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # July 2016
+    my_time = final_results.loc[final_results['Time'] == 138]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 12) & (row["Exmoor pony"] >= 10) & (row["Longhorn cattle"] <= 112) & (row["Longhorn cattle"] >= 62) & (row["Tamworth pigs"] <= 27) & (row["Tamworth pigs"] >= 7):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[16,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Aug 2016
+    my_time = final_results.loc[final_results['Time'] == 139]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 12) & (row["Exmoor pony"] >= 10) & (row["Longhorn cattle"] <= 112) & (row["Longhorn cattle"] >= 62) & (row["Tamworth pigs"] <= 27) & (row["Tamworth pigs"] >= 7):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[17,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Sept 2016
+    my_time = final_results.loc[final_results['Time'] == 140]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 12) & (row["Exmoor pony"] >= 10) &(row["Longhorn cattle"] <= 122) & (row["Longhorn cattle"] >= 72) & (row["Tamworth pigs"] <= 27) & (row["Tamworth pigs"] >= 7):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[18,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Oct 2016
+    my_time = final_results.loc[final_results['Time'] == 141]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 12) & (row["Exmoor pony"] >= 10) & (row["Longhorn cattle"] <= 122) & (row["Longhorn cattle"] >= 72) & (row["Tamworth pigs"] <= 27) & (row["Tamworth pigs"] >= 7):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[19,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Nov 2016
+    my_time = final_results.loc[final_results['Time'] == 142]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 12) & (row["Exmoor pony"] >= 10) &(row["Longhorn cattle"] <= 117) & (row["Longhorn cattle"] >= 67) &(row["Tamworth pigs"] <= 27) & (row["Tamworth pigs"] >= 7):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[20,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Dec 2016
+    my_time = final_results.loc[final_results['Time'] == 143]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 12) & (row["Exmoor pony"] >= 10) &(row["Longhorn cattle"] <= 104) & (row["Longhorn cattle"] >= 54)& (row["Tamworth pigs"] <= 23) & (row["Tamworth pigs"] >= 3):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[21,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Jan 2017
+    my_time = final_results.loc[final_results['Time'] == 144]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 12) & (row["Exmoor pony"] >= 10) & (row["Longhorn cattle"] <= 104) & (row["Longhorn cattle"] >= 54) & (row["Tamworth pigs"] <= 19) & (row["Tamworth pigs"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[22,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Feb 2017
+    my_time = final_results.loc[final_results['Time'] == 145]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 12) & (row["Exmoor pony"] >= 10) & (row["Longhorn cattle"] <= 104) & (row["Longhorn cattle"] >= 54) & (row["Tamworth pigs"] <= 17) & (row["Tamworth pigs"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[23,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+
+
+    # March 2017
+    my_time = final_results.loc[final_results['Time'] == 146]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) & (row["Fallow deer"] <= 215) & (row["Fallow deer"] >= 115) &(row["Longhorn cattle"] <= 104) & (row["Longhorn cattle"] >= 54) &(row["Tamworth pigs"] <= 17) & (row["Tamworth pigs"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[24,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # April 2017
+    my_time = final_results.loc[final_results['Time'] == 147]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) &(row["Longhorn cattle"] <= 125) & (row["Longhorn cattle"] >= 75) &(row["Tamworth pigs"] <= 32) & (row["Tamworth pigs"] >= 12):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[25,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # May 2017
+    my_time = final_results.loc[final_results['Time'] == 148]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if  (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) &(row["Longhorn cattle"] <= 134) & (row["Longhorn cattle"] >= 84) &(row["Tamworth pigs"] <= 32) & (row["Tamworth pigs"] >= 12):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[26,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # June 2017
+    my_time = final_results.loc[final_results['Time'] == 149]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) &(row["Longhorn cattle"] <= 119) & (row["Longhorn cattle"] >= 69) &(row["Tamworth pigs"] <= 32) & (row["Tamworth pigs"] >= 12):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[27,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # July 2017
+    my_time = final_results.loc[final_results['Time'] == 150]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) &(row["Longhorn cattle"] <= 119) & (row["Longhorn cattle"] >= 69)&(row["Tamworth pigs"] <= 32) & (row["Tamworth pigs"] >= 12):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[28,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Aug 2017
+    my_time = final_results.loc[final_results['Time'] == 151]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) &(row["Longhorn cattle"] <= 119) & (row["Longhorn cattle"] >= 69)&(row["Tamworth pigs"] <= 32) & (row["Tamworth pigs"] >= 12):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[29,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Sept 2017
+    my_time = final_results.loc[final_results['Time'] == 152]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) &(row["Longhorn cattle"] <= 115) & (row["Longhorn cattle"] >= 65)& (row["Tamworth pigs"] <= 32) & (row["Tamworth pigs"] >= 12):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[30,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Oct 2017
+    my_time = final_results.loc[final_results['Time'] == 153]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) &(row["Longhorn cattle"] <= 113) & (row["Longhorn cattle"] >= 63)&(row["Tamworth pigs"] <= 32) & (row["Tamworth pigs"] >= 12):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[31,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Nov 2017
+    my_time = final_results.loc[final_results['Time'] == 154]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) &(row["Longhorn cattle"] <= 113) & (row["Longhorn cattle"] >= 63)&(row["Tamworth pigs"] <= 32) & (row["Tamworth pigs"] >= 12):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[32,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Dec 2017
+    my_time = final_results.loc[final_results['Time'] == 155]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) &(row["Longhorn cattle"] <= 113) & (row["Longhorn cattle"] >= 63)&(row["Tamworth pigs"] <= 28) & (row["Tamworth pigs"] >= 8):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[33,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # January 2018
+    my_time = final_results.loc[final_results['Time'] == 156]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) &(row["Longhorn cattle"] <= 113) & (row["Longhorn cattle"] >= 63)&(row["Tamworth pigs"] <= 21) & (row["Tamworth pigs"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[34,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # February 2018
+    my_time = final_results.loc[final_results['Time'] == 157]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) &(row["Longhorn cattle"] <= 113) & (row["Longhorn cattle"] >= 63)&(row["Tamworth pigs"] <= 26) & (row["Tamworth pigs"] >= 6):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[35,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+   
+
+    # March 2018
+    my_time = final_results.loc[final_results['Time'] == 158]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 10) & (row["Exmoor pony"] >= 8) & (row["Longhorn cattle"] <= 113) & (row["Longhorn cattle"] >= 63) &(row["Red deer"] <= 29) & (row["Red deer"] >= 19) &(row["Tamworth pigs"] <= 26) & (row["Tamworth pigs"] >= 6):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[36,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # April 2018
+    my_time = final_results.loc[final_results['Time'] == 159]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 10) & (row["Exmoor pony"] >= 8) & (row["Longhorn cattle"] <= 126) & (row["Longhorn cattle"] >= 76) &(row["Tamworth pigs"] <= 26) & (row["Tamworth pigs"] >= 6):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[37,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # May 2018
+    my_time = final_results.loc[final_results['Time'] == 160]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 10) & (row["Exmoor pony"] >= 8) &(row["Longhorn cattle"] <= 142) & (row["Longhorn cattle"] >= 92)&(row["Tamworth pigs"] <= 33) & (row["Tamworth pigs"] >= 13):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[38,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # June 2018
+    my_time = final_results.loc[final_results['Time'] == 161]
+    accepted_runs = []
+    for index, row in my_time.iterrows(): 
+        if (row["Exmoor pony"] <= 10) & (row["Exmoor pony"] >= 8) & (row["Longhorn cattle"] <= 128) & (row["Longhorn cattle"] >= 78)& (row["Tamworth pigs"] <= 33) & (row["Tamworth pigs"] >= 13):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[39,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # July 2018
+    my_time = final_results.loc[final_results['Time'] == 162]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if  (row["Exmoor pony"] <= 10) & (row["Exmoor pony"] >= 8) &(row["Longhorn cattle"] <= 128) & (row["Longhorn cattle"] >= 78)&(row["Tamworth pigs"] <= 32) & (row["Tamworth pigs"] >= 12):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[40,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Aug 2018
+    my_time = final_results.loc[final_results['Time'] == 163]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 127) & (row["Longhorn cattle"] >= 77) &(row["Tamworth pigs"] <= 32) & (row["Tamworth pigs"] >= 12):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[41,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Sept 2018
+    my_time = final_results.loc[final_results['Time'] == 164]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 131) & (row["Longhorn cattle"] >= 81) & (row["Tamworth pigs"] <= 32) & (row["Tamworth pigs"] >= 12):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[42,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Oct 2018
+    my_time = final_results.loc[final_results['Time'] == 165]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 126) & (row["Longhorn cattle"] >= 76) & (row["Tamworth pigs"] <= 31) & (row["Tamworth pigs"] >= 11):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[43,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Nov 2018
+    my_time = final_results.loc[final_results['Time'] == 166]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 118) & (row["Longhorn cattle"] >= 68) & (row["Tamworth pigs"] <= 19) & (row["Tamworth pigs"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[44,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Dec 2018
+    my_time = final_results.loc[final_results['Time'] == 167]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 114) & (row["Longhorn cattle"] >= 64) & (row["Tamworth pigs"] <= 19) & (row["Tamworth pigs"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[45,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Jan 2019
+    my_time = final_results.loc[final_results['Time'] == 168]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 114) & (row["Longhorn cattle"] >= 64) & (row["Tamworth pigs"] <= 19) & (row["Tamworth pigs"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[46,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Feb 2019
+    my_time = final_results.loc[final_results['Time'] == 169]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 112) & (row["Longhorn cattle"] >= 62) &(row["Tamworth pigs"] <= 20) & (row["Tamworth pigs"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[47,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+  
+
+    # March 2019
+    my_time = final_results.loc[final_results['Time'] == 170]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Fallow deer"] <= 303) & (row["Fallow deer"] >= 253) &(row["Longhorn cattle"] <= 112) & (row["Longhorn cattle"] >= 62) &(row["Red deer"] <= 42) & (row["Red deer"] >= 32) & (row["Tamworth pigs"] <= 19) & (row["Tamworth pigs"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[48,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # April 2019
+    my_time = final_results.loc[final_results['Time'] == 171]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 126) & (row["Longhorn cattle"] >= 76) &(row["Tamworth pigs"] <= 18) & (row["Tamworth pigs"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[49,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # May 2019
+    my_time = final_results.loc[final_results['Time'] == 172]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 135) & (row["Longhorn cattle"] >= 85) & (row["Tamworth pigs"] <= 18) & (row["Tamworth pigs"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[50,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # June 2019
+    my_time = final_results.loc[final_results['Time'] == 173]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 114) & (row["Longhorn cattle"] >= 64) & (row["Tamworth pigs"] <= 18) & (row["Tamworth pigs"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[51,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # July 2019
+    my_time = final_results.loc[final_results['Time'] == 174]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 116) & (row["Longhorn cattle"] >= 66) &(row["Tamworth pigs"] <= 19) & (row["Tamworth pigs"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[52,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Aug 2019
+    my_time = final_results.loc[final_results['Time'] == 175]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 116) & (row["Longhorn cattle"] >= 66) & (row["Tamworth pigs"] <= 19) & (row["Tamworth pigs"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[53,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Sept 2019
+    my_time = final_results.loc[final_results['Time'] == 176]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 118) & (row["Longhorn cattle"] >= 68) & (row["Tamworth pigs"] <= 19) & (row["Tamworth pigs"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[54,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Oct 2019
+    my_time = final_results.loc[final_results['Time'] == 177]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 113) & (row["Longhorn cattle"] >= 63) &(row["Tamworth pigs"] <= 19) & (row["Tamworth pigs"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[55,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Nov 2019
+    my_time = final_results.loc[final_results['Time'] == 178]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 112) & (row["Longhorn cattle"] >= 62) & (row["Tamworth pigs"] <= 19) & (row["Tamworth pigs"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[56,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Dec 2019
+    my_time = final_results.loc[final_results['Time'] == 179]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 105) & (row["Longhorn cattle"] >= 55) & (row["Tamworth pigs"] <= 20) & (row["Tamworth pigs"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[57,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # Jan 2020
+    my_time = final_results.loc[final_results['Time'] == 180]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 105) & (row["Longhorn cattle"] >= 55) & (row["Tamworth pigs"] <= 20) & (row["Tamworth pigs"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[58,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+  
+    # Feb 2020
+    my_time = final_results.loc[final_results['Time'] == 181]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Longhorn cattle"] <= 104) & (row["Longhorn cattle"] >= 54) & (row["Tamworth pigs"] <= 18) & (row["Tamworth pigs"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[59,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+  
+    # March 2020
+    my_time = final_results.loc[final_results['Time'] == 182]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Fallow deer"] <= 272) & (row["Fallow deer"] >= 222) & (row["Red deer"] <= 40) & (row["Red deer"] >= 32) &(row["Longhorn cattle"] <= 106) & (row["Longhorn cattle"] >= 56)&(row["Tamworth pigs"] <= 17) & (row["Tamworth pigs"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[60,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    # April 2020
+    my_time = final_results.loc[final_results['Time'] == 183]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Exmoor pony"] <= 17) & (row["Exmoor pony"] >= 14) &(row["Longhorn cattle"] <= 106) & (row["Longhorn cattle"] >= 56) &(row["Tamworth pigs"] <= 17) & (row["Tamworth pigs"] >= 1):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[61,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
     # May 2020
-    all_accepted_runs = filtered_preReintro[(filtered_preReintro["Time"] == 184) &
-    # (filtered_April2020["Tamworth pigs"] <= 21) & (filtered_April2020["Tamworth pigs"] >= 17) &
-    (filtered_preReintro["Exmoor pony"] <= 17) & (filtered_preReintro["Exmoor pony"] >= 14) &
-    # (filtered_preReintro["Longhorn cattle"] <= 89) & (filtered_preReintro["Longhorn cattle"] >= 73) &
-    (filtered_preReintro["Roe deer"] <= 80) & (filtered_preReintro["Roe deer"] >= 20) & 
-    (filtered_preReintro["Grassland"] <= 69) & (filtered_preReintro["Grassland"] >= 49) & 
-    (filtered_preReintro["Thorny Scrub"] <= 35) & (filtered_preReintro["Thorny Scrub"] >= 21) &
-    (filtered_preReintro["Woodland"] <= 29) & (filtered_preReintro["Woodland"] >= 9)]
+    my_time = final_results.loc[final_results['Time'] == 184]
+    accepted_runs = []
+    for index, row in my_time.iterrows():
+        if (row["Tamworth pigs"] <= 29) & (row["Tamworth pigs"] >= 9) &(row["Exmoor pony"] <= 17) & (row["Exmoor pony"] >= 14) &(row["Longhorn cattle"] <= 106) & (row["Longhorn cattle"] >= 56) &(row["Roe deer"] <= 80) & (row["Roe deer"] >= 20) & (row["Grassland"] <= 69) & (row["Grassland"] >= 49) & (row["Thorny Scrub"] <= 35) & (row["Thorny Scrub"] >= 21) &(row["Woodland"] <= 29) & (row["Woodland"] >= 9):
+            accepted_runs.append(row["run_number"])
+            difficult_filters.loc[62,'times_passed'] += 1
+    final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
+    
 
-    print("number passed all filters:", len(all_accepted_runs))
-
-    # take these filters - linux cluster a ton of times and save the parameters that are accepted. Keep looping it till Monday so we have a bunch of sets of results
-    # maybe take top 100 that pass most filters
-    # parameters - sensitivity; which one changed the most and by how much. Vary 1 parameter at a time
-    # do numbers graph
+    difficult_filters.to_csv('difficult_filters_49.csv')
+    # get the top 1% of results 
+    last_year = final_results.loc[final_results['Time'] == 184] # pick one year to look at
+    best_results = last_year.nlargest(100, 'passed_filters')
+    # keep track of how many passed filters
+    filters_passed_graph = best_results[["passed_filters"]]/63
+    filters_passed_graph["perc"] = 50
+    filters_passed_graph.to_excel('filters_passed_graph_49.xlsx')
 
     # accepted parameters
-    accepted_parameters = final_parameters[final_parameters['run_number'].isin(all_accepted_runs['run_number'])]
+    accepted_parameters = final_parameters[final_parameters['run_number'].isin(best_results['run_number'])]
     # tag the accepted simulations
     final_results['accepted?'] = np.where(final_results['run_number'].isin(accepted_parameters['run_number']), 'Accepted', 'Rejected')
+    final_results.to_csv('final_results_49.csv')
 
-    # with pd.option_context('display.max_columns',None):
-    #     print(accepted_parameters)
-    #     # just_nodes = final_results[final_results['Time'] == 184]
-    #     # print(just_nodes[["Time", "Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"]])
-    
-    # with pd.option_context('display.max_rows',None, 'display.max_columns',None):
-    #     print("accepted_years: \n", all_accepted_runs)
-
-
-    # save to excel sheet
-    # final_parameters.to_excel("all_parameters.xlsx")
-    accepted_parameters.to_excel("accepted_parameters.xlsx")
-
+    # save to csv - all parameters
+    final_parameters["accepted?"] = np.where(final_parameters['run_number'].isin(best_results['run_number']), 'Accepted', 'Rejected')
+    final_parameters.to_csv('all_parameters_49.csv')
+    accepted_parameters.to_csv('accepted_parameters_49.csv')
 
     return number_simulations, final_results, accepted_parameters
+
+run_all_models()
 

@@ -10,66 +10,95 @@ from scipy.stats import linregress
 
 
 # # define the parameters
-# chance_reproduceSapling = 0.10453203
-# chance_reproduceYoungScrub = 0.23984245
-# chance_regrowGrass = 0.30678081
-# chance_saplingBecomingTree = 0.00280897
-# chance_youngScrubMatures = 0.00586312
-# chance_scrubOutcompetedByTree = 0.02446419
-# chance_grassOutcompetedByTree = 0.9462915
-# chance_grassOutcompetedByScrub = 0.9426664
-# chance_saplingOutcompetedByTree = 0.92489406
-# chance_saplingOutcompetedByScrub =0.89946235
-# chance_youngScrubOutcompetedByScrub = 0.92686055
-# chance_youngScrubOutcompetedByTree = 0.94425658
-
+# chance_reproduceSapling = 0.04206406
+# chance_reproduceYoungScrub =0.1109531
+# chance_regrowGrass = 0.24463218
+# chance_saplingBecomingTree = 0.00289472
+# chance_youngScrubMatures = 0.00601638
+# chance_scrubOutcompetedByTree = 0.03450849
+# chance_grassOutcompetedByTree = 0.28874493
+# chance_grassOutcompetedByScrub = 0.29790348
+# chance_saplingOutcompetedByTree = 0.35425409
+# chance_saplingOutcompetedByScrub =0.25885052
+# chance_youngScrubOutcompetedByScrub = 0.37929889
+# chance_youngScrubOutcompetedByTree = 0.3982258
 # # initial values
 # initial_roeDeer = 0.12
 # initial_grassland = 0.8
 # initial_woodland = 0.14
 # initial_scrubland = 0.01
-
 # # roe deer
-# roeDeer_reproduce = 0.1820612
-# roeDeer_gain_from_grass = 0.87653423
-# roeDeer_gain_from_Trees = 0.56002015
-# roeDeer_gain_from_Scrub = 0.31700781
-# roeDeer_gain_from_Saplings = 0.17359909
-# roeDeer_gain_from_YoungScrub = 0.10501903
+# roeDeer_reproduce = 0.18215313
+# roeDeer_gain_from_grass = 0.69330732
+# roeDeer_gain_from_Trees = 0.6982617
+# roeDeer_gain_from_Scrub = 0.46792347
+# roeDeer_gain_from_Saplings =0.14360982
+# roeDeer_gain_from_YoungScrub =0.10447744
 # # Fallow deer
-# fallowDeer_reproduce = 0.28999103
-# fallowDeer_gain_from_grass = 0.80584063
-# fallowDeer_gain_from_Trees = 0.54393178
-# fallowDeer_gain_from_Scrub = 0.28713036
-# fallowDeer_gain_from_Saplings = 0.10079212
-# fallowDeer_gain_from_YoungScrub = 0.07335673
+# fallowDeer_reproduce = 0.28586154
+# fallowDeer_gain_from_grass =0.60193723
+# fallowDeer_gain_from_Trees = 0.62907582
+# fallowDeer_gain_from_Scrub = 0.41669232
+# fallowDeer_gain_from_Saplings = 0.13022322
+# fallowDeer_gain_from_YoungScrub = 0.07403832
 # # Red deer
-# redDeer_reproduce = 0.31560646
-# redDeer_gain_from_grass = 0.76444708
-# redDeer_gain_from_Trees = 0.45464787
-# redDeer_gain_from_Scrub = 0.22482635
-# redDeer_gain_from_Saplings = 0.08840829
-# redDeer_gain_from_YoungScrub = 0.06817436
+# redDeer_reproduce = 0.3065381
+# redDeer_gain_from_grass = 0.5464753
+# redDeer_gain_from_Trees = 0.57759807
+# redDeer_gain_from_Scrub = 0.39375145
+# redDeer_gain_from_Saplings = 0.11916663
+# redDeer_gain_from_YoungScrub = 0.06335441
 # # Exmoor ponies
-# ponies_gain_from_grass = 0.72915031
-# ponies_gain_from_Trees = 0.4142464
-# ponies_gain_from_Scrub = 0.16508224
-# ponies_gain_from_Saplings = 0.07216459
-# ponies_gain_from_YoungScrub = 0.05341865
+# ponies_gain_from_grass = 0.46791793
+# ponies_gain_from_Trees = 0.50082365
+# ponies_gain_from_Scrub = 0.34385853
+# ponies_gain_from_Saplings = 0.10451826
+# ponies_gain_from_YoungScrub =0.05673449
 # # Longhorn cattle
-# cows_reproduce = 0.21197986
-# cows_gain_from_grass = 0.68746036
-# cows_gain_from_Trees = 0.33225956
-# cows_gain_from_Scrub = 0.11829169
-# cows_gain_from_Saplings = 0.06269837
-# cows_gain_from_YoungScrub = 0.03042194
+# cows_reproduce = 0.20204395
+# cows_gain_from_grass = 0.44058728
+# cows_gain_from_Trees = 0.45394087
+# cows_gain_from_Scrub = 0.2761602
+# cows_gain_from_Saplings = 0.08643107
+# cows_gain_from_YoungScrub = 0.04245426
 # # Tamworth pigs
-# pigs_reproduce = 0.24808032
-# pigs_gain_from_grass = 0.60543958
-# pigs_gain_from_Trees = 0.525367
-# pigs_gain_from_Scrub = 0.16852274
-# pigs_gain_from_Saplings = 0.16226507
-# pigs_gain_from_YoungScrub = 0.05785037
+# pigs_reproduce = 0.33496453
+# pigs_gain_from_grass =0.39056552
+# pigs_gain_from_Trees = 0.6909069
+# pigs_gain_from_Scrub = 0.47493354
+# pigs_gain_from_Saplings = 0.07887992
+# pigs_gain_from_YoungScrub = 0.08125611
+
+# # stocking values
+# fallowDeer_stocking = 247
+# cattle_stocking = 81
+# redDeer_stocking = 35
+# tamworthPig_stocking = 7
+# exmoor_stocking = 15
+# # euro bison parameters
+# reproduce_bison = 0
+# # bison should have higher impact than any other consumer
+# bison_gain_from_grass =  0
+# bison_gain_from_Trees =0
+# bison_gain_from_Scrub =0
+# bison_gain_from_Saplings = 0
+# bison_gain_from_YoungScrub = 0  
+# # euro elk parameters
+# reproduce_elk = 0
+# # bison should have higher impact than any other consumer
+# elk_gain_from_grass =  0
+# elk_gain_from_Trees = 0
+# elk_gain_from_Scrub = 0
+# elk_gain_from_Saplings =  0
+# elk_gain_from_YoungScrub =  0
+# # reindeer parameters
+# reproduce_reindeer = 0
+# # reindeer should have impacts between red and fallow deer
+# reindeer_gain_from_grass = 0
+# reindeer_gain_from_Trees =0
+# reindeer_gain_from_Scrub =0
+# reindeer_gain_from_Saplings = 0
+# reindeer_gain_from_YoungScrub = 0
 
 
 # # keep track of my parameters
@@ -300,7 +329,7 @@ top_ten = roe_gradients.iloc[0:10,:]
 top_ten.to_excel("/Users/emilyneil/Desktop/KneppABM/outputs/sensitivity/final_df_gradients_roeDeer.xlsx")
 # plot those
 top_ten_roe = merged_dfs[merged_dfs['Parameter_Changes'].isin(top_ten['Parameter_names'])]
-sns.set(font_scale=1.5)
+sns.set(font_scale=1)
 ro = sns.relplot(data=top_ten_roe, x='Parameter_Value', y='Roe deer', col='Parameter_Changes', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
 ro.fig.suptitle('Roe deer gradients')
 ro.set_titles('{col_name}')

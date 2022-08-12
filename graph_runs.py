@@ -1,148 +1,333 @@
 # graph the runs
-from run_experiments import run_counterfactual
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import glob
+import os
 import itertools    
+import gc
+from scipy import stats
+import matplotlib.patches as mpatches
+import xarray as xr
 
 
-def graph_runs():
+def organise_output_data():
 
-    number_simulations, final_results, counterfactual, accepted_parameters = run_counterfactual()
+    # # check which filters were hardest to pass; open and merge files 
+    # filter_files = glob.glob(os.path.join("outputs/perc_bound_experiments/fifty_perc_copy/", "difficult_filters*.csv"))
+    # final_filters = pd.concat(map(pd.read_csv, filter_files), ignore_index=True).iloc[: , 1:]
+    # # sum filters & add row where filter_number = 0 and times_passed = 100000 for starting condition so we can divide them
+    # summed_filters = final_filters.groupby(['filter_number'], as_index=False).sum().append({'times_passed': 100000, 'filter_number':0}, ignore_index = True)
+    # # add proportion to find bottlenecks 
+    # sorted = summed_filters.sort_values('times_passed', ascending=True)
+    # sorted.to_excel("sorted_filters.xlsx")
 
-    # there were 8 parameters that were in the top 10 most important parameters for >6/9 nodes. Histograms:
+    # setting the path for joining multiple files & list of merged files returned
+    files = glob.glob(os.path.join("outputs/perc_bound_experiments/fifty_perc_copy/", "final_results*.csv"))
+    parameter_files = glob.glob(os.path.join("outputs/perc_bound_experiments/fifty_perc_copy/", "all_parameters*.csv"))
+
+    # # make sure run_numbers don't overlap
+    # numbers = 0
+    # for f in files:
+    #     for pf in parameter_files:
+    #         a, b = f.split('_'), pf.split('_')
+    #         if a[6] == b[6]: # check this each time
+    #             df, df1 = pd.read_csv(f), pd.read_csv(pf)
+    #             df['run_number'] = df['run_number'] + numbers
+    #             df1['run_number'] = df1['run_number'] + numbers
+    #             numbers += 10000
+    #             df.to_csv(f'{f}')
+    #             df1.to_csv(f'{pf}')
+
+    # create a temporary file with only the last year that passed habs filters, filters passed
+    last_year_accepted_habitats = pd.DataFrame()
+    for file in files:
+        df = pd.read_csv(file)
+        # drop the first two columns
+        df = df.iloc[: , 2:]
+        # look at only the last year
+        last_year = df.loc[df['Time'] == 184]
+        # does it pass the habitat filters?
+        accepted_habs = last_year.loc[(last_year['Grassland'] <= 69) & (last_year['Grassland'] >= 49) & 
+        (last_year['Thorny Scrub'] <= 35) & (last_year["Thorny Scrub"] >= 21) & 
+        (last_year["Woodland"] <= 29) & (last_year["Woodland"] >= 9) &
+        (last_year["Roe deer"] <= 80) & (last_year["Roe deer"] >= 20)]
+        # if yes, append it to the temp dataframe
+        last_year_accepted_habitats = last_year_accepted_habitats.append(accepted_habs)
+    print(len(last_year_accepted_habitats))
+
+    # take the top 1% of those runs 
+    best_results = last_year_accepted_habitats.nlargest(round(last_year_accepted_habitats.shape[0]*0.01), 'passed_filters')
+    print(len(best_results))
+    # loop through the csvs again
+    final_accepted_results = pd.DataFrame()
+    for file in files:
+        df = pd.read_csv(file)
+        # drop first column
+        df = df.iloc[: , 2:]
+        # if the accepted run_number is there, label as accepted
+        df['accepted?'] = np.where(df['run_number'].isin(best_results['run_number']), 'Accepted', 'Rejected')
+        accepted_df = df.loc[df['accepted?'] == 'Accepted']
+        # and append it to final_results
+        final_accepted_results = final_accepted_results.append(accepted_df)
+
+    # pick one df; take the rejected runs and append to a diff dataframe (for graphing)
+    temp_df = pd.read_csv(files[0]).iloc[: , 2:]
+    temp_df['accepted?'] = np.where(temp_df['run_number'].isin(best_results['run_number']), 'Accepted', 'Rejected')
+    temp_df_rejected = temp_df.loc[temp_df['accepted?'] == 'Rejected']
+
+    # concat the dataframes and save to csv
+    final_results = pd.concat([final_accepted_results,temp_df_rejected], axis=0)
+    final_results.to_csv("combined_results.csv")
+
+    # now find accepted parameters
+    final_parameters = pd.concat(map(pd.read_csv, parameter_files), ignore_index=True)
+    # drop first column
+    final_parameters = final_parameters.iloc[: , 2:] 
+    # select the top 1% of parameters
+    accepted_parameters = final_parameters[final_parameters['run_number'].isin(best_results['run_number'])]
+    accepted_parameters.to_csv("combined_accepted_parameters.csv")
+
+    # use accepted params to run experiments
+    from experiments_counterfac_stockingDensity import run_counterfactual
+    counterfactual = run_counterfactual(accepted_parameters)
+    number_simulations = 100000
+
+
+def histograms():
+    
+    final_results = pd.read_csv('combined_results.csv') 
+    accepted_parameters = pd.read_csv('combined_accepted_parameters.csv') 
+
+    # KS test
+    accepted = accepted_parameters.iloc[:,1:52]
+    accepted = accepted.drop(['initial_roeDeer', 'initial_grassland', 'initial_woodland', 'initial_scrubland'], 1)
+    for column in accepted:
+        print(column,stats.kstest(accepted[column], stats.uniform(loc=min(accepted[column]), scale=(max(accepted[column])-min(accepted[column]))).cdf))
+    
+    # corr matrix
+    corr = accepted.corr()
+    # mask the upper triangle; True = do NOT show
+    mask = np.zeros_like(corr, dtype=np.bool)
+    mask[np.triu_indices_from(mask)] = True
+    # graph it 
+    f, ax = plt.subplots(figsize=(11, 9))
+    cmap =sns.diverging_palette(220, 60, l=65, center="light", as_cmap=True)
+    # Draw the heatmap with the mask and correct aspect ratio
+    heatmap = sns.heatmap(
+        corr,          # The data to plot
+        mask=mask,     # Mask some cells
+        cmap=cmap,     # What colors to plot the heatmap as
+        annot=False,    # Should the values be plotted in the cells?
+        vmax=1,       # The maximum value of the legend. All higher vals will be same color
+        vmin=-1,      # The minimum value of the legend. All lower vals will be same color
+        center=0,      # The center value of the legend. With divergent cmap, where white is
+        square=True,   # Force cells to be square
+        linewidths=0.1, # Width of lines that divide cells
+        cbar_kws={"shrink": .5},  # Extra kwargs for the legend; in this case, shrink by 50%
+    )
+    heatmap.figure.tight_layout()
+    plt.savefig('corr_matrix.png')
+    plt.show()
+
+    # Histograms
+    # 1
+    accepted_parameters["chance_reproduceSapling"].hist()
+    plt.title("Histogram of chance_reproduceSapling")
+    plt.savefig('hist_parameter1.png')
+    plt.show()
+    # 2
+    accepted_parameters["chance_reproduceYoungScrub"].hist()
+    plt.title("Histogram of chance_reproduceYoungScrub")
+    plt.savefig('hist_parameter2.png')
+    plt.show()
+    # 3
     accepted_parameters["chance_saplingBecomingTree"].hist()
     plt.title("Histogram of chance_saplingBecomingTree")
-    # plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/one_perc/hist_parameter1.png')
-    plt.savefig('hist_parameter1_50%.png')
+    plt.savefig('hist_parameter3.png')
     plt.show()
-
+    # 4
     accepted_parameters["chance_youngScrubMatures"].hist()
     plt.title("Histogram of chance_youngScrubMatures")
-    # plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/one_perc/hist_parameter2.png')
-    plt.savefig('hist_parameter2_25%.png')
+    plt.savefig('hist_parameter4.png')
+    plt.show()
+    # 5
+    accepted_parameters["chance_grassOutcompetedByTree"].hist()
+    plt.title("Histogram of chance_grassOutcompetedByTree")
+    plt.savefig('hist_parameter5.png')
+    plt.show()
+    # 6
+    accepted_parameters["chance_grassOutcompetedByScrub"].hist()
+    plt.title("Histogram of chance_grassOutcompetedByScrub")
+    plt.savefig('hist_parameter6.png')
+    plt.show()
+    # 7
+    accepted_parameters["chance_saplingOutcompetedByTree"].hist()
+    plt.title("Histogram of chance_saplingOutcompetedByTree")
+    plt.savefig('hist_parameter7.png')
+    plt.show()
+    # 8
+    accepted_parameters["roeDeer_reproduce"].hist()
+    plt.title("Histogram of roeDeer_reproduce")
+    plt.savefig('hist_parameter8.png')
+    plt.show()
+    # 9
+    accepted_parameters["cows_reproduce"].hist()
+    plt.title("Histogram of cows_reproduce")
+    plt.savefig('hist_parameter9.png')
+    plt.show()
+    # 10
+    accepted_parameters["fallowDeer_reproduce"].hist()
+    plt.title("Histogram of fallowDeer_reproduce")
+    plt.savefig('hist_parameter10.png')
+    plt.show()
+    # 11
+    accepted_parameters["redDeer_reproduce"].hist()
+    plt.title("Histogram of redDeer_reproduce")
+    plt.savefig('hist_parameter11.png')
+    plt.show()
+    # 12
+    accepted_parameters["pigs_reproduce"].hist()
+    plt.title("Histogram of pigs_reproduce")
+    plt.savefig('hist_parameter12.png')
     plt.show()
 
-    accepted_parameters["cows_gain_from_YoungScrub"].hist()
-    plt.title("Histogram of cows_gain_from_YoungScrub")
-    # plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/one_perc/hist_parameter3.png')
-    plt.savefig('hist_parameter3_25%.png')
-    plt.show()
 
-    accepted_parameters["pigs_gain_from_YoungScrub"].hist()
-    plt.title("Histogram of pigs_gain_from_YoungScrub")
-    # plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/one_perc/hist_parameter4.png')
-    plt.savefig('hist_parameter4_25%.png')
-    plt.show()
 
-    accepted_parameters["ponies_gain_from_Saplings"].hist()
-    plt.title("Histogram of ponies_gain_from_Saplings")
-    # plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/one_perc/hist_parameter4.png')
-    plt.savefig('hist_parameter5_25%.png')
-    plt.show()
-
+def graph_passed_filters():
+    # graph the number of filters passed per % above/below
     palette=['#db5f57', '#57d3db', '#57db5f','#5f57db', '#db57d3']
-    # NUMBERS GRAPHS #
-    numbers_results = final_results[["Time", "Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas", "accepted?", "run_number"]]
-    counterfactual_results = counterfactual[["Time", "Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas", "accepted?", "run_number"]]
-    # accepted shape
-    accepted_shape_numbers1 = np.repeat(numbers_results['accepted?'], 12)
-    accepted_shape_counterfactual_numbers = np.repeat(counterfactual_results['accepted?'], 12)
-    accepted_shape_numbers = pd.concat([accepted_shape_numbers1, accepted_shape_counterfactual_numbers], axis=0)
-    # y values - number of trees, scrub, etc. 
-    y_values_finaldf_number = numbers_results.drop(['run_number', 'accepted?', 'Time'], axis=1).values.flatten()
-    y_values_counterfactual_number = counterfactual_results.drop(['run_number', 'accepted?', 'Time'], axis=1).values.flatten()
-    y_values_numbers = np.concatenate((y_values_finaldf_number, y_values_counterfactual_number), axis=0)
-    # grouping variable
-    grouping_variable_finaldf = np.repeat(numbers_results['run_number'], 12)
-    grouping_variable_counterfactual = np.repeat(counterfactual_results['run_number'], 12)
-    grouping_variable_numbers = pd.concat([grouping_variable_finaldf, grouping_variable_counterfactual], axis=0)
-    # species list. this should be +1 the number of simulations
-    species_list_finaldf = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Mature Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas"], 185*number_simulations) 
-    species_list_counterfactual = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Mature Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas"], 185*len(accepted_parameters))
-    species_list_numbers = np.concatenate((species_list_finaldf, species_list_counterfactual), axis=0)
-    # indices
-    indices_finaldf = np.repeat(numbers_results['Time'], 12)
-    indices_counterfactual = np.repeat(counterfactual_results['Time'], 12)
-    indices_numbers = pd.concat([indices_finaldf, indices_counterfactual], axis=0)
+    filters = pd.read_csv('combined_results.csv')
+    filters = filters.loc[filters['Time'] == 184]
+    filters["passed_filters"] = filters[["passed_filters"]]/64 # show percentage passed
 
-    # make the final dataframe
-    final_df_numbers = pd.DataFrame(
-    {'Abundance %': y_values_numbers, 'runNumber': grouping_variable_numbers, 'Ecosystem Element': species_list_numbers, 'Time': indices_numbers, 'runType': accepted_shape_numbers})
-    filtered_final_numbers = final_df_numbers.loc[(final_df_numbers['runType'] == "Accepted") | (final_df_numbers['runType'] == "Rejected") ]
-    # calculate median 
-    m = filtered_final_numbers.groupby(['Time', 'runType', 'Ecosystem Element'])[['Abundance %']].apply(np.median)
-    m.name = 'Median'
-    filtered_final_numbers = filtered_final_numbers.join(m, on=['Time', 'runType', 'Ecosystem Element'])
-    # calculate quantiles
-    perc1 = filtered_final_numbers.groupby(['Time', 'runType', 'Ecosystem Element'])['Abundance %'].quantile(.95)
-    perc1.name = 'ninetyfivePerc'
-    filtered_final_numbers = filtered_final_numbers.join(perc1, on=['Time', 'runType', 'Ecosystem Element'])
-    perc2 = filtered_final_numbers.groupby(['Time', 'runType', 'Ecosystem Element'])['Abundance %'].quantile(.05)
-    perc2.name = "fivePerc"
-    filtered_final_numbers = filtered_final_numbers.join(perc2, on=['Time','runType', 'Ecosystem Element'])
-    # reset the index
-    filtered_final_numbers = filtered_final_numbers.reset_index(drop=True)
+    d = np.diff(np.unique(filters[['passed_filters']])).min()
+    left_of_first_bin = np.unique(filters[['passed_filters']]).min() - float(d)/2
+    right_of_last_bin = np.unique(filters[['passed_filters']]).max() + float(d)/2
 
-    # now graph it
-    g = sns.FacetGrid(filtered_final_numbers, col="Ecosystem Element", hue = "runType", palette = palette, col_wrap=5, sharey = False)
-    g.map(sns.lineplot, 'Time', 'Median')
-    g.map(sns.lineplot, 'Time', 'fivePerc')
-    g.map(sns.lineplot, 'Time', 'ninetyfivePerc')
-    for ax in g.axes.flat:
-        ax.fill_between(ax.lines[2].get_xdata(),ax.lines[2].get_ydata(), ax.lines[4].get_ydata(), color="#db5f57", alpha=0.2)
-        ax.fill_between(ax.lines[3].get_xdata(),ax.lines[3].get_ydata(), ax.lines[5].get_ydata(), color="#57d3db", alpha=0.2)
-        ax.set_ylabel('Abundance')
-    axes = g.axes.flatten()
-    # fill between the quantiles
-    axes = g.axes.flatten()
-    axes[0].set_title("Roe deer")
-    axes[1].set_title("Exmoor pony")
-    axes[2].set_title("Fallow deer")
-    axes[3].set_title("Longhorn cattle")
-    axes[4].set_title("Red deer")
-    axes[5].set_title("Tamworth pigs")
-    axes[6].set_title("Grass")
-    axes[7].set_title("Mature Trees")
-    axes[8].set_title("Mature Scrub")
-    axes[9].set_title("Saplings")
-    axes[10].set_title("Young Scrub")
-    axes[11].set_title("Bare ground")
-    # stop the plots from overlapping
-    g.fig.suptitle("Accepted vs. Rejected Runs: Ecosystem Elements & Habitat Components")
-    plt.tight_layout()
-    plt.legend(labels=['Rejected Runs', 'Accepted Runs'],bbox_to_anchor=(2.2, 0), loc='lower right', fontsize=12)
-    # plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/one_perc/outputs_numbers_acceptedRejected.png')
-    plt.savefig('outputs_numbers_acceptedRejected_50%.png')
+    fig, ax = plt.subplots()
+    sns.histplot(
+        data=filters, x='passed_filters', hue='accepted?', multiple='stack',
+        ax=ax, palette="hls", bins=np.arange(left_of_first_bin, right_of_last_bin + d, d)
+    )
+    plt.xlabel("Percentage of filters passed")
+    plt.ylabel("Count")
+    plt.title("Percentage of filters passed by the accepted runs")
+    plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/filtersPassed_100k.png')
     plt.show()
 
 
+def graph_hardest_filters():
+    final_results = pd.read_csv('combined_results.csv') 
+    temp_results = final_results.loc[final_results['Time'] == 184]
+    
+    fig, ax = plt.subplots()
+    sns.histplot(
+        data=temp_results, x='Woodland', multiple='stack',
+        ax=ax, palette="hls", bins=35) # ,bins = 25
 
-    # counterfactual numbers
-    filtered_final_numbers_counter = final_df_numbers.loc[(final_df_numbers['runType'] == "Accepted") | (final_df_numbers['runType'] == "noReintro")]
+    plt.xlabel("Percentage Woodland")
+    plt.ylabel("Count")
+    plt.title("Woodland in May 2020")
+    # add filter numbers
+    left, bottom, width, height = (9, 0, 20 , 30000)
+    rect=mpatches.Rectangle((left,bottom),width,height, 
+                            alpha=0.1,
+                        facecolor="red")
+    plt.gca().add_patch(rect)
+    plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/hardestFilter_wood_May2020.png')
+    plt.show()
+
+graph_hardest_filters()
+
+def clean_dataframes():
+    # open the counterfactul dataframe
+    counterfactual = pd.read_csv('combined_counterfactual.csv').iloc[: , 1:]
+    # and main dataframe
+    final_results = pd.read_csv('combined_results.csv').iloc[: , 1:]
+    # and parameters
+    accepted_parameters = pd.read_csv('combined_accepted_parameters.csv').iloc[: , 1:]
+
+     # now create the new df - numbers
+    final_df_numbers = pd.DataFrame(np.concatenate([np.repeat(final_results['accepted?'], 12), np.repeat(counterfactual['accepted?'], 12)], axis=0), columns=['runType']).astype("category")
+    final_df_numbers["Abundance %"] = pd.DataFrame(np.concatenate(
+                    (final_results[["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas"]].values.flatten(),
+                     counterfactual[["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas"]].values.flatten()), 
+                     axis=0))
+    final_df_numbers["runNumber"] = pd.DataFrame(np.concatenate([np.repeat(final_results['run_number'], 12), np.repeat(counterfactual['run_number'], 12)], axis=0)).astype("int32")
+    final_df_numbers["Time"] = pd.DataFrame(np.concatenate([np.repeat(final_results['Time'], 12), np.repeat(counterfactual['Time'], 12)], axis=0)).astype("int16")
+    # this should be len(number_simulations) and len(accepted_parameters)
+    final_df_numbers["Ecosystem Element"] = pd.DataFrame(np.concatenate(
+        (np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas"], len(final_results)),
+                    np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas"], 185*len(accepted_parameters))),
+                    axis=0)).astype("category")
     # calculate median 
-    m2 = filtered_final_numbers_counter.groupby(['Time', 'runType', 'Ecosystem Element'])[['Abundance %']].apply(np.median)
-    m2.name = 'Median'
-    filtered_final_numbers_counter = filtered_final_numbers_counter.join(m2, on=['Time', 'runType', 'Ecosystem Element'])
+    m = final_df_numbers.groupby(['Time', 'runType', 'Ecosystem Element'])[['Abundance %']].apply(np.median)
+    m.name = 'Median'
+    final_df_numbers = final_df_numbers.join(m, on=['Time', 'runType', 'Ecosystem Element'])
     # calculate quantiles
-    perc12 = filtered_final_numbers_counter.groupby(['Time', 'runType', 'Ecosystem Element'])['Abundance %'].quantile(.95)
-    perc12.name = 'ninetyfivePerc'
-    filtered_final_numbers_counter = filtered_final_numbers_counter.join(perc12, on=['Time', 'runType', 'Ecosystem Element'])
-    perc22 = filtered_final_numbers_counter.groupby(['Time', 'runType', 'Ecosystem Element'])['Abundance %'].quantile(.05)
-    perc22.name = "fivePerc"
-    filtered_final_numbers_counter = filtered_final_numbers_counter.join(perc22, on=['Time','runType', 'Ecosystem Element'])
+    perc1 = final_df_numbers.groupby(['Time', 'runType', 'Ecosystem Element'])['Abundance %'].quantile(.95)
+    perc1.name = 'ninetyfivePerc'
+    final_df_numbers = final_df_numbers.join(perc1, on=['Time', 'runType', 'Ecosystem Element'])
+    perc2 = final_df_numbers.groupby(['Time', 'runType', 'Ecosystem Element'])['Abundance %'].quantile(.05)
+    perc2.name = "fivePerc"
+    final_df_numbers = final_df_numbers.join(perc2, on=['Time','runType', 'Ecosystem Element'])
     # reset the index
-    filtered_final_numbers_counter = filtered_final_numbers_counter.reset_index(drop=True)
- 
-    # now graph it
-    h = sns.FacetGrid(filtered_final_numbers_counter, col="Ecosystem Element", hue = "runType", palette = palette, col_wrap=5, sharey = False)
+    final_df_numbers = final_df_numbers.reset_index(drop=True)
+    final_df_numbers.to_csv("combined_df_numbers.csv")
+
+    # clear memory (so RAM isn't overloaded)
+    del final_df_numbers
+    gc.collect()
+
+    # now create the new df
+    final_df = pd.DataFrame(np.concatenate([np.repeat(final_results['accepted?'], 10), np.repeat(counterfactual['accepted?'], 10)], axis=0), columns=['runType']).astype("category")
+    final_df["Abundance %"] = pd.DataFrame(np.concatenate(
+                    (final_results[["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland","Woodland", "Thorny Scrub","Bare ground"]].values.flatten(),
+                     counterfactual[["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland","Thorny Scrub", "Bare ground"]].values.flatten()), 
+                     axis=0))
+    final_df["runNumber"] = pd.DataFrame(np.concatenate([np.repeat(final_results['run_number'], 10), np.repeat(counterfactual['run_number'], 10)], axis=0)).astype("int32")
+    final_df["Time"] = pd.DataFrame(np.concatenate([np.repeat(final_results['Time'], 10), np.repeat(counterfactual['Time'], 10)], axis=0)).astype("int16")
+    # this should be len(number_simulations) and len(accepted_parameters)
+    final_df["Ecosystem Element"] = pd.DataFrame(np.concatenate(
+        (np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Thorny Scrub", "Woodland", "Bare ground"], len(final_results)),
+                    np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs",  "Grassland", "Thorny Scrub", "Woodland", "Bare ground"], 185*len(accepted_parameters))),
+                    axis=0)).astype("category")
+    # calculate median 
+    m = final_df.groupby(['Time', 'runType', 'Ecosystem Element'])[['Abundance %']].apply(np.median)
+    m.name = 'Median'
+    final_df = final_df.join(m, on=['Time', 'runType', 'Ecosystem Element'])
+    # calculate quantiles
+    perc1 = final_df.groupby(['Time', 'runType', 'Ecosystem Element'])['Abundance %'].quantile(.95)
+    perc1.name = 'ninetyfivePerc'
+    final_df = final_df.join(perc1, on=['Time', 'runType', 'Ecosystem Element'])
+    perc2 = final_df.groupby(['Time', 'runType', 'Ecosystem Element'])['Abundance %'].quantile(.05)
+    perc2.name = "fivePerc"
+    final_df = final_df.join(perc2, on=['Time','runType', 'Ecosystem Element'])
+    # reset the index
+    final_df = final_df.reset_index(drop=True)
+    final_df.to_csv("combined_df.csv")
+
+
+def graph_counterfac():
+    # open dataframes
+    final_df_numbers = pd.read_csv('combined_df_numbers.csv').iloc[: , 1:]
+    final_df = pd.read_csv('combined_df.csv').iloc[: , 1:]
+
+    # COUNTERFACTUAL GRAPHS
+    palette=['#db5f57', '#57d3db', '#57db5f','#5f57db', '#db57d3']
+    
+    # numbers
+    final_df_numbers = final_df_numbers.loc[(final_df_numbers['runType'] == "Accepted") | (final_df_numbers['runType'] == "noReintro") ]
+    h = sns.FacetGrid(final_df_numbers, col="Ecosystem Element", hue = "runType", palette = palette, col_wrap=5, sharey = False)
     h.map(sns.lineplot, 'Time', 'Median')
     h.map(sns.lineplot, 'Time', 'fivePerc')
     h.map(sns.lineplot, 'Time', 'ninetyfivePerc')
     for ax in h.axes.flat:
         ax.fill_between(ax.lines[2].get_xdata(),ax.lines[2].get_ydata(), ax.lines[4].get_ydata(),color="#db5f57",alpha =0.2)
         ax.fill_between(ax.lines[3].get_xdata(),ax.lines[3].get_ydata(), ax.lines[5].get_ydata(), color="#57d3db",alpha=0.2)
+        ax.set_xlabel('Time (Months)')
         ax.set_ylabel('Abundance')
     # fill between the quantiles
     axes = h.axes.flatten()
@@ -162,52 +347,10 @@ def graph_runs():
     h.fig.suptitle("Reintroduction vs. No Reintroduction: Ecosystem Elements & Habitat Components")
     plt.tight_layout()
     plt.legend(labels=['Reintroductions', 'No reintroductions'],bbox_to_anchor=(2.2, 0),loc='lower right', fontsize=12)
-    # plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/one_perc/outputs_numbers_counterfactual.png')
-    plt.savefig('outputs_numbers_counterfactual_10%.png')
+    plt.savefig('outputs_numbers_counterfactual.png')
     plt.show()
-
-
-
-    # counterfactual graphs
-    final_results = final_results[["Time", "Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground", "accepted?", "run_number"]]
-    counterfactual = counterfactual[["Time", "Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground", "accepted?", "run_number"]]
-    # reshape final dataframe: accepted shape
-    accepted_shape_finaldf = np.repeat(final_results['accepted?'], 10)
-    accepted_shape_counterfactual = np.repeat(counterfactual['accepted?'], 10)
-    accepted_shape = pd.concat([accepted_shape_finaldf, accepted_shape_counterfactual], axis=0)
-    # grouping variable
-    grouping_variable_finaldf = np.repeat(final_results['run_number'], 10)
-    grouping_variable_counterfactual = np.repeat(counterfactual['run_number'], 10)
-    grouping_variable = pd.concat([grouping_variable_finaldf, grouping_variable_counterfactual], axis=0)
-    # y values
-    y_values_finaldf = final_results.drop(['run_number', 'accepted?', 'Time'], axis=1).values.flatten()
-    y_values_counterfactual = counterfactual.drop(['run_number', 'accepted?', 'Time'], axis=1).values.flatten()
-    y_values = np.concatenate((y_values_finaldf, y_values_counterfactual), axis=0)
-    # species list. this should be +1 the number of simulations
-    species_list_finaldf = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"], 185*number_simulations) 
-    species_list_counterfactual = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"], 185*len(accepted_parameters))
-    species_list = np.concatenate((species_list_finaldf, species_list_counterfactual), axis=0)
-    # indices
-    indices_finaldf = np.repeat(final_results['Time'], 10)
-    indices_counterfactual = np.repeat(counterfactual['Time'], 10)
-    indices = pd.concat([indices_finaldf, indices_counterfactual], axis=0)
-
-    final_df = pd.DataFrame(
-    {'Abundance %': y_values, 'runNumber': grouping_variable, 'Ecosystem Element': species_list, 'Time': indices, 'runType': accepted_shape})
-    # calculate median 
-    m = final_df.groupby(['Time', 'runType', 'Ecosystem Element'])[['Abundance %']].apply(np.median)
-    m.name = 'Median'
-    final_df = final_df.join(m, on=['Time', 'runType', 'Ecosystem Element'])
-    # calculate quantiles
-    perc1 = final_df.groupby(['Time', 'runType', 'Ecosystem Element'])['Abundance %'].quantile(.95)
-    perc1.name = 'ninetyfivePerc'
-    final_df = final_df.join(perc1, on=['Time', 'runType', 'Ecosystem Element'])
-    perc2 = final_df.groupby(['Time', 'runType', 'Ecosystem Element'])['Abundance %'].quantile(.05)
-    perc2.name = "fivePerc"
-    final_df = final_df.join(perc2, on=['Time','runType', 'Ecosystem Element'])
-    # final_df.to_csv('/Users/emilyneil/Desktop/KneppABM/outputs/one_perc/combined_df.csv')
-    final_df.to_csv("combined_df_10%.csv")
-
+    
+    # conditions
     counterfactual_graph = final_df.loc[(final_df['runType'] == "Accepted") | (final_df['runType'] == "noReintro")]
     counterfactual_graph = counterfactual_graph.reset_index(drop=True)
     f = sns.FacetGrid(counterfactual_graph, col="Ecosystem Element", hue = "runType", palette = palette, col_wrap=4, sharey = False)
@@ -218,7 +361,7 @@ def graph_runs():
         ax.fill_between(ax.lines[2].get_xdata(),ax.lines[2].get_ydata(), ax.lines[4].get_ydata(),  color="#db5f57",alpha =0.2)
         ax.fill_between(ax.lines[3].get_xdata(),ax.lines[3].get_ydata(), ax.lines[5].get_ydata(), color="#57d3db",alpha=0.2)
         ax.set_ylabel('Abundance')
-
+        ax.set_xlabel('Time (Months)')
     # add subplot titles
     axes = f.axes.flatten()
     # fill between the quantiles
@@ -476,17 +619,20 @@ def graph_runs():
     f.axes[6].vlines(x=184,ymin=49,ymax=69, color='r')
     f.axes[7].vlines(x=184,ymin=9,ymax=29, color='r')
     f.axes[8].vlines(x=184,ymin=21,ymax=35, color='r')
-
-    # # stop the plots from overlapping
+    # stop the plots from overlapping
     f.fig.suptitle('Current dynamics vs. if reintroductions had not occurred')
     plt.tight_layout()
     plt.legend(labels=['Reintroductions', 'No reintroductions'],bbox_to_anchor=(2.2, 0),loc='lower right', fontsize=12)
-    # plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/one_perc/counterfactual.png')
-    plt.savefig('counterfactual_10%.png')
+    plt.savefig('counterfactual.png')
     plt.show()
 
+def graph_accepted_rejected():
 
-    # second graph: accepted vs rejected runs
+    # open dataframes
+    final_df = pd.read_csv('combined_df.csv') .iloc[: , 1:]
+    palette=['#db5f57', '#57d3db', '#57db5f','#5f57db', '#db57d3']
+
+    # Accepted vs rejected runs
     final_df = final_df.reset_index(drop=True)
     filtered_rejectedAccepted = final_df.loc[(final_df['runType'] == "Accepted") | (final_df['runType'] == "Rejected") ]
     g = sns.FacetGrid(filtered_rejectedAccepted, col="Ecosystem Element", hue = "runType", palette = palette, col_wrap=4, sharey = False)
@@ -497,6 +643,8 @@ def graph_runs():
         ax.fill_between(ax.lines[2].get_xdata(),ax.lines[2].get_ydata(), ax.lines[4].get_ydata(),color="#db5f57", alpha =0.2)
         ax.fill_between(ax.lines[3].get_xdata(),ax.lines[3].get_ydata(), ax.lines[5].get_ydata(), color="#57d3db", alpha=0.2)
         ax.set_ylabel('Abundance')
+        ax.set_xlabel('Time (Months)')
+
     # add subplot titles
     axes = g.axes.flatten()
     # fill between the quantiles
@@ -759,10 +907,6 @@ def graph_runs():
     # stop the plots from overlapping
     g.fig.suptitle('Accepted vs. Rejected Runs')
     plt.tight_layout()
-    plt.legend(labels=['Rejected Runs', 'Accepted Runs'],bbox_to_anchor=(2.2, 0), loc='lower right', fontsize=12)
-    # plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/one_perc/rejected_accepted_runs.png')
-    plt.savefig('rejected_accepted_runs_10%.png')
+    plt.legend(labels=['Accepted Runs', 'Rejected Runs'],bbox_to_anchor=(2.2, 0), loc='lower right', fontsize=12)
+    plt.savefig('rejected_accepted_runs.png')
     plt.show()
-
-
-graph_runs()

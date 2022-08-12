@@ -17,9 +17,12 @@ def eat_saplings(habitat_patch, eatenSaps):
     habitat_patch.edibles["saplings"] -= eatenSaps
 
 def eat_trees(habitat_patch, eatenTrees):
+    # if eatenTrees > 3: eatenTrees = 3
     habitat_patch.edibles["trees"] -= eatenTrees
+    return eatenTrees
 
 def eat_scrub(habitat_patch, eatenScrub):
+    # if eatenScrub > 3: eatenScrub = 3
     habitat_patch.edibles["scrub"] -= eatenScrub
 
 def eat_youngscrub(habitat_patch, eatenYoungScrub):
@@ -95,7 +98,7 @@ class habitatAgent (Agent):
         # chance of reproducing scrub
         number_reproduce_shrubs = np.random.binomial(n=self.edibles['scrub'], p=self.model.chance_reproduceYoungScrub)
         # are there any that aren't full of other scrub/young scrub?
-        available_youngscrub_cell = [i for i in no_herbivores if i.edibles["youngScrub"] < 5000 and i.edibles['scrub'] < 400]
+        available_youngscrub_cell = [i for i in no_herbivores if i.edibles["youngScrub"] < 5000 and i.edibles['scrub'] < 800]
         if len(available_youngscrub_cell) > 0:
             list_of_choices = random.choices(available_youngscrub_cell, k = number_reproduce_shrubs)
             for i in range(number_reproduce_shrubs):
@@ -177,7 +180,9 @@ class reindeer(RandomWalker):
 
     def step(self):
         # move & reduce energy
-        self.mixedDiet_move()
+        # self.mixedDiet_move()
+        self.grazer_move()
+
         living = True
         self.energy -= 1
         self.count_eaten.clear()
@@ -204,15 +209,15 @@ class reindeer(RandomWalker):
                     eatenTrees = math.ceil((1-self.energy)/self.model.reindeer_gain_from_Trees)
                     if eatenTrees >= habitat_patch.edibles["trees"]:
                         eatenTrees = habitat_patch.edibles["trees"]
-                    eat_trees(habitat_patch, eatenTrees)
                     self.energy += (self.model.reindeer_gain_from_Trees * eatenTrees)
-                    self.count_eaten[my_choice] += eatenTrees
+                    remove_trees = eat_trees(habitat_patch, eatenTrees)
+                    self.count_eaten[my_choice] += remove_trees
                 elif my_choice == "scrub":
                     eatenScrub = math.ceil((1-self.energy)/self.model.reindeer_gain_from_Scrub)
                     if eatenScrub >= habitat_patch.edibles['scrub']:
                         eatenScrub = habitat_patch.edibles['scrub']
-                    eat_scrub(habitat_patch, eatenScrub)
                     self.energy += (self.model.reindeer_gain_from_Scrub * eatenScrub)
+                    remove_trees = eat_scrub(habitat_patch, eatenScrub)
                     self.count_eaten[my_choice] += eatenScrub
                 elif my_choice == "youngScrub":
                     eatenYoungScrub = math.ceil((1-self.energy)/self.model.reindeer_gain_from_YoungScrub)
@@ -251,10 +256,6 @@ class reindeer(RandomWalker):
 
 
 
-
-
-
-
 class euroElk(RandomWalker):
     def __init__(self, unique_id, pos, model, moore, energy):
         super().__init__(unique_id, pos, model, moore=moore)
@@ -290,15 +291,15 @@ class euroElk(RandomWalker):
                     eatenTrees = math.ceil((1-self.energy)/self.model.elk_gain_from_Trees)
                     if eatenTrees >= habitat_patch.edibles["trees"]:
                         eatenTrees = habitat_patch.edibles["trees"]
-                    eat_trees(habitat_patch, eatenTrees)
                     self.energy += (self.model.elk_gain_from_Trees * eatenTrees)
-                    self.count_eaten[my_choice] += eatenTrees
+                    remove_trees = eat_trees(habitat_patch, eatenTrees)
+                    self.count_eaten[my_choice] += remove_trees
                 elif my_choice == "scrub":
                     eatenScrub = math.ceil((1-self.energy)/self.model.elk_gain_from_Scrub)
                     if eatenScrub >= habitat_patch.edibles['scrub']:
                         eatenScrub = habitat_patch.edibles['scrub']
-                    eat_scrub(habitat_patch, eatenScrub)
                     self.energy += (self.model.elk_gain_from_Scrub * eatenScrub)
+                    remove_trees = eat_scrub(habitat_patch, eatenScrub)
                     self.count_eaten[my_choice] += eatenScrub
                 elif my_choice == "youngScrub":
                     eatenYoungScrub = math.ceil((1-self.energy)/self.model.elk_gain_from_YoungScrub)
@@ -375,15 +376,15 @@ class euroBison(RandomWalker):
                     eatenTrees = math.ceil((1-self.energy)/self.model.bison_gain_from_Trees)
                     if eatenTrees >= habitat_patch.edibles["trees"]:
                         eatenTrees = habitat_patch.edibles["trees"]
-                    eat_trees(habitat_patch, eatenTrees)
                     self.energy += (self.model.bison_gain_from_Trees * eatenTrees)
-                    self.count_eaten[my_choice] += eatenTrees
+                    remove_trees = eat_trees(habitat_patch, eatenTrees)
+                    self.count_eaten[my_choice] += remove_trees
                 elif my_choice == "scrub":
                     eatenScrub = math.ceil((1-self.energy)/self.model.bison_gain_from_Scrub)
                     if eatenScrub >= habitat_patch.edibles['scrub']:
                         eatenScrub = habitat_patch.edibles['scrub']
-                    eat_scrub(habitat_patch, eatenScrub)
                     self.energy += (self.model.bison_gain_from_Scrub * eatenScrub)
+                    remove_trees = eat_scrub(habitat_patch, eatenScrub)
                     self.count_eaten[my_choice] += eatenScrub
                 elif my_choice == "youngScrub":
                     eatenYoungScrub = math.ceil((1-self.energy)/self.model.bison_gain_from_YoungScrub)
@@ -461,16 +462,16 @@ class roeDeer(RandomWalker):
                     eatenTrees = math.ceil((1-self.energy)/self.model.roeDeer_gain_from_Trees)
                     if eatenTrees >= habitat_patch.edibles["trees"]:
                         eatenTrees = habitat_patch.edibles["trees"]
-                    eat_trees(habitat_patch, eatenTrees)
                     self.energy += (self.model.roeDeer_gain_from_Trees * eatenTrees)
-                    self.count_eaten[my_choice] += eatenTrees
+                    remove_trees = eat_trees(habitat_patch, eatenTrees)
+                    self.count_eaten[my_choice] += remove_trees
                 elif my_choice == "scrub":
                     eatenScrub = math.ceil((1-self.energy)/self.model.roeDeer_gain_from_Scrub)
                     if eatenScrub >= habitat_patch.edibles['scrub']:
                         eatenScrub = habitat_patch.edibles['scrub']
-                    eat_scrub(habitat_patch, eatenScrub)
                     self.energy += (self.model.roeDeer_gain_from_Scrub * eatenScrub)
-                    self.count_eaten[my_choice] +=eatenScrub
+                    remove_trees = eat_scrub(habitat_patch, eatenScrub)
+                    self.count_eaten[my_choice] += eatenScrub
                 elif my_choice == "youngScrub":
                     eatenYoungScrub = math.ceil((1-self.energy)/self.model.roeDeer_gain_from_YoungScrub)
                     # scrub facilitates saplings by preventing herbivory
@@ -543,15 +544,15 @@ class exmoorPony(RandomWalker):
                     eatenTrees = math.ceil((1-self.energy)/self.model.ponies_gain_from_Trees)
                     if eatenTrees >= habitat_patch.edibles["trees"]:
                         eatenTrees = habitat_patch.edibles["trees"]
-                    eat_trees(habitat_patch, eatenTrees)
                     self.energy += (self.model.ponies_gain_from_Trees * eatenTrees)
-                    self.count_eaten[my_choice] += eatenTrees
+                    remove_trees = eat_trees(habitat_patch, eatenTrees)
+                    self.count_eaten[my_choice] += remove_trees
                 elif my_choice == "scrub":
                     eatenScrub = math.ceil((1-self.energy)/self.model.ponies_gain_from_Scrub)
                     if eatenScrub >= habitat_patch.edibles['scrub']:
                         eatenScrub = habitat_patch.edibles['scrub']
-                    eat_scrub(habitat_patch, eatenScrub)
                     self.energy += (self.model.ponies_gain_from_Scrub * eatenScrub)
+                    remove_trees = eat_scrub(habitat_patch, eatenScrub)
                     self.count_eaten[my_choice] += eatenScrub
                 elif my_choice == "youngScrub":
                     eatenYoungScrub = math.ceil((1-self.energy)/self.model.ponies_gain_from_YoungScrub)
@@ -617,15 +618,15 @@ class longhornCattle(RandomWalker):
                     eatenTrees = math.ceil((1-self.energy)/self.model.cows_gain_from_Trees)
                     if eatenTrees >= habitat_patch.edibles["trees"]:
                         eatenTrees = habitat_patch.edibles["trees"]
-                    eat_trees(habitat_patch, eatenTrees)
                     self.energy += (self.model.cows_gain_from_Trees * eatenTrees)
-                    self.count_eaten[my_choice] += eatenTrees
+                    remove_trees = eat_trees(habitat_patch, eatenTrees)
+                    self.count_eaten[my_choice] += remove_trees
                 elif my_choice == "scrub":
                     eatenScrub = math.ceil((1-self.energy)/self.model.cows_gain_from_Scrub)
                     if eatenScrub >= habitat_patch.edibles['scrub']:
                         eatenScrub = habitat_patch.edibles['scrub']
-                    eat_scrub(habitat_patch, eatenScrub)
                     self.energy += (self.model.cows_gain_from_Scrub * eatenScrub)
+                    remove_trees = eat_scrub(habitat_patch, eatenScrub)
                     self.count_eaten[my_choice] += eatenScrub
                 elif my_choice == "youngScrub":
                     eatenYoungScrub = math.ceil((1-self.energy)/self.model.cows_gain_from_YoungScrub)
@@ -699,15 +700,15 @@ class fallowDeer(RandomWalker):
                     eatenTrees = math.ceil((1-self.energy)/self.model.fallowDeer_gain_from_Trees)
                     if eatenTrees >= habitat_patch.edibles["trees"]:
                         eatenTrees = habitat_patch.edibles["trees"]
-                    eat_trees(habitat_patch, eatenTrees)
                     self.energy += (self.model.fallowDeer_gain_from_Trees * eatenTrees)
-                    self.count_eaten[my_choice] += eatenTrees
+                    remove_trees = eat_trees(habitat_patch, eatenTrees)
+                    self.count_eaten[my_choice] += remove_trees
                 elif my_choice == "scrub":
                     eatenScrub = math.ceil((1-self.energy)/self.model.fallowDeer_gain_from_Scrub)
                     if eatenScrub >= habitat_patch.edibles['scrub']:
                         eatenScrub = habitat_patch.edibles['scrub']
-                    eat_scrub(habitat_patch, eatenScrub)
                     self.energy += (self.model.fallowDeer_gain_from_Scrub * eatenScrub)
+                    remove_trees = eat_scrub(habitat_patch, eatenScrub)
                     self.count_eaten[my_choice] += eatenScrub
                 elif my_choice == "youngScrub":
                     eatenYoungScrub = math.ceil((1-self.energy)/self.model.fallowDeer_gain_from_YoungScrub)
@@ -781,15 +782,15 @@ class redDeer(RandomWalker):
                     eatenTrees = math.ceil((1-self.energy)/self.model.redDeer_gain_from_Trees)
                     if eatenTrees >= habitat_patch.edibles["trees"]:
                         eatenTrees = habitat_patch.edibles["trees"]
-                    eat_trees(habitat_patch, eatenTrees)
                     self.energy += (self.model.redDeer_gain_from_Trees * eatenTrees)
-                    self.count_eaten[my_choice] += eatenTrees
+                    remove_trees = eat_trees(habitat_patch, eatenTrees)
+                    self.count_eaten[my_choice] += remove_trees
                 elif my_choice == "scrub":
                     eatenScrub = math.ceil((1-self.energy)/self.model.redDeer_gain_from_Scrub)
                     if eatenScrub >= habitat_patch.edibles['scrub']:
                         eatenScrub = habitat_patch.edibles['scrub']
-                    eat_scrub(habitat_patch, eatenScrub)
                     self.energy += (self.model.redDeer_gain_from_Scrub * eatenScrub)
+                    remove_trees = eat_scrub(habitat_patch, eatenScrub)
                     self.count_eaten[my_choice] += eatenScrub
                 elif my_choice == "youngScrub":
                     eatenYoungScrub = math.ceil((1-self.energy)/self.model.redDeer_gain_from_YoungScrub)
@@ -881,15 +882,15 @@ class tamworthPigs(RandomWalker):
                     eatenTrees = math.ceil((1-self.energy)/self.model.pigs_gain_from_Trees)
                     if eatenTrees >= habitat_patch.edibles["trees"]:
                         eatenTrees = habitat_patch.edibles["trees"]
-                    eat_trees(habitat_patch, eatenTrees)
                     self.energy += (self.model.pigs_gain_from_Trees * eatenTrees)
-                    self.count_eaten[my_choice] += eatenTrees
+                    remove_trees = eat_trees(habitat_patch, eatenTrees)
+                    self.count_eaten[my_choice] += remove_trees
                 elif my_choice == "scrub":
                     eatenScrub = math.ceil((1-self.energy)/self.model.pigs_gain_from_Scrub)
                     if eatenScrub >= habitat_patch.edibles['scrub']:
                         eatenScrub = habitat_patch.edibles['scrub']
-                    eat_scrub(habitat_patch, eatenScrub)
                     self.energy += (self.model.pigs_gain_from_Scrub * eatenScrub)
+                    remove_trees = eat_scrub(habitat_patch, eatenScrub)
                     self.count_eaten[my_choice] += eatenScrub
             else:
                 break
@@ -947,7 +948,8 @@ class KneppModel(Model):
             reproduce_bison, bison_gain_from_grass, bison_gain_from_Trees, bison_gain_from_Scrub, bison_gain_from_Saplings, bison_gain_from_YoungScrub,
             reproduce_elk, elk_gain_from_grass, elk_gain_from_Trees, elk_gain_from_Scrub, elk_gain_from_Saplings, elk_gain_from_YoungScrub,
             reproduce_reindeer, reindeer_gain_from_grass, reindeer_gain_from_Trees, reindeer_gain_from_Scrub, reindeer_gain_from_Saplings, reindeer_gain_from_YoungScrub,
-            width, height, max_time, reintroduction, introduce_euroBison, introduce_elk, introduce_reindeer):
+            fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, reindeer_stocking_forecast, roeDeer_stocking_forecast,
+            width, height, max_time, reintroduction, introduce_euroBison, introduce_elk, introduce_reindeer, cull_roe):
 
         self.steps = 0
         # set parameters
@@ -1022,6 +1024,7 @@ class KneppModel(Model):
         self.introduce_euroBison = introduce_euroBison
         self.introduce_elk = introduce_elk
         self.introduce_reindeer = introduce_reindeer
+        self.cull_roe = cull_roe
         # stocking densities
         self.fallowDeer_stocking = fallowDeer_stocking
         self.cattle_stocking = cattle_stocking
@@ -1049,6 +1052,13 @@ class KneppModel(Model):
         self.reindeer_gain_from_Scrub = reindeer_gain_from_Scrub
         self.reindeer_gain_from_Saplings = reindeer_gain_from_Saplings
         self.reindeer_gain_from_YoungScrub = reindeer_gain_from_YoungScrub
+        self.fallowDeer_stocking_forecast = fallowDeer_stocking_forecast
+        self.cattle_stocking_forecast = cattle_stocking_forecast
+        self.redDeer_stocking_forecast = redDeer_stocking_forecast
+        self.tamworthPig_stocking_forecast = tamworthPig_stocking_forecast
+        self.exmoor_stocking_forecast = exmoor_stocking_forecast
+        self.reindeer_stocking_forecast = reindeer_stocking_forecast
+        self.roeDeer_stocking_forecast = roeDeer_stocking_forecast
 
         # set grid & schedule
         self.grid = MultiGrid(width, height, False) # this grid allows for multiple agents on same cell
@@ -1837,127 +1847,127 @@ class KneppModel(Model):
                 results_2 = self.datacollector.get_model_vars_dataframe()
                 # first make sure that exmoor ponies are at their stocking density
                 exmoorValue = results_2.iloc[185]['Exmoor pony']
-                if exmoorValue > self.exmoor_stocking: # make sure ponies are at their stocking density
-                    number_to_subtract = -self.exmoor_stocking + exmoorValue
+                if exmoorValue > self.exmoor_stocking_forecast: # make sure ponies are at their stocking density
+                    number_to_subtract = -self.exmoor_stocking_forecast + exmoorValue
                     self.remove_herbivores(exmoorPony, number_to_subtract)
                 else:
-                    number_to_add = self.exmoor_stocking - exmoorValue
+                    number_to_add = self.exmoor_stocking_forecast - exmoorValue
                     self.add_herbivores(exmoorPony, number_to_add)
                     # Longhorn cattle can be culled in July
                     cattleValue = results_2.iloc[185]['Longhorn cattle']
-                    if cattleValue > self.cattle_stocking:
-                        number_to_subtract = random.randint(0,self.cattle_stocking)
+                    if cattleValue > self.cattle_stocking_forecast:
+                        number_to_subtract = random.randint(0,self.cattle_stocking_forecast)
                         self.remove_herbivores(longhornCattle, number_to_subtract)
                 if self.introduce_euroBison == True:
-                    self.add_herbivores(euroBison, 10)
+                    self.add_herbivores(euroBison, 50)
                 if self.introduce_elk == True:
-                    self.add_herbivores(euroElk, 10)
+                    self.add_herbivores(euroElk, 50)
                 if self.introduce_reindeer == True:
-                    self.add_herbivores(reindeer, 10)
+                    self.add_herbivores(reindeer, self.reindeer_stocking_forecast)
             # August 2020
             if self.schedule.time == 186:
                 results = self.datacollector.get_model_vars_dataframe()
                 cattleValue = results.iloc[186]['Longhorn cattle']
-                if cattleValue > self.cattle_stocking:
-                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                if cattleValue > self.cattle_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.cattle_stocking_forecast)
                     self.remove_herbivores(longhornCattle, number_to_subtract)
                 fallowValue = results.iloc[186]['Fallow deer']
-                if fallowValue > self.fallowDeer_stocking:
-                    number_to_subtract = random.randint(0,self.fallowDeer_stocking)
+                if fallowValue > self.fallowDeer_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.fallowDeer_stocking_forecast)
                     self.remove_herbivores(fallowDeer, number_to_subtract)
                 redDeer_value = results.iloc[186]['Red deer']
-                if redDeer_value > self.redDeer_stocking:
-                    number_to_subtract = random.randint(0,self.redDeer_stocking)
+                if redDeer_value > self.redDeer_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.redDeer_stocking_forecast)
                     self.remove_herbivores(redDeer, number_to_subtract)
             # Sept 2020
             if self.schedule.time == 187:
                 results = self.datacollector.get_model_vars_dataframe()
                 cattleValue = results.iloc[187]['Longhorn cattle']
-                if cattleValue > self.cattle_stocking:
-                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                if cattleValue > self.cattle_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.cattle_stocking_forecast)
                     self.remove_herbivores(longhornCattle, number_to_subtract)
                 fallowValue = results.iloc[187]['Fallow deer']
-                if fallowValue > self.fallowDeer_stocking:
-                    number_to_subtract = random.randint(0,self.fallowDeer_stocking)
+                if fallowValue > self.fallowDeer_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.fallowDeer_stocking_forecast)
                     self.remove_herbivores(fallowDeer, number_to_subtract)
             # Oct 2020
             if self.schedule.time == 188:
                 results = self.datacollector.get_model_vars_dataframe()
                 cattleValue = results.iloc[188]['Longhorn cattle']
-                if cattleValue > self.cattle_stocking:
-                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                if cattleValue > self.cattle_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.cattle_stocking_forecast)
                     self.remove_herbivores(longhornCattle, number_to_subtract)
             # Nov 2020
             if self.schedule.time == 189:
                 results = self.datacollector.get_model_vars_dataframe()
                 cattleValue = results.iloc[189]['Longhorn cattle']
-                if cattleValue > self.cattle_stocking:
-                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                if cattleValue > self.cattle_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.cattle_stocking_forecast)
                     self.remove_herbivores(longhornCattle, number_to_subtract)
                 fallowValue = results.iloc[189]['Fallow deer']
-                if fallowValue > self.fallowDeer_stocking:
-                    number_to_subtract = random.randint(0,self.fallowDeer_stocking)
+                if fallowValue > self.fallowDeer_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.fallowDeer_stocking_forecast)
                     self.remove_herbivores(fallowDeer, number_to_subtract)
                 redDeer_value = results.iloc[189]['Red deer']
-                if redDeer_value > self.redDeer_stocking:
-                    number_to_subtract = random.randint(0,self.redDeer_stocking)
+                if redDeer_value > self.redDeer_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.redDeer_stocking_forecast)
                     self.remove_herbivores(redDeer, number_to_subtract)
             # Dec 2020
             if self.schedule.time == 190:
                 results = self.datacollector.get_model_vars_dataframe()
                 cattleValue = results.iloc[190]['Longhorn cattle']
-                if cattleValue > self.cattle_stocking:
-                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                if cattleValue > self.cattle_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.cattle_stocking_forecast)
                     self.remove_herbivores(longhornCattle, number_to_subtract)
                 fallowValue = results.iloc[190]['Fallow deer']
-                if fallowValue > self.fallowDeer_stocking:
-                    number_to_subtract = random.randint(0,self.fallowDeer_stocking)
+                if fallowValue > self.fallowDeer_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.fallowDeer_stocking_forecast)
                     self.remove_herbivores(fallowDeer, number_to_subtract)
                 redDeer_value = results.iloc[190]['Red deer']
-                if redDeer_value > self.redDeer_stocking:
-                    number_to_subtract = random.randint(0,self.redDeer_stocking)
+                if redDeer_value > self.redDeer_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.redDeer_stocking_forecast)
                     self.remove_herbivores(redDeer, number_to_subtract)
                 pigValue = results.iloc[190]['Tamworth pigs']
-                if pigValue > self.tamworthPig_stocking:
-                    number_to_subtract = random.randint(0,self.tamworthPig_stocking)
+                if pigValue > self.tamworthPig_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.tamworthPig_stocking_forecast)
                     self.remove_pig(tamworthPigs,number_to_subtract,0,0)
             # Jan 2021  
             if self.schedule.time == 191:
                 results = self.datacollector.get_model_vars_dataframe()
                 cattleValue = results.iloc[191]['Longhorn cattle']
-                if cattleValue > self.cattle_stocking:
-                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                if cattleValue > self.cattle_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.cattle_stocking_forecast)
                     self.remove_herbivores(longhornCattle, number_to_subtract)
                 fallowValue = results.iloc[191]['Fallow deer']
-                if fallowValue > self.fallowDeer_stocking:
-                    number_to_subtract = random.randint(0,self.fallowDeer_stocking)
+                if fallowValue > self.fallowDeer_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.fallowDeer_stocking_forecast)
                     self.remove_herbivores(fallowDeer, number_to_subtract)
                 redDeer_value = results.iloc[191]['Red deer']
-                if redDeer_value > self.redDeer_stocking:
-                    number_to_subtract = random.randint(0,self.redDeer_stocking)
+                if redDeer_value > self.redDeer_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.redDeer_stocking_forecast)
                     self.remove_herbivores(redDeer, number_to_subtract)
                 pigValue = results.iloc[191]['Tamworth pigs']
-                if pigValue > self.tamworthPig_stocking:
-                    number_to_subtract = random.randint(0,self.tamworthPig_stocking)
+                if pigValue > self.tamworthPig_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.tamworthPig_stocking_forecast)
                     self.remove_pig(tamworthPigs, number_to_subtract,0,0)
             # Feb 2021: cull them all back to stocking values
             if self.schedule.time == 192:
                 results = self.datacollector.get_model_vars_dataframe()
                 cattleValue = results.iloc[192]['Longhorn cattle']
-                if cattleValue > self.cattle_stocking:
-                    number_to_subtract = -self.cattle_stocking + cattleValue
+                if cattleValue > self.cattle_stocking_forecast:
+                    number_to_subtract = -self.cattle_stocking_forecast + cattleValue
                     self.remove_herbivores(longhornCattle, number_to_subtract)
                 fallowValue = results.iloc[192]['Fallow deer']
-                if fallowValue > self.fallowDeer_stocking:
-                    number_to_subtract = -self.fallowDeer_stocking + fallowValue
+                if fallowValue > self.fallowDeer_stocking_forecast:
+                    number_to_subtract = -self.fallowDeer_stocking_forecast + fallowValue
                     self.remove_herbivores(fallowDeer, number_to_subtract)
                 redDeer_value = results.iloc[192]['Red deer']
-                if redDeer_value > self.redDeer_stocking:
-                    number_to_subtract = -self.redDeer_stocking + redDeer_value
+                if redDeer_value > self.redDeer_stocking_forecast:
+                    number_to_subtract = -self.redDeer_stocking_forecast + redDeer_value
                     self.remove_herbivores(redDeer, number_to_subtract)
                 pigValue = results.iloc[192]['Tamworth pigs']
-                if pigValue > self.tamworthPig_stocking:
-                    number_to_subtract = -self.tamworthPig_stocking + pigValue
+                if pigValue > self.tamworthPig_stocking_forecast:
+                    number_to_subtract = -self.tamworthPig_stocking_forecast + pigValue
                     self.remove_pig(tamworthPigs,number_to_subtract,0,0)
 
 
@@ -1967,148 +1977,153 @@ class KneppModel(Model):
                 results = self.datacollector.get_model_vars_dataframe()
                 # first make sure that exmoor ponies are at their stocking density
                 exmoorValue = results.iloc[-1]['Exmoor pony']
-                if exmoorValue < self.exmoor_stocking: # shouldn't have to subtract anything since they don't grow
-                    number_to_add = self.exmoor_stocking - exmoorValue
+                if exmoorValue < self.exmoor_stocking_forecast: # shouldn't have to subtract anything since they don't grow
+                    number_to_add = self.exmoor_stocking_forecast - exmoorValue
                     self.add_herbivores(exmoorPony, number_to_add)
                 # reset fallow deer values (they are culled)
                 fallowValue = results.iloc[-1]['Fallow deer']
-                if fallowValue > self.fallowDeer_stocking:
-                    number_to_subtract = random.randint(0,self.fallowDeer_stocking)
+                if fallowValue > self.fallowDeer_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.fallowDeer_stocking_forecast)
                     self.remove_herbivores(fallowDeer, number_to_subtract)
                 else:
-                    number_to_add = self.fallowDeer_stocking - fallowValue
+                    number_to_add = self.fallowDeer_stocking_forecast - fallowValue
                     self.add_herbivores(fallowDeer, number_to_add)
                 # reset red deer values  (they are culled)
                 redDeer_value = results.iloc[-1]['Red deer']
-                if redDeer_value > self.redDeer_stocking:
-                    number_to_subtract = random.randint(0,self.redDeer_stocking)
+                if redDeer_value > self.redDeer_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.redDeer_stocking_forecast)
                     self.remove_herbivores(redDeer, number_to_subtract)
                 else:
-                    number_to_add = self.redDeer_stocking - redDeer_value
+                    number_to_add = self.redDeer_stocking_forecast - redDeer_value
                     self.add_herbivores(redDeer, number_to_add)
                 # reset longhorn cattle values (they aren't culled this month)
                 cattleValue = results.iloc[-1]['Longhorn cattle']
-                if cattleValue < self.cattle_stocking:
-                    number_to_add = self.cattle_stocking - cattleValue
+                if cattleValue < self.cattle_stocking_forecast:
+                    number_to_add = self.cattle_stocking_forecast - cattleValue
                     self.add_herbivores(longhornCattle, number_to_add)
                 # reset tamworth pig values (they aren't culled this month)
                 pigValue = results.iloc[-1]['Tamworth pigs']
-                if pigValue < self.tamworthPig_stocking:
-                    number_to_add = self.tamworthPig_stocking - pigValue
+                if pigValue < self.tamworthPig_stocking_forecast:
+                    number_to_add = self.tamworthPig_stocking_forecast - pigValue
                     self.add_pig(tamworthPigs, 0,number_to_add,0)
                 if self.introduce_euroBison == True:
                     bisonValue = results.iloc[-1]['European bison']
-                    if bisonValue > 10:
-                        number_to_remove = -10 + bisonValue
+                    if bisonValue > 50:
+                        number_to_remove = -50 + bisonValue
                         self.remove_herbivores(euroBison, number_to_remove)
                 if self.introduce_elk == True:
                     elkValue = results.iloc[-1]['European elk']
-                    if elkValue > 10:
-                        number_to_remove = -10 + elkValue
+                    if elkValue > 50:
+                        number_to_remove = -50 + elkValue
                         self.remove_herbivores(euroElk, number_to_remove)
                 if self.introduce_reindeer == True:
                     reindeerValue = results.iloc[-1]['Reindeer']
-                    if reindeerValue > 10:
-                        number_to_remove = -10 + reindeerValue
+                    if reindeerValue > self.reindeer_stocking_forecast:
+                        number_to_remove = -self.reindeer_stocking_forecast + reindeerValue
                         self.remove_herbivores(reindeer, number_to_remove)
+                if self.cull_roe == True:
+                    roeValue = results.iloc[-1]['Roe deer']
+                    if roeValue > self.roeDeer_stocking_forecast:
+                        number_to_remove = -self.roeDeer_stocking_forecast + roeValue
+                        self.remove_herbivores(roeDeer, number_to_remove)
             # April 2021
             if self.schedule.time >= 193 and ((self.schedule.time % 12) + 1) == 4:
                 results = self.datacollector.get_model_vars_dataframe()
                 fallowValue = results.iloc[-1]['Fallow deer']
-                if fallowValue > self.fallowDeer_stocking:
-                    number_to_subtract = -self.fallowDeer_stocking + fallowValue
+                if fallowValue > self.fallowDeer_stocking_forecast:
+                    number_to_subtract = -self.fallowDeer_stocking_forecast + fallowValue
                     self.remove_herbivores(fallowDeer, number_to_subtract)
                 redDeer_value = results.iloc[-1]['Red deer']
-                if redDeer_value > self.redDeer_stocking:
-                    number_to_subtract = -self.redDeer_stocking + redDeer_value
+                if redDeer_value > self.redDeer_stocking_forecast:
+                    number_to_subtract = -self.redDeer_stocking_forecast + redDeer_value
                     self.remove_herbivores(redDeer, number_to_subtract)
             # May 2021
             if self.schedule.time >= 193 and ((self.schedule.time % 12) + 1) == 5:
                 results = self.datacollector.get_model_vars_dataframe()
                 pigValue = results.iloc[-1]['Tamworth pigs']
-                if pigValue > self.tamworthPig_stocking:
-                    number_to_subtract = random.randint(0,self.tamworthPig_stocking)
+                if pigValue > self.tamworthPig_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.tamworthPig_stocking_forecast)
                     self.remove_pig(tamworthPigs, number_to_subtract,0,0)
             # June 2021
             if self.schedule.time >= 193 and ((self.schedule.time % 12) + 1) == 6:
                 results = self.datacollector.get_model_vars_dataframe()
                 cattleValue = results.iloc[-1]['Longhorn cattle']
-                if cattleValue >= self.cattle_stocking:
-                    number_to_subtract = random.randint(0,self.cattle_stocking)
-                    self.remove_herbivores(self.cattle_stocking, number_to_subtract)
+                if cattleValue >= self.cattle_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.cattle_stocking_forecast)
+                    self.remove_herbivores(self.cattle_stocking_forecast, number_to_subtract)
             # July 2021
             if self.schedule.time >= 193 and ((self.schedule.time % 12) + 1) == 7:
                 results = self.datacollector.get_model_vars_dataframe()
                 cattleValue = results.iloc[-1]['Longhorn cattle']
-                if cattleValue >= self.cattle_stocking:
-                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                if cattleValue >= self.cattle_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.cattle_stocking_forecast)
                     self.remove_herbivores(longhornCattle, number_to_subtract)
             # August 2021
             if self.schedule.time >= 193 and ((self.schedule.time % 12) + 1) == 8:
                 results = self.datacollector.get_model_vars_dataframe()
                 cattleValue = results.iloc[-1]['Longhorn cattle']
-                if cattleValue > self.cattle_stocking:
-                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                if cattleValue > self.cattle_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.cattle_stocking_forecast)
                     self.remove_herbivores(longhornCattle, number_to_subtract)
                 fallowValue = results.iloc[-1]['Fallow deer']
-                if fallowValue > self.fallowDeer_stocking:
-                    number_to_subtract = random.randint(0,self.fallowDeer_stocking)
+                if fallowValue > self.fallowDeer_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.fallowDeer_stocking_forecast)
                     self.remove_herbivores(fallowDeer, number_to_subtract)
                 redDeer_value = results.iloc[-1]['Red deer']
-                if redDeer_value > self.redDeer_stocking:
-                    number_to_subtract = random.randint(0,self.redDeer_stocking)
+                if redDeer_value > self.redDeer_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.redDeer_stocking_forecast)
                     self.remove_herbivores(redDeer, number_to_subtract)
             # Sept 2021
             if self.schedule.time >= 193 and ((self.schedule.time % 12) + 1) == 9:
                 results = self.datacollector.get_model_vars_dataframe()
                 cattleValue = results.iloc[-1]['Longhorn cattle']
-                if cattleValue > self.cattle_stocking:
-                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                if cattleValue > self.cattle_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.cattle_stocking_forecast)
                     self.remove_herbivores(longhornCattle, number_to_subtract)
                 fallowValue = results.iloc[-1]['Fallow deer']
-                if fallowValue > self.fallowDeer_stocking:
-                    number_to_subtract = random.randint(0,self.fallowDeer_stocking)
+                if fallowValue > self.fallowDeer_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.fallowDeer_stocking_forecast)
                     self.remove_herbivores(fallowDeer, number_to_subtract)
             # Oct 2021
             if self.schedule.time >= 193 and ((self.schedule.time % 12) + 1) == 10:
                 results = self.datacollector.get_model_vars_dataframe()
                 cattleValue = results.iloc[-1]['Longhorn cattle']
-                if cattleValue > self.cattle_stocking:
-                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                if cattleValue > self.cattle_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.cattle_stocking_forecast)
                     self.remove_herbivores(longhornCattle, number_to_subtract)
             # Nov 2021
             if self.schedule.time >= 193 and ((self.schedule.time % 12) + 1) == 11:
                 results = self.datacollector.get_model_vars_dataframe()
                 cattleValue = results.iloc[-1]['Longhorn cattle']
-                if cattleValue > self.cattle_stocking:
-                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                if cattleValue > self.cattle_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.cattle_stocking_forecast)
                     self.remove_herbivores(longhornCattle, number_to_subtract)
                 fallowValue = results.iloc[-1]['Fallow deer']
-                if fallowValue > self.fallowDeer_stocking:
-                    number_to_subtract = random.randint(0,self.fallowDeer_stocking)
+                if fallowValue > self.fallowDeer_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.fallowDeer_stocking_forecast)
                     self.remove_herbivores(fallowDeer, number_to_subtract)
                 redDeer_value = results.iloc[-1]['Red deer']
-                if redDeer_value > self.redDeer_stocking:
-                    number_to_subtract = random.randint(0,self.redDeer_stocking)
+                if redDeer_value > self.redDeer_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.redDeer_stocking_forecast)
                     self.remove_herbivores(redDeer, number_to_subtract)
             # Dec 2021
             if self.schedule.time >= 193 and ((self.schedule.time % 12) + 1) == 12:
                 results = self.datacollector.get_model_vars_dataframe()
                 cattleValue = results.iloc[-1]['Longhorn cattle']
-                if cattleValue > self.cattle_stocking:
-                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                if cattleValue > self.cattle_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.cattle_stocking_forecast)
                     self.remove_herbivores(longhornCattle, number_to_subtract)
                 fallowValue = results.iloc[-1]['Fallow deer']
-                if fallowValue > self.fallowDeer_stocking:
-                    number_to_subtract = random.randint(0,self.fallowDeer_stocking)
+                if fallowValue > self.fallowDeer_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.fallowDeer_stocking_forecast)
                     self.remove_herbivores(fallowDeer, number_to_subtract)
                 redDeer_value = results.iloc[-1]['Red deer']
-                if redDeer_value > self.redDeer_stocking:
-                    number_to_subtract = random.randint(0,self.redDeer_stocking)
+                if redDeer_value > self.redDeer_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.redDeer_stocking_forecast)
                     self.remove_herbivores(redDeer, number_to_subtract)
                 pigValue = results.iloc[-1]['Tamworth pigs']
-                if pigValue > self.tamworthPig_stocking:
-                    number_to_subtract = random.randint(0,self.tamworthPig_stocking)
+                if pigValue > self.tamworthPig_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.tamworthPig_stocking_forecast)
                     self.remove_pig(tamworthPigs,number_to_subtract,0,0)
                 # add boars
                 self.add_pig(tamworthPigs, 0, 0, 1)
@@ -2117,20 +2132,20 @@ class KneppModel(Model):
             if self.schedule.time >= 193 and ((self.schedule.time % 12) + 1) == 1:
                 results = self.datacollector.get_model_vars_dataframe()
                 cattleValue = results.iloc[-1]['Longhorn cattle']
-                if cattleValue >self.cattle_stocking:
-                    number_to_subtract = random.randint(0,self.cattle_stocking)
+                if cattleValue >self.cattle_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.cattle_stocking_forecast)
                     self.remove_herbivores(longhornCattle, number_to_subtract)
                 fallowValue = results.iloc[-1]['Fallow deer']
-                if fallowValue > self.fallowDeer_stocking:
-                    number_to_subtract = random.randint(0,self.fallowDeer_stocking)
+                if fallowValue > self.fallowDeer_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.fallowDeer_stocking_forecast)
                     self.remove_herbivores(fallowDeer, number_to_subtract)
                 redDeer_value = results.iloc[-1]['Red deer']
-                if redDeer_value > self.redDeer_stocking:
-                    number_to_subtract = random.randint(0,self.redDeer_stocking)
+                if redDeer_value > self.redDeer_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.redDeer_stocking_forecast)
                     self.remove_herbivores(redDeer, number_to_subtract)
                 pigValue = results.iloc[-1]['Tamworth pigs']
-                if pigValue > self.tamworthPig_stocking:
-                    number_to_subtract = random.randint(0,self.tamworthPig_stocking)
+                if pigValue > self.tamworthPig_stocking_forecast:
+                    number_to_subtract = random.randint(0,self.tamworthPig_stocking_forecast)
                     # remove boars
                     self.remove_pig(tamworthPigs,number_to_subtract,0,1)
 
@@ -2138,21 +2153,21 @@ class KneppModel(Model):
             if self.schedule.time >= 193 and ((self.schedule.time % 12) + 1) == 2:
                 results = self.datacollector.get_model_vars_dataframe()
                 cattleValue = results.iloc[-1]['Longhorn cattle']
-                if cattleValue > self.cattle_stocking:
-                    number_to_subtract = -self.cattle_stocking + cattleValue
+                if cattleValue > self.cattle_stocking_forecast:
+                    number_to_subtract = -self.cattle_stocking_forecast + cattleValue
                     self.remove_herbivores(longhornCattle, number_to_subtract)
                 fallowValue = results.iloc[-1]['Fallow deer']
-                if fallowValue > self.fallowDeer_stocking:
-                    number_to_subtract = -self.fallowDeer_stocking + fallowValue
+                if fallowValue > self.fallowDeer_stocking_forecast:
+                    number_to_subtract = -self.fallowDeer_stocking_forecast + fallowValue
                     self.remove_herbivores(fallowDeer, number_to_subtract)
                 redDeer_value = results.iloc[-1]['Red deer']
-                if redDeer_value > self.redDeer_stocking:
-                    number_to_subtract = -self.redDeer_stocking + redDeer_value
+                if redDeer_value > self.redDeer_stocking_forecast:
+                    number_to_subtract = -self.redDeer_stocking_forecast + redDeer_value
                     self.remove_herbivores(redDeer, number_to_subtract)
                 pigValue = results.iloc[-1]['Tamworth pigs']
-                if pigValue > self.tamworthPig_stocking:
-                    number_to_subtract = -self.tamworthPig_stocking + pigValue
-                    self.remove_pig(tamworthPigs,number_to_subtract,0,0)
+                if pigValue > self.tamworthPig_stocking_forecast:
+                    number_to_subtract = -self.tamworthPig_stocking_forecast + pigValue
+                    self.remove_pig(tamworthPigs,number_to_subtract,0,0)                    
 
 
         # stop running it at the max_time (184 for present day ones)
