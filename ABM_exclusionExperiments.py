@@ -17,12 +17,10 @@ def eat_saplings(habitat_patch, eatenSaps):
     habitat_patch.edibles["saplings"] -= eatenSaps
 
 def eat_trees(habitat_patch, eatenTrees):
-    # if eatenTrees > 3: eatenTrees = 3
     habitat_patch.edibles["trees"] -= eatenTrees
     return eatenTrees
 
 def eat_scrub(habitat_patch, eatenScrub):
-    # if eatenScrub > 3: eatenScrub = 3
     habitat_patch.edibles["scrub"] -= eatenScrub
 
 def eat_youngscrub(habitat_patch, eatenYoungScrub):
@@ -54,6 +52,9 @@ class habitatAgent (Agent):
         self.habs_outcompeted_byScrub = defaultdict(int)
         self.habs_grew_up = defaultdict(int)
 
+        # is the area protected?
+        self.protected = False
+
 
     def step(self):
 
@@ -61,6 +62,14 @@ class habitatAgent (Agent):
         self.habs_outcompeted_byTrees.clear()
         self.habs_outcompeted_byScrub.clear()
         self.habs_grew_up.clear()
+
+        # make 10% of the area protected
+        if self.model.schedule.time == 185 and self.pos[0] >= 17 and self.pos[1] >= 13: 
+            self.protected = True
+
+        # if self.model.schedule.time == 185: 
+        #     self.edibles["trees"] = self.edibles["trees"] + 50
+        #     self.edibles["saplings"] = self.edibles["saplings"] + 2500
 
         # chance of 1 young scrub becoming 1 mature scrub
         number_scrub_maturing = np.random.binomial(n=self.edibles["youngScrub"], p=self.model.chance_youngScrubMatures)
@@ -180,8 +189,8 @@ class reindeer(RandomWalker):
 
     def step(self):
         # move & reduce energy
-        # self.mixedDiet_move()
-        self.grazer_move()
+        self.mixedDiet_move()
+        # self.grazer_move()
 
         living = True
         self.energy -= 1
@@ -932,7 +941,7 @@ class tamworthPigs(RandomWalker):
 
                                 # # # # ------ Define the model ------ # # # # 
 
-class KneppModel(Model):
+class KneppModel_exclusion(Model):
 
     def __init__(self,             
             chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
@@ -1317,7 +1326,6 @@ class KneppModel(Model):
             self.grid.place_agent(to_add, (x, y))
             self.schedule.add(to_add)
 
-
     def remove_pig(self, herbivore, count_piglets, count_sow, count_boar):
         to_remove = self.schedule.agents_by_breed[herbivore].items()
         to_remove_piglets = [i for (k, i) in to_remove if i.condition == "piglet"]
@@ -1341,7 +1349,8 @@ class KneppModel(Model):
             my_choice_boar = my_choice_boar
             self.grid._remove_agent(my_choice_boar.pos, my_choice_boar)
             self.schedule.remove(my_choice_boar)
-    
+
+
     def get_month(self):
         return (self.schedule.time % 12) + 1
 
@@ -1792,8 +1801,6 @@ class KneppModel(Model):
                 self.remove_herbivores(redDeer, 7)
                 self.remove_pig(tamworthPigs, 5, 0, 0)                                                                                   
                 self.add_pig(tamworthPigs, 0, 4, 0)                                                                                   
-
-
             if self.schedule.time == 170:
                 self.remove_pig(tamworthPigs, 0, 0, 1)
             # June 2019: -28 cows and cow filtering condition
@@ -1930,7 +1937,7 @@ class KneppModel(Model):
                 pigValue = results.iloc[190]['Tamworth pigs']
                 if pigValue > self.tamworthPig_stocking_forecast:
                     number_to_subtract = random.randint(0,self.tamworthPig_stocking_forecast)
-                    self.remove_pig(tamworthPigs,number_to_subtract,0,0)
+                    self.remove_pig(tamworthPigs,number_to_subtract,pigValue-number_to_subtract,0)
             # Jan 2021  
             if self.schedule.time == 191:
                 results = self.datacollector.get_model_vars_dataframe()
@@ -1949,7 +1956,7 @@ class KneppModel(Model):
                 pigValue = results.iloc[191]['Tamworth pigs']
                 if pigValue > self.tamworthPig_stocking_forecast:
                     number_to_subtract = random.randint(0,self.tamworthPig_stocking_forecast)
-                    self.remove_pig(tamworthPigs, number_to_subtract,0,0)
+                    self.remove_pig(tamworthPigs, number_to_subtract,pigValue-number_to_subtract,0)
             # Feb 2021: cull them all back to stocking values
             if self.schedule.time == 192:
                 results = self.datacollector.get_model_vars_dataframe()
@@ -1968,7 +1975,7 @@ class KneppModel(Model):
                 pigValue = results.iloc[192]['Tamworth pigs']
                 if pigValue > self.tamworthPig_stocking_forecast:
                     number_to_subtract = -self.tamworthPig_stocking_forecast + pigValue
-                    self.remove_pig(tamworthPigs,number_to_subtract,0,0)
+                    self.remove_pig(tamworthPigs,number_to_subtract,pigValue-number_to_subtract,0)
 
 
             # March 2021
@@ -2043,7 +2050,7 @@ class KneppModel(Model):
                 pigValue = results.iloc[-1]['Tamworth pigs']
                 if pigValue > self.tamworthPig_stocking_forecast:
                     number_to_subtract = random.randint(0,self.tamworthPig_stocking_forecast)
-                    self.remove_pig(tamworthPigs, number_to_subtract,0,0)
+                    self.remove_pig(tamworthPigs, number_to_subtract,pigValue-number_to_subtract,0)
             # June 2021
             if self.schedule.time >= 193 and ((self.schedule.time % 12) + 1) == 6:
                 results = self.datacollector.get_model_vars_dataframe()
@@ -2124,7 +2131,7 @@ class KneppModel(Model):
                 pigValue = results.iloc[-1]['Tamworth pigs']
                 if pigValue > self.tamworthPig_stocking_forecast:
                     number_to_subtract = random.randint(0,self.tamworthPig_stocking_forecast)
-                    self.remove_pig(tamworthPigs,number_to_subtract,0,0)
+                    self.remove_pig(tamworthPigs,number_to_subtract,pigValue-number_to_subtract,0)
                 # add boars
                 self.add_pig(tamworthPigs, 0, 0, 1)
 
@@ -2147,7 +2154,7 @@ class KneppModel(Model):
                 if pigValue > self.tamworthPig_stocking_forecast:
                     number_to_subtract = random.randint(0,self.tamworthPig_stocking_forecast)
                     # remove boars
-                    self.remove_pig(tamworthPigs,number_to_subtract,0,1)
+                    self.remove_pig(tamworthPigs,number_to_subtract,pigValue-number_to_subtract,1)
 
             # Feb 2022: cull them all back to stocking values
             if self.schedule.time >= 193 and ((self.schedule.time % 12) + 1) == 2:
@@ -2167,7 +2174,7 @@ class KneppModel(Model):
                 pigValue = results.iloc[-1]['Tamworth pigs']
                 if pigValue > self.tamworthPig_stocking_forecast:
                     number_to_subtract = -self.tamworthPig_stocking_forecast + pigValue
-                    self.remove_pig(tamworthPigs,number_to_subtract,0,0)                    
+                    self.remove_pig(tamworthPigs,number_to_subtract,pigValue-number_to_subtract,0)                    
 
 
         # stop running it at the max_time (184 for present day ones)
@@ -2176,9 +2183,7 @@ class KneppModel(Model):
 
 
     def run_model(self): 
-        # run it for 184 steps
         for i in range(self.max_time):
             self.step()
-            # print(i)
         results = self.datacollector.get_model_vars_dataframe()
         return results

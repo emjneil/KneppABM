@@ -12,8 +12,11 @@ from scipy.stats import linregress
 # open the accepted parameters
 accepted_parameters = pd.read_csv('combined_accepted_parameters.csv') 
 
-# check the 9 non-uniform KS parameters in accepted_parameters
-# ks_params = ["chance_reproduceYoungScrub", "chance_saplingBecomingTree", "chance_youngScrubMatures", "chance_grassOutcompetedByTree", "chance_grassOutcompetedByScrub", "chance_saplingOutcompetedByTree", "roeDeer_reproduce", "cows_reproduce", "fallowDeer_reproduce", "redDeer_reproduce", "pigs_reproduce"]
+# check the 12 non-uniform KS parameters in accepted_parameters
+# ks_params = ["chance_reproduceSapling", "chance_reproduceYoungScrub", "chance_saplingBecomingTree", "chance_youngScrubMatures", "chance_grassOutcompetedByTree", "chance_grassOutcompetedByScrub", "chance_saplingOutcompetedByTree", "roeDeer_reproduce", "cows_reproduce", "fallowDeer_reproduce", "redDeer_reproduce", "pigs_reproduce"]
+
+# ks_params = 
+# "roeDeer_reproduce", - linux24
 
 # alter each one, one at a time
 sensitivity_results_list = []
@@ -21,13 +24,13 @@ sensitivity_parameters = []
 perc_numbers=[]
 run_number  = 0
 # choose my percent above/below number
-perc_aboveBelow = [-0.1, -0.05,-0.01, 0, 0.01, 0.05, 0.1]
+perc_aboveBelow = [-0.5, -0.1,-0.01, 0, 0.01, 0.1, 0.5]
 final_parameters = accepted_parameters.iloc[:,1:52]
 # accepted_parameters.iloc[0:3,1:52]
 # loop through each one, changing one cell at a time
 for i,row1 in final_parameters.iterrows():
     for index, row in row1.iteritems():
-        if index == "chance_reproduceYoungScrub":
+        if index == "roeDeer_reproduce":
             for perc_number in perc_aboveBelow:
                 # make a temp parameter set
                 final_parameters_temp = final_parameters
@@ -354,11 +357,11 @@ merged_dfs = pd.concat([pd.DataFrame({'Filters': sensitivity_results_list}), pd.
 
 # plot it
 sns.scatterplot(data=merged_dfs, x="Parameter", y="Filters", hue="Percentage", palette="viridis")
-plt.title('Sensitivity test results for the parameter: chance_reproduceYoungScrub')
+plt.title('Sensitivity test results for the parameter: roeDeer_reproduce')
 plt.xlabel('Parameter value')
 plt.ylabel('Percentage of filters passed')
 plt.legend(title='Percentage around accepted \n parameter values', ncol=2)
-plt.savefig('ks-test-2.png')
+plt.savefig('ks-test-roeDeer_reproduce.png')
 
 plt.show()
 

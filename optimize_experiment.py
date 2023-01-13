@@ -12,12 +12,6 @@ import matplotlib.pyplot as plt
 # manually change whether it's browser, grazer, or intermediate. Run it once per each and take best result
 # if it's not possible to hit the filters with current stocking densities? Optimise those too. 
 
-# grazer -  1 - levels out around 12-15%
-#  [0.27995299 0.66148828 0.02037398 0.0590684  0.18684425 0.21771809
-#  0.56247843 0.59172031 0.29453923 0.08512734 0.05911069 0.54202918
-#  0.3118936 ]
-
-
 def objectiveFunction(x):
     # habitats
     chance_reproduceSapling = 0.04206406
@@ -110,7 +104,7 @@ def objectiveFunction(x):
     tamworthPig_stocking_forecast = round(x[3]*100)
     exmoor_stocking_forecast = round(x[4]*100)
     # reindeer parameters
-    reproduce_reindeer = 0
+    reproduce_reindeer =0
     # reindeer should have impacts between red and fallow deer
     reindeer_gain_from_grass = 0
     reindeer_gain_from_Trees =0
@@ -145,16 +139,15 @@ def objectiveFunction(x):
     
     # find the middle of each filter - 50 years in future
     filtered_result = (
-        # (((list(results.loc[results['Time'] == 784, 'Grassland'])[0])-50)**2) +
-        # (((list(results.loc[results['Time'] == 784, 'Thorny Scrub'])[0])-25)**2) +
-        (((list(results.loc[results['Time'] == 384, 'Woodland'])[0])-35)**2) +
-        (((list(results.loc[results['Time'] == 784, 'Woodland'])[0])-35)**2))          
-
-
+        # (((list(results.loc[results['Time'] == 784, 'Grassland'])[0])-40)**2) +
+        (((list(results.loc[results['Time'] == 1784, 'Woodland'])[0])-30)**2))
+        # (((list(results.loc[results['Time'] == 784, 'Thorny Scrub'])[0])-30)**2))
+   
     print("r:", filtered_result)
-    with pd.option_context('display.max_columns',None):
-        just_nodes = results[results['Time'] == 784]
-        print(just_nodes[["Time","Roe deer", "Grassland", "Woodland", "Thorny Scrub", "Bare ground", "Reindeer"]])
+    if filtered_result <= 100:
+        with pd.option_context('display.max_columns',None):
+            just_nodes = results[results['Time'] == 784]
+            print(just_nodes[["Time","Roe deer", "Grassland", "Woodland", "Thorny Scrub", "Bare ground", "Reindeer"]])
 
     return filtered_result
    
@@ -165,23 +158,39 @@ def run_optimizer():
     bds = np.array([
         # stocking densities
         # [124,370],[41,122],[18,53],[4,11],[8,23],
-        [0.75,3.70],[0.25,1.5],[0.15,0.75],[0.04,0.25],[0.08,0.5],
-        # new species growth & impact
+        [0.3,2.5],[0.12,1.25],[0.1,0.75],[0.02,0.15],[0.04,0.25],
+        # # new species growth & impact
         # [0.16,0.25],[0.4,0.76],[0.4,0.76],[0.25,0.52],[0.07,0.15],[0.036,0.11],
-        # new species stocking density
-        # [0.1,0.5],
+        # # new species stocking density
+        # [0.01,.5],
         # roe culls
-        [0.2,4]
+        [0.5,2.5]
     ])
 
-#      The best solution found:                                                                           
-#  [1.00396431 0.61177667 0.19238756 0.1167678  0.1143261  0.26472061]
+#  The best solution found: - mixed grazer - WITH reintroduction
+#  [0.1095119  0.1298712  0.10469196 0.07433355 0.07173677 0.16557592
+#  0.68542382 0.59080239 0.45348923 0.0849116  0.06612913 0.03765434
+#  0.53457395]
 
 #  Objective function:
-#  410.0
+#  45.0
 
-    algorithm_param = {'max_num_iteration': 10,\
-                    'population_size':100,\
+# WITHOUT reintroduction - requiring at least 10 of each species
+#  The best solution found:
+#  [0.85528357 0.76485367 0.21839889 0.1021892  0.203925   0.11931687]
+
+#  Objective function:
+#  5.0
+
+#  The best solution found:
+#  [0.33386596 0.17470407 0.17000631 0.04212933 0.07252528 0.62338414]
+
+#  Objective function:
+#  145.0
+
+
+    algorithm_param = {'max_num_iteration': 5,\
+                    'population_size':150,\
                     'mutation_probability':0.1,\
                     'elit_ratio': 0.01,\
                     'crossover_probability': 0.5,\
@@ -295,7 +304,7 @@ def graph_results():
     # reindeer parameters
     reproduce_reindeer =0
     # reindeer should have impacts between red and fallow deer
-    reindeer_gain_from_grass = 0
+    reindeer_gain_from_grass =0
     reindeer_gain_from_Trees =0
     reindeer_gain_from_Scrub =0
     reindeer_gain_from_Saplings = 0
@@ -303,27 +312,35 @@ def graph_results():
     reindeer_stocking_forecast = 0
     roeDeer_stocking_forecast = round(output_parameters["variable"][5]*100)
 
-    # fallowDeer_stocking_forecast = round(0.27995299*100)
-    # cattle_stocking_forecast = round(0.66148828*100)
-    # redDeer_stocking_forecast = round(0.02037398*100)
-    # tamworthPig_stocking_forecast = round(0.0590684*100)
-    # exmoor_stocking_forecast = round(0.18684425*100)
+    # fallowDeer_stocking_forecast = round(0.33*100)
+    # cattle_stocking_forecast = round(0.17*100)
+    # redDeer_stocking_forecast = round(0.17*100)
+    # tamworthPig_stocking_forecast = round(0.04*100)
+    # exmoor_stocking_forecast = round(0.07*100)
     # # reindeer parameters
-    # reproduce_reindeer = 0.21771809
+    # reproduce_reindeer = 0
     # # reindeer should have impacts between red and fallow deer
-    # reindeer_gain_from_grass = 0.56247843
-    # reindeer_gain_from_Trees = 0.59172031
-    # reindeer_gain_from_Scrub =0.29453923
-    # reindeer_gain_from_Saplings = 0.08512734
-    # reindeer_gain_from_YoungScrub = 0.05911069
-    # reindeer_stocking_forecast = round(0.54202918*100)
-    # roeDeer_stocking_forecast = round(0.3118936*100)
+    # reindeer_gain_from_grass = 0
+    # reindeer_gain_from_Trees = 0
+    # reindeer_gain_from_Scrub =0
+    # reindeer_gain_from_Saplings = 0
+    # reindeer_gain_from_YoungScrub = 0
+    # reindeer_stocking_forecast = 0
+    # roeDeer_stocking_forecast = round(0.62*100)
+
+#  The best solution found: - mixed grazer - WITH reintroduction
+#  [0.1095119  0.1298712  0.10469196 0.07433355 0.07173677 0.16557592
+#  0.68542382 0.59080239 0.45348923 0.0849116  0.06612913 0.03765434
+#  0.53457395]
+
+#  Objective function:
+#  45.0
 
 
     # run it
     final_results_list = []
     run_number = 0
-    number_simulations = 10
+    number_simulations = 15
 
     for _ in range(number_simulations):
         # keep track of the runs 
@@ -402,7 +419,7 @@ def graph_results():
     # stop the plots from overlapping
     g.fig.suptitle("Engineering the system towards 25% woodland")
     plt.tight_layout()
-    plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/experiment_optimizer_outputs.png')
+    plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/experiment_optimizer_outputs_SD_only.png')
     plt.show()
 
 graph_results()

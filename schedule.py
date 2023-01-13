@@ -1,5 +1,4 @@
 from collections import defaultdict
-
 from mesa.time import RandomActivation
 
 
@@ -48,7 +47,7 @@ class RandomActivationByBreed(RandomActivation):
         """
         if by_breed:
             for agent_class in self.agents_by_breed:
-                self.step_breed(agent_class)
+                self.step_breed(agent_class) 
             self.steps += 1
             self.time += 1
         else:
@@ -64,6 +63,7 @@ class RandomActivationByBreed(RandomActivation):
         self.model.random.shuffle(agent_keys)
         for agent_key in agent_keys:
             self.agents_by_breed[breed][agent_key].step()
+
 
     def get_breed_count(self, breed_class):
         """
