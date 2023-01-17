@@ -44,21 +44,23 @@ def schelling_draw(agent):
 
 map_element = mg.visualization.MapModule(schelling_draw, [50.971, -0.376], 14)
 
-chart_element = ChartModule([{"Label": "Roe deer", "Color": "Red"}, 
+chart_element_herbivores = ChartModule([{"Label": "Roe deer", "Color": "Red"}, 
                             {"Label": "Exmoor pony", "Color": "Purple"},
                             {"Label": "Fallow deer", "Color": "#F16529"},
                             {"Label": "Longhorn cattle", "Color": "#4B8BBE"},
                             {"Label": "Red deer", "Color": "#BC473A"},
-                            {"Label": "Tamworth pigs", "Color": "Black"},
-                             {"Label": "Grassland", "Color": "#3C873A"},
+                            {"Label": "Tamworth pigs", "Color": "Black"}])
+
+chart_element_habitats = ChartModule([{"Label": "Grassland", "Color": "#3C873A"},
                              {"Label": "Bare ground", "Color": "#560000"},
                              {"Label": "Thorny Scrub", "Color": "#FFD43B"},
                              {"Label": "Woodland", "Color": "Blue"}])
 
+
 server = mesa.visualization.ModularServer(
     KneppModel, 
-    [map_element, chart_element],
-    "Knepp Estate", {"roe_deer_reproduce":0.18, "roe_deer_gain_from_saplings":0.25,"roe_deer_gain_from_trees":0.7, "roe_deer_gain_from_scrub":0.5,"roe_deer_gain_from_young_scrub":0.25, "roe_deer_gain_from_grass":0.75,
+    [map_element, chart_element_herbivores, chart_element_habitats],
+    "Knepp Estate", {"initial_roe":12,"roe_deer_reproduce":0.18, "roe_deer_gain_from_saplings":0.25,"roe_deer_gain_from_trees":0.7, "roe_deer_gain_from_scrub":0.5,"roe_deer_gain_from_young_scrub":0.25, "roe_deer_gain_from_grass":0.75,
                     "chance_youngScrubMatures":0.05, "chance_saplingBecomingTree":0.01, "chance_reproduceSapling":0.25,"chance_reproduceYoungScrub":0.35, "chance_regrowGrass":0.9, 
                     "chance_grassOutcompetedByTree": 0.5, "chance_grassOutcompetedByScrub":0.5,"chance_scrubOutcompetedByTree":0.5, "chance_saplingOutcompetedByTree": 0.5, "chance_saplingOutcompetedByScrub": 0.5, "chance_youngScrubOutcompetedByTree":0.5, "chance_youngScrubOutcompetedByScrub":0.5, 
                     "ponies_gain_from_saplings": 0.7, "ponies_gain_from_trees":0.5, "ponies_gain_from_scrub":0.6, "ponies_gain_from_young_scrub":0.7, "ponies_gain_from_grass":0.8, 

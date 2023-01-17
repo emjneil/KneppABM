@@ -11,7 +11,7 @@ from mesa.datacollection import DataCollector
 
 
 class KneppModel(mesa.Model):
-    def __init__(self, roe_deer_reproduce, roe_deer_gain_from_saplings, roe_deer_gain_from_trees, roe_deer_gain_from_scrub, roe_deer_gain_from_young_scrub, roe_deer_gain_from_grass,
+    def __init__(self, initial_roe, roe_deer_reproduce, roe_deer_gain_from_saplings, roe_deer_gain_from_trees, roe_deer_gain_from_scrub, roe_deer_gain_from_young_scrub, roe_deer_gain_from_grass,
                         chance_youngScrubMatures, chance_saplingBecomingTree, chance_reproduceSapling,chance_reproduceYoungScrub, chance_regrowGrass, 
                         chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_scrubOutcompetedByTree, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByTree, chance_youngScrubOutcompetedByScrub, 
                         ponies_gain_from_saplings, ponies_gain_from_trees, ponies_gain_from_scrub, ponies_gain_from_young_scrub, ponies_gain_from_grass, 
@@ -43,6 +43,7 @@ class KneppModel(mesa.Model):
         for field in fields:
             self.schedule.add(field)
         # add other parameters
+        self.initial_roe = initial_roe
         self.roe_deer_reproduce = roe_deer_reproduce
         self.roe_deer_gain_from_saplings = roe_deer_gain_from_saplings
         self.roe_deer_gain_from_trees = roe_deer_gain_from_trees
@@ -133,7 +134,7 @@ class KneppModel(mesa.Model):
         self.introduced_species_stocking_forecast = introduced_species_stocking_forecast
 
         # then add the herbivores as points
-        for _ in range(12): # number of roe deer
+        for _ in range(initial_roe): # number of roe deer
             field = random.choice(fields) # randomly pick field
             energy = np.random.uniform(0, 1)
             roe = roe_deer_agent(
@@ -242,8 +243,8 @@ class KneppModel(mesa.Model):
         for key, value in model.schedule.agents_by_breed[FieldAgent].items():
             if value.condition == habitat_condition:
                 count += 1
-        # return percentage of entire area
-        return round((count/450)*100)
+        # return percentage of entire area (number of grid cells)
+        return round((count/506)*100)
 
 
     def track_position(self, model, breed):
@@ -859,7 +860,7 @@ class KneppModel(mesa.Model):
                 outputs = self.datacollector.get_model_vars_dataframe()
                 # first make sure that exmoor ponies are at their stocking density
                 if outputs.iloc[185]['Exmoor pony'] > self.exmoor_stocking_forecast:
-                    number_to_subtract = int(-self.exmoor_stocking_forecast + int(outputs.iloc[185]['Exmoor pony']))
+                    number_to_subtract = -self.exmoor_stocking_forecast + int(outputs.iloc[185]['Exmoor pony'])
                     self.remove_herbivores(exmoor_pony_agent, number_to_subtract)
                 else:
                     number_to_add = self.exmoor_stocking_forecast - int(outputs.iloc[185]['Exmoor pony'])
@@ -1118,10 +1119,10 @@ class KneppModel(mesa.Model):
 
 
 
-    # def run_model(self): 
-    #     # run it for 184 steps
-    #     for i in range(self.max_time):
-    #         self.step()
-    #         # print(i)
-    #     results = self.datacollector.get_model_vars_dataframe()
-    #     return results
+    def run_model(self): 
+        # run it for 184 steps
+        for i in range(self.max_time):
+            self.step()
+            # print(i)
+        results = self.datacollector.get_model_vars_dataframe()
+        return results

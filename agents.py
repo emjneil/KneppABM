@@ -14,7 +14,7 @@ class FieldAgent(mg.GeoAgent):
     def __init__(self, unique_id, model, geometry, crs):
         super().__init__(unique_id, model, geometry, crs)
         # set up the dominant habitat condition
-        self.condition=np.random.choice(["grassland", "thorny_scrubland", "woodland", "bare_ground"], p=[0.90, 0.04, 0.05, 0.01])
+        self.condition=np.random.choice(["grassland", "thorny_scrubland", "woodland", "bare_ground"], p=[0.899, 0.043, 0.058, 0])
         # what is the size of my patch? some fields are multipolygons
         if type(self.geometry) == Polygon:
             self.size_of_patch = Polygon(self.geometry).area
@@ -33,25 +33,18 @@ class FieldAgent(mg.GeoAgent):
             self.perc_bareground_here = 100 - self.perc_grass_here
         elif self.condition == "thorny_scrubland": 
             self.trees_here = random.randint(0, 49)*(self.size_of_patch/10000)
-            self.saplings_here = random.randint(0, 50)*(self.size_of_patch/10000)
+            self.saplings_here = random.randint(0, 500)*(self.size_of_patch/10000)
             self.scrub_here = random.randint(100, 800)*(self.size_of_patch/10000)
-            self.youngscrub_here = random.randint(0, 50)*(self.size_of_patch/10000)
+            self.youngscrub_here = random.randint(0, 500)*(self.size_of_patch/10000)
             self.perc_grass_here = random.randint(0, 100)
             self.perc_bareground_here = 100 - self.perc_grass_here
         elif self.condition == "woodland":  
             self.trees_here = random.randint(50, 400)*(self.size_of_patch/10000)
-            self.saplings_here = random.randint(0, 50)*(self.size_of_patch/10000)
+            self.saplings_here = random.randint(0, 500)*(self.size_of_patch/10000)
             self.scrub_here = random.randint(0, 80)*(self.size_of_patch/10000)
-            self.youngscrub_here = random.randint(0, 50)*(self.size_of_patch/10000)
+            self.youngscrub_here = random.randint(0, 500)*(self.size_of_patch/10000)
             self.perc_grass_here = random.randint(0, 100)
             self.perc_bareground_here = 100 - self.perc_grass_here
-        elif self.condition == "bare_ground":
-            self.trees_here = random.randint(0, 49)*(self.size_of_patch/10000)
-            self.saplings_here = 0
-            self.scrub_here = random.randint(0, 99)*(self.size_of_patch/10000)
-            self.youngscrub_here = 0
-            self.perc_bareground_here = random.randint(51, 100)
-            self.perc_grass_here = 100 - self.perc_bareground_here
         # this is the food available for herbivores in this habitat agent
         self.edibles = defaultdict(int)
         self.edibles["trees"] = self.trees_here
@@ -209,7 +202,6 @@ class roe_deer_agent(mg.GeoAgent):
         browser_move(self, FieldAgent)
         self.energy -= 1
         # eat
-        self.count_eaten.clear()
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
         self.energy = eat_habitats(self, habitat_patch, gain_from_saplings = self.model.roe_deer_gain_from_saplings, gain_from_trees=self.model.roe_deer_gain_from_trees, gain_from_scrub=self.model.roe_deer_gain_from_scrub, gain_from_young_scrub=self.model.roe_deer_gain_from_young_scrub, gain_from_grass=self.model.roe_deer_gain_from_grass)
         # if roe deer's energy is less than 0, die 
@@ -239,7 +231,6 @@ class exmoor_pony_agent(mg.GeoAgent):
         grazer_move(self, FieldAgent)
         self.energy -= 1
         # eat
-        self.count_eaten.clear()
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
         self.energy = eat_habitats(self, habitat_patch, gain_from_saplings = self.model.ponies_gain_from_saplings, gain_from_trees=self.model.ponies_gain_from_trees, gain_from_scrub=self.model.ponies_gain_from_scrub, gain_from_young_scrub=self.model.ponies_gain_from_young_scrub, gain_from_grass=self.model.ponies_gain_from_grass)
         # if energy is less than 0, die 
@@ -262,7 +253,6 @@ class longhorn_cattle_agent(mg.GeoAgent):
         grazer_move(self, FieldAgent)
         self.energy -= 1
         # eat
-        self.count_eaten.clear()
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
         self.energy = eat_habitats(self, habitat_patch, gain_from_saplings = self.model.cows_gain_from_saplings, gain_from_trees=self.model.cows_gain_from_trees, gain_from_scrub=self.model.cows_gain_from_scrub, gain_from_young_scrub=self.model.cows_gain_from_young_scrub, gain_from_grass=self.model.cows_gain_from_grass)
         # if energy is less than 0, die 
@@ -293,7 +283,6 @@ class fallow_deer_agent(mg.GeoAgent):
         mixed_diet_move(self, FieldAgent)
         self.energy -= 1
         # eat
-        self.count_eaten.clear()
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
         self.energy = eat_habitats(self, habitat_patch, gain_from_saplings = self.model.fallow_deer_gain_from_saplings, gain_from_trees=self.model.fallow_deer_gain_from_trees, gain_from_scrub=self.model.fallow_deer_gain_from_scrub, gain_from_young_scrub=self.model.fallow_deer_gain_from_young_scrub, gain_from_grass=self.model.fallow_deer_gain_from_grass)
         # if energy is less than 0, die 
@@ -324,7 +313,6 @@ class red_deer_agent(mg.GeoAgent):
         mixed_diet_move(self, FieldAgent)
         self.energy -= 1
         # eat
-        self.count_eaten.clear()
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
         self.energy = eat_habitats(self, habitat_patch, gain_from_saplings = self.model.red_deer_gain_from_saplings, gain_from_trees=self.model.red_deer_gain_from_trees, gain_from_scrub=self.model.red_deer_gain_from_scrub, gain_from_young_scrub=self.model.red_deer_gain_from_young_scrub, gain_from_grass=self.model.red_deer_gain_from_grass)
         # if energy is less than 0, die 
@@ -358,7 +346,6 @@ class tamworth_pig_agent(mg.GeoAgent):
         random_move(self, FieldAgent)
         self.energy -= 1
         # eat
-        self.count_eaten.clear()
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
         self.energy = eat_habitats(self, habitat_patch, gain_from_saplings = self.model.tamworth_pig_gain_from_saplings, gain_from_trees=self.model.tamworth_pig_gain_from_trees, gain_from_scrub=self.model.tamworth_pig_gain_from_scrub, gain_from_young_scrub=self.model.tamworth_pig_gain_from_young_scrub, gain_from_grass=self.model.tamworth_pig_gain_from_grass)
         # if energy is less than 0, die 
@@ -409,7 +396,6 @@ class reindeer_agent(mg.GeoAgent):
         mixed_diet_move(self, FieldAgent)
         self.energy -= 1
         # eat
-        self.count_eaten.clear()
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
         self.energy = eat_habitats(self, habitat_patch, gain_from_saplings = self.model.reindeer_gain_from_saplings, gain_from_trees=self.model.reindeer_gain_from_trees, gain_from_scrub=self.model.reindeer_gain_from_scrub, gain_from_young_scrub=self.model.reindeer_gain_from_young_scrub, gain_from_grass=self.model.reindeer_gain_from_grass)
         # if energy is less than 0, die 
@@ -440,7 +426,6 @@ class european_elk_agent(mg.GeoAgent):
         browser_move(self, FieldAgent)
         self.energy -= 1
         # eat
-        self.count_eaten.clear()
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
         self.energy = eat_habitats(self, habitat_patch, gain_from_saplings = self.model.european_elk_gain_from_saplings, gain_from_trees=self.model.european_elk_gain_from_trees, gain_from_scrub=self.model.european_elk_gain_from_scrub, gain_from_young_scrub=self.model.european_elk_gain_from_young_scrub, gain_from_grass=self.model.european_elk_gain_from_grass)
         # if energy is less than 0, die 
@@ -470,7 +455,6 @@ class european_bison_agent(mg.GeoAgent):
         mixed_diet_move(self, FieldAgent)
         self.energy -= 1
         # eat
-        self.count_eaten.clear()
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
         self.energy = eat_habitats(self, habitat_patch, gain_from_saplings = self.model.european_bison_gain_from_saplings, gain_from_trees=self.model.european_bison_gain_from_trees, gain_from_scrub=self.model.european_bison_gain_from_scrub, gain_from_young_scrub=self.model.european_bison_gain_from_young_scrub, gain_from_grass=self.model.european_bison_gain_from_grass)
         # if energy is less than 0, die 

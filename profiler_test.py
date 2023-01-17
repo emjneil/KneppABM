@@ -1,4 +1,4 @@
-from KneppModel_ABM import KneppModel 
+from model import KneppModel 
 
 model = KneppModel(
         0.1, 0.1, 0.1, 0.1, 0.1, 
@@ -10,9 +10,11 @@ model = KneppModel(
         0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 
         0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 
         0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,
-        width = 25, height = 18, 
-        max_time = 185, reintroduction = True, 
-        RC1_noFood = False, RC2_noTreesScrub = False, RC3_noTrees = False, RC4_noScrub = False)
+        0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,
+        0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,
+        0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 
+        max_time = 185, 
+        reintroduction = True, introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
 
 model.run_model()
 

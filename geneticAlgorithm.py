@@ -1,5 +1,5 @@
 # ------ Optimization of the Knepp ABM model --------
-from KneppModel_ABM import KneppModel 
+from model import KneppModel 
 import numpy as np
 import pandas as pd
 from geneticalgorithm import geneticalgorithm as ga
@@ -12,7 +12,7 @@ import sys
 
 def objectiveFunction(x):
 
-    # define the parameters
+    # define the parameters (12)
     chance_reproduceSapling = x[0]
     chance_reproduceYoungScrub =x[1]
     chance_regrowGrass =x[2]
@@ -27,69 +27,66 @@ def objectiveFunction(x):
     chance_youngScrubOutcompetedByTree =x[11]
 
     # initial values
-    initial_roeDeer = 0.12
-    initial_grassland = 0.9
-    initial_woodland = 0.06
-    initial_scrubland = 0.043
-    roeDeer_reproduce =x[12]
-    roeDeer_gain_from_grass =x[13]
-    roeDeer_gain_from_Trees = x[14]
-    roeDeer_gain_from_Scrub = x[15]
-    roeDeer_gain_from_Saplings = x[16]
-    roeDeer_gain_from_YoungScrub = x[17]
-    fallowDeer_reproduce = x[18]
-    fallowDeer_gain_from_grass = x[19]
-    fallowDeer_gain_from_Trees = x[20]
-    fallowDeer_gain_from_Scrub = x[21]
-    fallowDeer_gain_from_Saplings = x[22]
-    fallowDeer_gain_from_YoungScrub = x[23]
-    redDeer_reproduce = x[24]
-    redDeer_gain_from_grass = x[25]
-    redDeer_gain_from_Trees = x[26]
-    redDeer_gain_from_Scrub = x[27]
-    redDeer_gain_from_Saplings = x[28]
-    redDeer_gain_from_YoungScrub = x[29]
+    roe_deer_reproduce =x[12]
+    roe_deer_gain_from_grass =x[13]
+    roe_deer_gain_from_trees = x[14]
+    roe_deer_gain_from_scrub = x[15]
+    roe_deer_gain_from_saplings = x[16]
+    roe_deer_gain_from_young_scrub = x[17]
+    fallow_deer_reproduce = x[18]
+    fallow_deer_gain_from_grass = x[19]
+    fallow_deer_gain_from_trees = x[20]
+    fallow_deer_gain_from_scrub = x[21]
+    fallow_deer_gain_from_saplings = x[22]
+    fallow_deer_gain_from_young_scrub = x[23]
+    red_deer_reproduce = x[24]
+    red_deer_gain_from_grass = x[25]
+    red_deer_gain_from_trees = x[26]
+    red_deer_gain_from_scrub = x[27]
+    red_deer_gain_from_saplings = x[28]
+    red_deer_gain_from_young_scrub = x[29]
     ponies_gain_from_grass = x[30]
-    ponies_gain_from_Trees = x[31]
-    ponies_gain_from_Scrub = x[32]
-    ponies_gain_from_Saplings = x[33]
-    ponies_gain_from_YoungScrub = x[34]
-    cows_reproduce = x[35]
+    ponies_gain_from_trees = x[31]
+    ponies_gain_from_scrub = x[32]
+    ponies_gain_from_saplings = x[33]
+    ponies_gain_from_young_scrub = x[34]
+    cattle_reproduce = x[35]
     cows_gain_from_grass = x[36]
-    cows_gain_from_Trees = x[37]
-    cows_gain_from_Scrub = x[38]
-    cows_gain_from_Saplings = x[39]
-    cows_gain_from_YoungScrub = x[40]
-    pigs_reproduce = x[41]
-    pigs_gain_from_Trees = x[42]
-    pigs_gain_from_Scrub = x[43]
-    pigs_gain_from_grass =x[44]
-    pigs_gain_from_Saplings =x[45]
-    pigs_gain_from_YoungScrub = x[46]
-    reproduce_bison = 0
+    cows_gain_from_trees = x[37]
+    cows_gain_from_scrub = x[38]
+    cows_gain_from_saplings = x[39]
+    cows_gain_from_young_scrub = x[40]
+    tamworth_pig_reproduce = x[41]
+    tamworth_pig_gain_from_trees = x[42]
+    tamworth_pig_gain_from_scrub = x[43]
+    tamworth_pig_gain_from_grass =x[44]
+    tamworth_pig_gain_from_saplings =x[45]
+    tamworth_pig_gain_from_young_scrub = x[46]
+    european_bison_reproduce = 0
     # bison should have higher impact than any other consumer
-    bison_gain_from_grass =  0
-    bison_gain_from_Trees =0
-    bison_gain_from_Scrub =0
-    bison_gain_from_Saplings = 0
-    bison_gain_from_YoungScrub = 0  
+    european_bison_gain_from_grass =  0
+    european_bison_gain_from_trees =0
+    european_bison_gain_from_scrub =0
+    european_bison_gain_from_saplings = 0
+    european_bison_gain_from_young_scrub = 0  
     # euro elk parameters
-    reproduce_elk = 0
+    european_elk_reproduce = 0
     # bison should have higher impact than any other consumer
-    elk_gain_from_grass =  0
-    elk_gain_from_Trees = 0
-    elk_gain_from_Scrub = 0
-    elk_gain_from_Saplings =  0
-    elk_gain_from_YoungScrub =  0
+    european_elk_gain_from_grass =  0
+    european_elk_gain_from_trees = 0
+    european_elk_gain_from_scrub = 0
+    european_elk_gain_from_saplings =  0
+    european_elk_gain_from_young_scrub =  0
     # reindeer parameters
-    reproduce_reindeer = 0
+    reindeer_reproduce = 0
     # reindeer should have impacts between red and fallow deer
     reindeer_gain_from_grass = 0
-    reindeer_gain_from_Trees =0
-    reindeer_gain_from_Scrub =0
-    reindeer_gain_from_Saplings = 0
-    reindeer_gain_from_YoungScrub = 0
+    reindeer_gain_from_trees =0
+    reindeer_gain_from_scrub =0
+    reindeer_gain_from_saplings = 0
+    reindeer_gain_from_young_scrub = 0
     # stocking values
+    initial_roe = 12
     fallowDeer_stocking = 247
     cattle_stocking = 81
     redDeer_stocking = 35
@@ -102,27 +99,23 @@ def objectiveFunction(x):
     tamworthPig_stocking_forecast = 7
     exmoor_stocking_forecast = 15
     roeDeer_stocking_forecast = 12
-    reindeer_stocking_forecast = 0
+    introduced_species_stocking_forecast = 0
 
     # run the model
-
-    model = KneppModel(
-        chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
-        chance_scrubOutcompetedByTree, chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
-        initial_roeDeer, initial_grassland, initial_woodland, initial_scrubland, 
-        roeDeer_reproduce, roeDeer_gain_from_grass, roeDeer_gain_from_Trees, roeDeer_gain_from_Scrub, roeDeer_gain_from_Saplings, roeDeer_gain_from_YoungScrub,
-        ponies_gain_from_grass, ponies_gain_from_Trees, ponies_gain_from_Scrub, ponies_gain_from_Saplings, ponies_gain_from_YoungScrub, 
-        cows_reproduce, cows_gain_from_grass, cows_gain_from_Trees, cows_gain_from_Scrub, cows_gain_from_Saplings, cows_gain_from_YoungScrub, 
-        fallowDeer_reproduce, fallowDeer_gain_from_grass, fallowDeer_gain_from_Trees, fallowDeer_gain_from_Scrub, fallowDeer_gain_from_Saplings, fallowDeer_gain_from_YoungScrub, 
-        redDeer_reproduce, redDeer_gain_from_grass, redDeer_gain_from_Trees, redDeer_gain_from_Scrub, redDeer_gain_from_Saplings, redDeer_gain_from_YoungScrub, 
-        pigs_reproduce, pigs_gain_from_grass, pigs_gain_from_Trees, pigs_gain_from_Scrub, pigs_gain_from_Saplings, pigs_gain_from_YoungScrub, 
-        fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
-        reproduce_bison, bison_gain_from_grass, bison_gain_from_Trees, bison_gain_from_Scrub, bison_gain_from_Saplings, bison_gain_from_YoungScrub,
-        reproduce_elk, elk_gain_from_grass, elk_gain_from_Trees, elk_gain_from_Scrub, elk_gain_from_Saplings, elk_gain_from_YoungScrub,
-        reproduce_reindeer, reindeer_gain_from_grass, reindeer_gain_from_Trees, reindeer_gain_from_Scrub, reindeer_gain_from_Saplings, reindeer_gain_from_YoungScrub,
-        fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, reindeer_stocking_forecast, roeDeer_stocking_forecast,
-        width = 25, height = 18, max_time = 184, reintroduction = True,
-        introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False, cull_roe = False)
+    model = KneppModel(initial_roe, roe_deer_reproduce, roe_deer_gain_from_saplings, roe_deer_gain_from_trees, roe_deer_gain_from_scrub, roe_deer_gain_from_young_scrub, roe_deer_gain_from_grass,
+                        chance_youngScrubMatures, chance_saplingBecomingTree, chance_reproduceSapling,chance_reproduceYoungScrub, chance_regrowGrass, 
+                        chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_scrubOutcompetedByTree, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByTree, chance_youngScrubOutcompetedByScrub, 
+                        ponies_gain_from_saplings, ponies_gain_from_trees, ponies_gain_from_scrub, ponies_gain_from_young_scrub, ponies_gain_from_grass, 
+                        cattle_reproduce, cows_gain_from_grass, cows_gain_from_trees, cows_gain_from_scrub, cows_gain_from_saplings, cows_gain_from_young_scrub, 
+                        fallow_deer_reproduce, fallow_deer_gain_from_saplings, fallow_deer_gain_from_trees, fallow_deer_gain_from_scrub, fallow_deer_gain_from_young_scrub, fallow_deer_gain_from_grass,
+                        red_deer_reproduce, red_deer_gain_from_saplings, red_deer_gain_from_trees, red_deer_gain_from_scrub, red_deer_gain_from_young_scrub, red_deer_gain_from_grass,
+                        tamworth_pig_reproduce, tamworth_pig_gain_from_saplings,tamworth_pig_gain_from_trees,tamworth_pig_gain_from_scrub,tamworth_pig_gain_from_young_scrub,tamworth_pig_gain_from_grass,
+                        european_bison_reproduce, european_bison_gain_from_grass, european_bison_gain_from_trees, european_bison_gain_from_scrub, european_bison_gain_from_saplings, european_bison_gain_from_young_scrub,
+                        european_elk_reproduce, european_elk_gain_from_grass, european_elk_gain_from_trees, european_elk_gain_from_scrub, european_elk_gain_from_saplings, european_elk_gain_from_young_scrub,
+                        reindeer_reproduce, reindeer_gain_from_grass, reindeer_gain_from_trees, reindeer_gain_from_scrub, reindeer_gain_from_saplings, reindeer_gain_from_young_scrub,
+                        fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
+                        fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, introduced_species_stocking_forecast,
+                        max_time = 185, reintroduction = True, introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
 
     model.run_model()
 
@@ -132,22 +125,23 @@ def objectiveFunction(x):
     # find the middle of each filter
     filtered_result = (
         # pre-reintro model
-        ((((list(results.loc[results['Time'] == 49, 'Roe deer'])[0])-23)/23)**2) +
-        ((((list(results.loc[results['Time'] == 49, 'Grassland'])[0])-53.4))**2) +
-        ((((list(results.loc[results['Time'] == 49, 'Thorny Scrub'])[0])-12.7))**2) +
-        (((list(results.loc[results['Time'] == 49, 'Woodland'])[0])-11.4)**2) +
-        # post-reintro model: April 2015
-        ((((list(results.loc[results['Time'] == 123, 'Longhorn cattle'])[0])-115)/115)**2) +
-        ((((list(results.loc[results['Time'] == 123, 'Tamworth pigs'])[0])-22)/22)**2) +
+        ((((list(results.loc[results['Time'] == 49, 'Roe deer'])[0])-26)/26)**2) +
+        ((((list(results.loc[results['Time'] == 49, 'Grassland'])[0])-58.4)/58.4)**2) +
+        ((((list(results.loc[results['Time'] == 49, 'Thorny Scrub'])[0])-12.7)/12.7)**2) +
+        ((((list(results.loc[results['Time'] == 49, 'Woodland'])[0])-11.4)/11.4)**2) +
+
+        # # post-reintro model: April 2015
+        # ((((list(results.loc[results['Time'] == 123, 'Longhorn cattle'])[0])-115)/115)**2) +
+        # ((((list(results.loc[results['Time'] == 123, 'Tamworth pigs'])[0])-22)/22)**2) +
         ((((list(results.loc[results['Time'] == 123, 'Exmoor pony'])[0])-10)/10)**2) +
-        # # May 2015
-        ((((list(results.loc[results['Time'] == 124, 'Exmoor pony'])[0])-10)/10)**2) +
-        ((((list(results.loc[results['Time'] == 124, 'Longhorn cattle'])[0])-129)/129)**2) +
-        ((((list(results.loc[results['Time'] == 124, 'Tamworth pigs'])[0])-14)/14)**2) +
-        # June 2015
-        ((((list(results.loc[results['Time'] == 125, 'Exmoor pony'])[0])-10)/10)**2) +
-        ((((list(results.loc[results['Time'] == 125, 'Longhorn cattle'])[0])-129)/129)**2) +
-        ((((list(results.loc[results['Time'] == 125, 'Tamworth pigs'])[0])-14)/14)**2) +
+        # # # May 2015
+        # ((((list(results.loc[results['Time'] == 124, 'Exmoor pony'])[0])-10)/10)**2) +
+        # ((((list(results.loc[results['Time'] == 124, 'Longhorn cattle'])[0])-129)/129)**2) +
+        # ((((list(results.loc[results['Time'] == 124, 'Tamworth pigs'])[0])-14)/14)**2) +
+        # # June 2015
+        # ((((list(results.loc[results['Time'] == 125, 'Exmoor pony'])[0])-10)/10)**2) +
+        # ((((list(results.loc[results['Time'] == 125, 'Longhorn cattle'])[0])-129)/129)**2) +
+        # ((((list(results.loc[results['Time'] == 125, 'Tamworth pigs'])[0])-14)/14)**2) +
         # July 2015
         # ((((list(results.loc[results['Time'] == 126, 'Exmoor pony'])[0])-10)/10)**2) +
         # ((((list(results.loc[results['Time'] == 126, 'Longhorn cattle'])[0])-129)/129)**2) +
@@ -180,13 +174,13 @@ def objectiveFunction(x):
         # ((((list(results.loc[results['Time'] == 133, 'Exmoor pony'])[0])-10)/10)**2) +
         # ((((list(results.loc[results['Time'] == 133, 'Longhorn cattle'])[0])-86)/86)**2) +
         # ((((list(results.loc[results['Time'] == 133, 'Tamworth pigs'])[0])-8)/8)**2) +
-        # # March 2016
-        (((list(results.loc[results['Time'] == 134, 'Fallow deer'])[0])-140)**2) +
-        ((((list(results.loc[results['Time'] == 134, 'Red deer'])[0])-26)/26)**2) +
-        ((((list(results.loc[results['Time'] == 134, 'Tamworth pigs'])[0])-9)/9)**2) +
-        ((((list(results.loc[results['Time'] == 134, 'Longhorn cattle'])[0])-86)/86)**2) +
+        # March 2016
+        # ((((list(results.loc[results['Time'] == 134, 'Fallow deer'])[0])-140)/140)**2) +
+        # ((((list(results.loc[results['Time'] == 134, 'Red deer'])[0])-26)/26)**2) +
+        # ((((list(results.loc[results['Time'] == 134, 'Tamworth pigs'])[0])-9)/9)**2) +
+        # ((((list(results.loc[results['Time'] == 134, 'Longhorn cattle'])[0])-86)/86)**2) +
         ((((list(results.loc[results['Time'] == 134, 'Exmoor pony'])[0])-11)/11)**2) +
-        # # # April 2016
+        # # # # April 2016
         # ((((list(results.loc[results['Time'] == 135, 'Longhorn cattle'])[0])-103)/103)**2) +
         # ((((list(results.loc[results['Time'] == 135, 'Exmoor pony'])[0])-11)/11)**2) +
         # ((((list(results.loc[results['Time'] == 135, 'Tamworth pigs'])[0])-9)/9)**2) +
@@ -230,41 +224,41 @@ def objectiveFunction(x):
         # ((((list(results.loc[results['Time'] == 145, 'Exmoor pony'])[0])-11)/11)**2) +
         # ((((list(results.loc[results['Time'] == 145, 'Tamworth pigs'])[0])-7)/7)**2) +
         # ((((list(results.loc[results['Time'] == 145, 'Longhorn cattle'])[0])-79)/79)**2) +
-        # # # March 2017
-        ((((list(results.loc[results['Time'] == 146, 'Fallow deer'])[0])-165)/165)**2) +
-        ((((list(results.loc[results['Time'] == 146, 'Longhorn cattle'])[0])-79)/79)**2) +
-        ((((list(results.loc[results['Time'] == 146, 'Tamworth pigs'])[0])-7)/7)**2) +
+        # March 2017
+        # ((((list(results.loc[results['Time'] == 146, 'Fallow deer'])[0])-165)/165)**2) +
+        # ((((list(results.loc[results['Time'] == 146, 'Longhorn cattle'])[0])-79)/79)**2) +
+        # ((((list(results.loc[results['Time'] == 146, 'Tamworth pigs'])[0])-7)/7)**2) +
         ((((list(results.loc[results['Time'] == 146, 'Exmoor pony'])[0])-10)/10)**2) +
-        # # April 2017
+        # # # April 2017
         # ((((list(results.loc[results['Time'] == 147, 'Longhorn cattle'])[0])-100)/100)**2) +
         # ((((list(results.loc[results['Time'] == 147, 'Tamworth pigs'])[0])-22)/22)**2) +
-        # ((((list(results.loc[results['Time'] == 147, 'Exmoor pony'])[0])-10)/10)**2) +
+        ((((list(results.loc[results['Time'] == 147, 'Exmoor pony'])[0])-10)/10)**2) +
         # # # May 2017
         # ((((list(results.loc[results['Time'] == 148, 'Longhorn cattle'])[0])-109)/109)**2) +
-        # ((((list(results.loc[results['Time'] == 148, 'Exmoor pony'])[0])-10)/10)**2) +
+        ((((list(results.loc[results['Time'] == 148, 'Exmoor pony'])[0])-10)/10)**2) +
         # ((((list(results.loc[results['Time'] == 148, 'Tamworth pigs'])[0])-22)/22)**2) +
         # # June 2017
         # ((((list(results.loc[results['Time'] == 149, 'Longhorn cattle'])[0])-94)/94)**2) +
-        # ((((list(results.loc[results['Time'] == 149, 'Exmoor pony'])[0])-10)/10)**2) +
+        ((((list(results.loc[results['Time'] == 149, 'Exmoor pony'])[0])-10)/10)**2) +
         # ((((list(results.loc[results['Time'] == 149, 'Tamworth pigs'])[0])-22)/22)**2) +
         # # # July 2017
-        # ((((list(results.loc[results['Time'] == 150, 'Exmoor pony'])[0])-10)/10)**2) +
+        ((((list(results.loc[results['Time'] == 150, 'Exmoor pony'])[0])-10)/10)**2) +
         # ((((list(results.loc[results['Time'] == 150, 'Longhorn cattle'])[0])-94)/94)**2) +
         # ((((list(results.loc[results['Time'] == 150, 'Tamworth pigs'])[0])-22)/22)**2) +
         # # Aug 2017
-        # ((((list(results.loc[results['Time'] == 151, 'Exmoor pony'])[0])-10)/10)**2) +
+        ((((list(results.loc[results['Time'] == 151, 'Exmoor pony'])[0])-10)/10)**2) +
         # ((((list(results.loc[results['Time'] == 151, 'Longhorn cattle'])[0])-94)/94)**2) +
         # ((((list(results.loc[results['Time'] == 151, 'Tamworth pigs'])[0])-22)/22)**2) +
         # # # Sept 2017
-        # ((((list(results.loc[results['Time'] == 152, 'Exmoor pony'])[0])-10)/10)**2) +
+        ((((list(results.loc[results['Time'] == 152, 'Exmoor pony'])[0])-10)/10)**2) +
         # ((((list(results.loc[results['Time'] == 152, 'Longhorn cattle'])[0])-90)/90)**2) +
         # ((((list(results.loc[results['Time'] == 152, 'Tamworth pigs'])[0])-22)/22)**2) +
         # # # Oct 2017
-        # ((((list(results.loc[results['Time'] == 153, 'Exmoor pony'])[0])-10)/10)**2) +
+        ((((list(results.loc[results['Time'] == 153, 'Exmoor pony'])[0])-10)/10)**2) +
         # ((((list(results.loc[results['Time'] == 153, 'Longhorn cattle'])[0])-88)/88)**2) +
         # ((((list(results.loc[results['Time'] == 153, 'Tamworth pigs'])[0])-22)/22)**2) +
         # # # Nov 2017
-        # ((((list(results.loc[results['Time'] == 154, 'Exmoor pony'])[0])-10)/10)**2) +
+        ((((list(results.loc[results['Time'] == 154, 'Exmoor pony'])[0])-10)/10)**2) +
         # ((((list(results.loc[results['Time'] == 154, 'Longhorn cattle'])[0])-88)/88)**2) +
         # ((((list(results.loc[results['Time'] == 154, 'Tamworth pigs'])[0])-22)/22)**2) +
         # # # Dec 2017
@@ -273,19 +267,19 @@ def objectiveFunction(x):
         # ((((list(results.loc[results['Time'] == 155, 'Tamworth pigs'])[0])-18)/18)**2) +
         # # # Jan 2018
         # ((((list(results.loc[results['Time'] == 156, 'Tamworth pigs'])[0])-11)/11)**2) +
-        # ((((list(results.loc[results['Time'] == 156, 'Exmoor pony'])[0])-10)/10)**2) +
+        ((((list(results.loc[results['Time'] == 156, 'Exmoor pony'])[0])-10)/10)**2) +
         # ((((list(results.loc[results['Time'] == 156, 'Longhorn cattle'])[0])-88)/88)**2) +
         # # # Feb 2018
-        # ((((list(results.loc[results['Time'] == 157, 'Exmoor pony'])[0])-10)/10)**2) +
+        ((((list(results.loc[results['Time'] == 157, 'Exmoor pony'])[0])-10)/10)**2) +
         # ((((list(results.loc[results['Time'] == 157, 'Tamworth pigs'])[0])-16)/16)**2) +
         # ((((list(results.loc[results['Time'] == 157, 'Longhorn cattle'])[0])-88)/88)**2) +
         # March 2018
-        (((list(results.loc[results['Time'] == 158, 'Red deer'])[0])-24)**2) +
-        ((((list(results.loc[results['Time'] == 158, 'Longhorn cattle'])[0])-88)/88)**2) +
-        ((((list(results.loc[results['Time'] == 158, 'Tamworth pigs'])[0])-16)/16)**2) +
+        # ((((list(results.loc[results['Time'] == 158, 'Red deer'])[0])-24)/24)**2) +
+        # ((((list(results.loc[results['Time'] == 158, 'Longhorn cattle'])[0])-88)/88)**2) +
+        # ((((list(results.loc[results['Time'] == 158, 'Tamworth pigs'])[0])-16)/16)**2) +
         ((((list(results.loc[results['Time'] == 158, 'Exmoor pony'])[0])-9)/9)**2) +
-        # # April 2018
-        # ((((list(results.loc[results['Time'] == 159, 'Longhorn cattle'])[0])-101)/101)**2) +
+        # # # April 2018
+        # # ((((list(results.loc[results['Time'] == 159, 'Longhorn cattle'])[0])-101)/101)**2) +
         # ((((list(results.loc[results['Time'] == 159, 'Exmoor pony'])[0])-9)/9)**2) +
         # ((((list(results.loc[results['Time'] == 159, 'Tamworth pigs'])[0])-16)/16)**2) +
         # # # May 2018
@@ -297,7 +291,7 @@ def objectiveFunction(x):
         # ((((list(results.loc[results['Time'] == 161, 'Exmoor pony'])[0])-9)/9)**2) +
         # ((((list(results.loc[results['Time'] == 161, 'Tamworth pigs'])[0])-23)/23)**2) +
         # # # July 2019
-        # ((((list(results.loc[results['Time'] == 162, 'Exmoor pony'])[0])-9)/9)**2) +
+        ((((list(results.loc[results['Time'] == 162, 'Exmoor pony'])[0])-9)/9)**2) +
         # ((((list(results.loc[results['Time'] == 162, 'Longhorn cattle'])[0])-103)/103)**2) +
         # ((((list(results.loc[results['Time'] == 162, 'Tamworth pigs'])[0])-22)/22)**2) +
         # # # # Aug 2019
@@ -322,11 +316,11 @@ def objectiveFunction(x):
         # ((((list(results.loc[results['Time'] == 169, 'Longhorn cattle'])[0])-87)/87)**2) +
         # ((((list(results.loc[results['Time'] == 169, 'Tamworth pigs'])[0])-10)/10)**2) +
         # March 2019
-        ((((list(results.loc[results['Time'] == 170, 'Fallow deer'])[0])-278)/278)**2) +
-        ((((list(results.loc[results['Time'] == 170, 'Red deer'])[0])-37)/37)**2) +
-        ((((list(results.loc[results['Time'] == 170, 'Longhorn cattle'])[0])-87)/87)**2) +
-        ((((list(results.loc[results['Time'] == 170, 'Tamworth pigs'])[0])-9)/9)**2) +
-        # # # April 2019
+        # ((((list(results.loc[results['Time'] == 170, 'Fallow deer'])[0])-278)/278)**2) +
+        # ((((list(results.loc[results['Time'] == 170, 'Red deer'])[0])-37)/37)**2) +
+        # ((((list(results.loc[results['Time'] == 170, 'Longhorn cattle'])[0])-87)/87)**2) +
+        # ((((list(results.loc[results['Time'] == 170, 'Tamworth pigs'])[0])-9)/9)**2) +
+        # # # # April 2019
         # ((((list(results.loc[results['Time'] == 171, 'Longhorn cattle'])[0])-101)/101)**2) +
         # ((((list(results.loc[results['Time'] == 171, 'Tamworth pigs'])[0])-8)/8)**2) +
         # # # # May 2019
@@ -357,25 +351,25 @@ def objectiveFunction(x):
         # ((((list(results.loc[results['Time'] == 180, 'Longhorn cattle'])[0])-80)/80)**2) +
         # ((((list(results.loc[results['Time'] == 180, 'Tamworth pigs'])[0])-10)/10)**2) +
         # # # Feb 2020 
-        ((((list(results.loc[results['Time'] == 181, 'Longhorn cattle'])[0])-79)/79)**2) +
-        ((((list(results.loc[results['Time'] == 181, 'Tamworth pigs'])[0])-8)/8)**2) +
-        # March 2021 
-        ((((list(results.loc[results['Time'] == 182, 'Fallow deer'])[0])-247)/247)**2) +
-        ((((list(results.loc[results['Time'] == 182, 'Red deer'])[0])-35)/35)**2) +
-        ((((list(results.loc[results['Time'] == 182, 'Tamworth pigs'])[0])-7)/7)**2) +
-        ((((list(results.loc[results['Time'] == 182, 'Longhorn cattle'])[0])-81)/81)**2) +
-        # # April 2021
-        ((((list(results.loc[results['Time'] == 183, 'Tamworth pigs'])[0])-7)/7)**2) +
-        ((((list(results.loc[results['Time'] == 183, 'Longhorn cattle'])[0])-81)/81)**2) +
+        # ((((list(results.loc[results['Time'] == 181, 'Longhorn cattle'])[0])-79)/79)**2) +
+        # ((((list(results.loc[results['Time'] == 181, 'Tamworth pigs'])[0])-8)/8)**2) +
+        # # March 2021 
+        # ((((list(results.loc[results['Time'] == 182, 'Fallow deer'])[0])-247)/247)**2) +
+        # ((((list(results.loc[results['Time'] == 182, 'Red deer'])[0])-35)/35)**2) +
+        # ((((list(results.loc[results['Time'] == 182, 'Tamworth pigs'])[0])-7)/7)**2) +
+        # ((((list(results.loc[results['Time'] == 182, 'Longhorn cattle'])[0])-81)/81)**2) +
+        # # # April 2021
+        # ((((list(results.loc[results['Time'] == 183, 'Tamworth pigs'])[0])-7)/7)**2) +
+        # ((((list(results.loc[results['Time'] == 183, 'Longhorn cattle'])[0])-81)/81)**2) +
         ((((list(results.loc[results['Time'] == 183, 'Exmoor pony'])[0])-15)/15)**2) +
-        # # May 2021
-        ((((list(results.loc[results['Time'] == 184, 'Exmoor pony'])[0])-15)/15)**2) +
-        ((((list(results.loc[results['Time'] == 184, 'Tamworth pigs'])[0])-19)/19)**2) +
-        ((((list(results.loc[results['Time'] == 184, 'Longhorn cattle'])[0])-81)/81)**2) +
-        ((((list(results.loc[results['Time'] == 184, 'Roe deer'])[0])-50))**2) +
-        ((((list(results.loc[results['Time'] == 184, 'Grassland'])[0])-26.8))**2) +
-        ((((list(results.loc[results['Time'] == 184, 'Thorny Scrub'])[0])-51.8))**2) +
-        ((((list(results.loc[results['Time'] == 184, 'Woodland'])[0])-20.3))**2)      
+        # May 2021
+        ((((list(results.loc[results['Time'] == 184, 'Exmoor pony'])[0])-15)/15)**2)
+        # ((((list(results.loc[results['Time'] == 184, 'Tamworth pigs'])[0])-19)/19)**2) +
+        # ((((list(results.loc[results['Time'] == 184, 'Longhorn cattle'])[0])-81)/81)**2) +
+        # ((((list(results.loc[results['Time'] == 184, 'Roe deer'])[0])-50)/50)**2) +
+        # ((((list(results.loc[results['Time'] == 184, 'Grassland'])[0])-26.8)/26.8)**2) +
+        # ((((list(results.loc[results['Time'] == 184, 'Thorny Scrub'])[0])-51.8)/51.8)**2) +
+        # ((((list(results.loc[results['Time'] == 184, 'Woodland'])[0])-21.5)/21.5)**2)      
          )
 
     # only print the last year's result if it's reasonably close to the filters
@@ -393,56 +387,39 @@ def objectiveFunction(x):
 def run_optimizer():
     # Define the bounds
     bds = np.array([
-        [0.01,0.045],[0.01,0.07],[0.28,0.3],[0.0023,0.0036],[0.006,0.008],
-        [0.001,0.025], # mature scrub competition
-        [0.15,0.25],[0.15,0.25], # grass
-        [0.001,0.075],[0.001,0.05], # saplings
-        [0.001,0.075],[0.001,0.05], # young scrub 
+        [0,0.15],[0,0.15],[0.1,1],[0.001,0.005],[0.0025,0.025],
+        [0,0.1], # mature scrub competition
+        [0,0.1],[0,0.1], # grass
+        [0,0.1],[0,0.1], # saplings
+        [0,0.1],[0,0.1], # young scrub 
         # roe deer parameters
-        [0.17,0.2],[0.5,0.75],[0.69,0.7],[0.62,0.65],[0.05,0.2],[0.05,0.15],
+        [0.13,0.2],[0.7,1],[0.7,1],[0.5,1],[0,0.5],[0,0.5],
         # fallow deer parameters
-        [0.28,0.3],[0.4,0.7],[0.62,0.65],[0.45,0.5],[0.05,0.2],[0.05,0.17],
+        [0.28,0.3],[0.5,1],[0.4,1],[0.1,1],[0,0.5],[0,0.5],
         # red deer parameters
-        [0.3,0.35],[0.3,0.65],[0.55,0.6],[0.3,0.45],[0.03,0.15],[0.03,0.15],
+        [0.3,0.35],[0.4,1],[0.4,1],[0.1,1],[0,0.5],[0,0.5],
         # exmoor pony parameters
-                    [0.2,0.6],[0.42,0.5],[0.28,0.3],[0.01,0.1],[0.01,0.1],
+                    [0.3,1],[0.4,1],[0.1,1],[0,0.5],[0,0.5],
         # cattle parameters
-        [0.18,0.2],[0.1,0.55],[0.35,0.45],[0.39,0.4],[0.01,0.1],[0.01,0.1],
+        [0.18,0.2],[0.25,1],[0.3,1],[0.1,1],[0,0.5],[0,0.5],
         # pig parameters
-        [0.33,0.35],[0,0.35],[0.27,0.68],[0.67,0.68],[0.01,0.1],[0.01,0.1]])
+        [0.33,0.35],[0.1,1],[0,1],[0,1],[0,0.5],[0,0.5]])
 
-#      fun: 0.008687242865806685
-#  message: 'Maximum number of iterations has been exceeded.'
-#     nfev: 282
-#      nit: 2
-#  success: False
-#        x: array([0.03273611, 0.07369823, 0.22255833, 0.00373911, 0.00766077,
-#        0.04117487, 0.1675755 , 0.18342872, 0.32607782, 0.26809606,
-#        0.31991153, 0.29498166, 0.1791957 , 0.85130224, 0.80403492,
-#        0.79580267, 0.39467686, 0.19282416, 0.28928583, 0.82449525,
-#        0.74924312, 0.7337971 , 0.35332183, 0.18033711, 0.29254185,
-#        0.79926024, 0.72893041, 0.71616691, 0.33975114, 0.15630251,
-#        0.7285334 , 0.69837342, 0.63728582, 0.30332217, 0.13457029,
-#        0.19013176, 0.67583248, 0.67965654, 0.59145403, 0.27709183,
-#        0.09143037, 0.37433384, 0.47708918, 0.80750196, 0.66035626,
-#        0.30430301, 0.17170988])
-
-#  The best solution found:
-#  [0.03577691 0.07282627 0.28502226 0.0035648  0.00774614 0.03917214
-#  0.2400158  0.23939565 0.07997202 0.1082186  0.13751942 0.12471424
-#  0.17910508 0.74109629 0.69007431 0.62264649 0.28255509 0.17419205
-#  0.38638416 0.65149904 0.63353565 0.45990498 0.22769277 0.15295107
-#  0.38596074 0.54667065 0.48204953 0.33944427 0.19541452 0.1038647
-#  0.47788358 0.42681509 0.28838939 0.12414964 0.10613884 0.18448621
-#  0.26928311 0.23636794 0.3998652  0.17550501 0.03502987 0.3488819
-#  0.17325035 0.27038654 0.67590251 0.21350811 0.16244547]
+#  [0.10719667 0.03794083 0.99782111 0.00129944 0.03545324 0.36514799
+#  0.54504865 0.61012509 0.82048947 0.27410968 0.7761421  0.11078935
+#  0.12223506 0.48985377 0.52272807 0.75623978 0.203387   0.9963075
+#  0.29123401 0.62614995 0.54106028 0.67277476 0.75364159 0.69184503
+#  0.3397313  0.48804847 0.429809   0.61966094 0.07756558 0.62974428
+#  0.63742293 0.6993552  0.32279283 0.29488305 0.63867909 0.19191731
+#  0.56828674 0.12692419 0.17619645 0.53204822 0.33129289 0.33975284
+#  0.53624514 0.87668461 0.08158304 0.40413896 0.25088916]
 
 #  Objective function:
-#  687.2571742166401
+#  0.30540294465712925
 
     # popsize and maxiter are defined at the top of the page
-    algorithm_param = {'max_num_iteration': 10,\
-                    'population_size':50,\
+    algorithm_param = {'max_num_iteration': 1,\
+                    'population_size':1,\
                     'mutation_probability':0.1,\
                     'elit_ratio': 0.01,\
                     'crossover_probability': 0.5,\
@@ -459,10 +436,13 @@ def run_optimizer():
     return optimization.output_dict
 
 
+
+
 def graph_results():
     output_parameters = run_optimizer()
 
     # define the parameters
+    initial_roe = 12
     chance_reproduceSapling = output_parameters["variable"][0]
     chance_reproduceYoungScrub = output_parameters["variable"][1]
     chance_regrowGrass =output_parameters["variable"][2]
@@ -475,46 +455,42 @@ def graph_results():
     chance_saplingOutcompetedByScrub = output_parameters["variable"][9]
     chance_youngScrubOutcompetedByScrub = output_parameters["variable"][10]
     chance_youngScrubOutcompetedByTree =output_parameters["variable"][11]
-    # initial values
-    initial_roeDeer = 0.12
-    initial_grassland = 0.9
-    initial_woodland = 0.06
-    initial_scrubland = 0.043
-    roeDeer_reproduce =output_parameters["variable"][12]
-    roeDeer_gain_from_grass =output_parameters["variable"][13]
-    roeDeer_gain_from_Trees =output_parameters["variable"][14]
-    roeDeer_gain_from_Scrub = output_parameters["variable"][15]
-    roeDeer_gain_from_Saplings = output_parameters["variable"][16]
-    roeDeer_gain_from_YoungScrub = output_parameters["variable"][17]
-    fallowDeer_reproduce = output_parameters["variable"][18]
-    fallowDeer_gain_from_grass = output_parameters["variable"][19]
-    fallowDeer_gain_from_Trees = output_parameters["variable"][20]
-    fallowDeer_gain_from_Scrub = output_parameters["variable"][21]
-    fallowDeer_gain_from_Saplings = output_parameters["variable"][22]
-    fallowDeer_gain_from_YoungScrub = output_parameters["variable"][23]
-    redDeer_reproduce = output_parameters["variable"][24]
-    redDeer_gain_from_grass = output_parameters["variable"][25]
-    redDeer_gain_from_Trees = output_parameters["variable"][26]
-    redDeer_gain_from_Scrub = output_parameters["variable"][27]
-    redDeer_gain_from_Saplings = output_parameters["variable"][28]
-    redDeer_gain_from_YoungScrub = output_parameters["variable"][29]
+    # consumer values
+    roe_deer_reproduce =output_parameters["variable"][12]
+    roe_deer_gain_from_grass =output_parameters["variable"][13]
+    roe_deer_gain_from_trees =output_parameters["variable"][14]
+    roe_deer_gain_from_scrub = output_parameters["variable"][15]
+    roe_deer_gain_from_saplings = output_parameters["variable"][16]
+    roe_deer_gain_from_young_scrub = output_parameters["variable"][17]
+    fallow_deer_reproduce = output_parameters["variable"][18]
+    fallow_deer_gain_from_grass = output_parameters["variable"][19]
+    fallow_deer_gain_from_trees = output_parameters["variable"][20]
+    fallow_deer_gain_from_scrub = output_parameters["variable"][21]
+    fallow_deer_gain_from_saplings = output_parameters["variable"][22]
+    fallow_deer_gain_from_young_scrub = output_parameters["variable"][23]
+    red_deer_reproduce = output_parameters["variable"][24]
+    red_deer_gain_from_grass = output_parameters["variable"][25]
+    red_deer_gain_from_trees = output_parameters["variable"][26]
+    red_deer_gain_from_scrub = output_parameters["variable"][27]
+    red_deer_gain_from_saplings = output_parameters["variable"][28]
+    red_deer_gain_from_young_scrub = output_parameters["variable"][29]
     ponies_gain_from_grass = output_parameters["variable"][30]
-    ponies_gain_from_Trees = output_parameters["variable"][31]
-    ponies_gain_from_Scrub = output_parameters["variable"][32]
-    ponies_gain_from_Saplings = output_parameters["variable"][33]
-    ponies_gain_from_YoungScrub = output_parameters["variable"][34]
-    cows_reproduce = output_parameters["variable"][35]
+    ponies_gain_from_trees = output_parameters["variable"][31]
+    ponies_gain_from_scrub = output_parameters["variable"][32]
+    ponies_gain_from_saplings = output_parameters["variable"][33]
+    ponies_gain_from_young_scrub = output_parameters["variable"][34]
+    cattle_reproduce = output_parameters["variable"][35]
     cows_gain_from_grass = output_parameters["variable"][36]
-    cows_gain_from_Trees = output_parameters["variable"][37]
-    cows_gain_from_Scrub = output_parameters["variable"][38]
-    cows_gain_from_Saplings = output_parameters["variable"][39]
-    cows_gain_from_YoungScrub = output_parameters["variable"][40]
-    pigs_reproduce = output_parameters["variable"][41]
-    pigs_gain_from_Trees = output_parameters["variable"][42]
-    pigs_gain_from_Scrub = output_parameters["variable"][43]
-    pigs_gain_from_grass =output_parameters["variable"][44]
-    pigs_gain_from_Saplings =output_parameters["variable"][45]
-    pigs_gain_from_YoungScrub = output_parameters["variable"][46]
+    cows_gain_from_trees = output_parameters["variable"][37]
+    cows_gain_from_scrub = output_parameters["variable"][38]
+    cows_gain_from_saplings = output_parameters["variable"][39]
+    cows_gain_from_young_scrub = output_parameters["variable"][40]
+    tamworth_pig_reproduce = output_parameters["variable"][41]
+    tamworth_pig_gain_from_trees = output_parameters["variable"][42]
+    tamworth_pig_gain_from_scrub = output_parameters["variable"][43]
+    tamworth_pig_gain_from_grass =output_parameters["variable"][44]
+    tamworth_pig_gain_from_saplings =output_parameters["variable"][45]
+    tamworth_pig_gain_from_young_scrub = output_parameters["variable"][46]
     # stocking values
     fallowDeer_stocking = 247
     cattle_stocking = 81
@@ -522,29 +498,29 @@ def graph_results():
     tamworthPig_stocking = 7
     exmoor_stocking = 15
     # euro bison parameters
-    reproduce_bison = 0
+    european_bison_reproduce = 0
     # bison should have higher impact than any other consumer
-    bison_gain_from_grass =  0
-    bison_gain_from_Trees =0
-    bison_gain_from_Scrub =0
-    bison_gain_from_Saplings = 0
-    bison_gain_from_YoungScrub = 0  
+    european_bison_gain_from_grass =  0
+    european_bison_gain_from_trees =0
+    european_bison_gain_from_scrub =0
+    european_bison_gain_from_saplings = 0
+    european_bison_gain_from_young_scrub = 0  
     # euro elk parameters
-    reproduce_elk = 0
+    european_elk_reproduce = 0
     # bison should have higher impact than any other consumer
-    elk_gain_from_grass =  0
-    elk_gain_from_Trees = 0
-    elk_gain_from_Scrub = 0
-    elk_gain_from_Saplings =  0
-    elk_gain_from_YoungScrub =  0
+    european_elk_gain_from_grass =  0
+    european_elk_gain_from_trees = 0
+    european_elk_gain_from_scrub = 0
+    european_elk_gain_from_saplings =  0
+    european_elk_gain_from_young_scrub =  0
     # reindeer parameters
-    reproduce_reindeer = 0
+    reindeer_reproduce = 0
     # reindeer should have impacts between red and fallow deer
     reindeer_gain_from_grass = 0
-    reindeer_gain_from_Trees =0
-    reindeer_gain_from_Scrub =0
-    reindeer_gain_from_Saplings = 0
-    reindeer_gain_from_YoungScrub = 0
+    reindeer_gain_from_trees =0
+    reindeer_gain_from_scrub =0
+    reindeer_gain_from_saplings = 0
+    reindeer_gain_from_young_scrub = 0
     # forecasting
     fallowDeer_stocking_forecast = 86
     cattle_stocking_forecast = 76
@@ -552,7 +528,7 @@ def graph_results():
     tamworthPig_stocking_forecast = 7
     exmoor_stocking_forecast = 15
     roeDeer_stocking_forecast = 12
-    reindeer_stocking_forecast = 0
+    introduced_species_stocking_forecast = 0
     final_results_list = []
     run_number = 0
     number_simulations = 2
@@ -561,24 +537,20 @@ def graph_results():
         # keep track of the runs 
         run_number += 1
         print(run_number)
-        model = KneppModel(
-            chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
-            chance_scrubOutcompetedByTree, chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
-            initial_roeDeer, initial_grassland, initial_woodland, initial_scrubland, 
-            roeDeer_reproduce, roeDeer_gain_from_grass, roeDeer_gain_from_Trees, roeDeer_gain_from_Scrub, roeDeer_gain_from_Saplings, roeDeer_gain_from_YoungScrub,
-            ponies_gain_from_grass, ponies_gain_from_Trees, ponies_gain_from_Scrub, ponies_gain_from_Saplings, ponies_gain_from_YoungScrub, 
-            cows_reproduce, cows_gain_from_grass, cows_gain_from_Trees, cows_gain_from_Scrub, cows_gain_from_Saplings, cows_gain_from_YoungScrub, 
-            fallowDeer_reproduce, fallowDeer_gain_from_grass, fallowDeer_gain_from_Trees, fallowDeer_gain_from_Scrub, fallowDeer_gain_from_Saplings, fallowDeer_gain_from_YoungScrub, 
-            redDeer_reproduce, redDeer_gain_from_grass, redDeer_gain_from_Trees, redDeer_gain_from_Scrub, redDeer_gain_from_Saplings, redDeer_gain_from_YoungScrub, 
-            pigs_reproduce, pigs_gain_from_grass, pigs_gain_from_Trees, pigs_gain_from_Scrub, pigs_gain_from_Saplings, pigs_gain_from_YoungScrub, 
-            fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
-            reproduce_bison, bison_gain_from_grass, bison_gain_from_Trees, bison_gain_from_Scrub, bison_gain_from_Saplings, bison_gain_from_YoungScrub,
-            reproduce_elk, elk_gain_from_grass, elk_gain_from_Trees, elk_gain_from_Scrub, elk_gain_from_Saplings, elk_gain_from_YoungScrub,
-            reproduce_reindeer, reindeer_gain_from_grass, reindeer_gain_from_Trees, reindeer_gain_from_Scrub, reindeer_gain_from_Saplings, reindeer_gain_from_YoungScrub,
-            fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, reindeer_stocking_forecast, roeDeer_stocking_forecast,
-            width = 25, height = 18, max_time = 184, reintroduction = True,
-            introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False, cull_roe = False)
-
+        model = KneppModel(initial_roe, roe_deer_reproduce, roe_deer_gain_from_saplings, roe_deer_gain_from_trees, roe_deer_gain_from_scrub, roe_deer_gain_from_young_scrub, roe_deer_gain_from_grass,
+                        chance_youngScrubMatures, chance_saplingBecomingTree, chance_reproduceSapling,chance_reproduceYoungScrub, chance_regrowGrass, 
+                        chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_scrubOutcompetedByTree, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByTree, chance_youngScrubOutcompetedByScrub, 
+                        ponies_gain_from_saplings, ponies_gain_from_trees, ponies_gain_from_scrub, ponies_gain_from_young_scrub, ponies_gain_from_grass, 
+                        cattle_reproduce, cows_gain_from_grass, cows_gain_from_trees, cows_gain_from_scrub, cows_gain_from_saplings, cows_gain_from_young_scrub, 
+                        fallow_deer_reproduce, fallow_deer_gain_from_saplings, fallow_deer_gain_from_trees, fallow_deer_gain_from_scrub, fallow_deer_gain_from_young_scrub, fallow_deer_gain_from_grass,
+                        red_deer_reproduce, red_deer_gain_from_saplings, red_deer_gain_from_trees, red_deer_gain_from_scrub, red_deer_gain_from_young_scrub, red_deer_gain_from_grass,
+                        tamworth_pig_reproduce, tamworth_pig_gain_from_saplings,tamworth_pig_gain_from_trees,tamworth_pig_gain_from_scrub,tamworth_pig_gain_from_young_scrub,tamworth_pig_gain_from_grass,
+                        european_bison_reproduce, european_bison_gain_from_grass, european_bison_gain_from_trees, european_bison_gain_from_scrub, european_bison_gain_from_saplings, european_bison_gain_from_young_scrub,
+                        european_elk_reproduce, european_elk_gain_from_grass, european_elk_gain_from_trees, european_elk_gain_from_scrub, european_elk_gain_from_saplings, european_elk_gain_from_young_scrub,
+                        reindeer_reproduce, reindeer_gain_from_grass, reindeer_gain_from_trees, reindeer_gain_from_scrub, reindeer_gain_from_saplings, reindeer_gain_from_young_scrub,
+                        fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
+                        fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, introduced_species_stocking_forecast,
+                        max_time = 184, reintroduction = True, introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
 
         model.run_model()
 
@@ -1021,24 +993,22 @@ def graph_results():
         # keep track of the runs 
         run_number += 1
         print(run_number)
-        model = KneppModel(
-            chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
-            chance_scrubOutcompetedByTree, chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
-            initial_roeDeer, initial_grassland, initial_woodland, initial_scrubland, 
-            roeDeer_reproduce, roeDeer_gain_from_grass, roeDeer_gain_from_Trees, roeDeer_gain_from_Scrub, roeDeer_gain_from_Saplings, roeDeer_gain_from_YoungScrub,
-            ponies_gain_from_grass, ponies_gain_from_Trees, ponies_gain_from_Scrub, ponies_gain_from_Saplings, ponies_gain_from_YoungScrub, 
-            cows_reproduce, cows_gain_from_grass, cows_gain_from_Trees, cows_gain_from_Scrub, cows_gain_from_Saplings, cows_gain_from_YoungScrub, 
-            fallowDeer_reproduce, fallowDeer_gain_from_grass, fallowDeer_gain_from_Trees, fallowDeer_gain_from_Scrub, fallowDeer_gain_from_Saplings, fallowDeer_gain_from_YoungScrub, 
-            redDeer_reproduce, redDeer_gain_from_grass, redDeer_gain_from_Trees, redDeer_gain_from_Scrub, redDeer_gain_from_Saplings, redDeer_gain_from_YoungScrub, 
-            pigs_reproduce, pigs_gain_from_grass, pigs_gain_from_Trees, pigs_gain_from_Scrub, pigs_gain_from_Saplings, pigs_gain_from_YoungScrub, 
-            fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
-            reproduce_bison, bison_gain_from_grass, bison_gain_from_Trees, bison_gain_from_Scrub, bison_gain_from_Saplings, bison_gain_from_YoungScrub,
-            reproduce_elk, elk_gain_from_grass, elk_gain_from_Trees, elk_gain_from_Scrub, elk_gain_from_Saplings, elk_gain_from_YoungScrub,
-            reproduce_reindeer, reindeer_gain_from_grass, reindeer_gain_from_Trees, reindeer_gain_from_Scrub, reindeer_gain_from_Saplings, reindeer_gain_from_YoungScrub,
-            fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, reindeer_stocking_forecast, roeDeer_stocking_forecast,
-            width = 25, height = 18, max_time = 784, reintroduction = True,
-            introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False, cull_roe = False)
 
+        model = KneppModel(initial_roe, roe_deer_reproduce, roe_deer_gain_from_saplings, roe_deer_gain_from_trees, roe_deer_gain_from_scrub, roe_deer_gain_from_young_scrub, roe_deer_gain_from_grass,
+                    chance_youngScrubMatures, chance_saplingBecomingTree, chance_reproduceSapling,chance_reproduceYoungScrub, chance_regrowGrass, 
+                    chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_scrubOutcompetedByTree, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByTree, chance_youngScrubOutcompetedByScrub, 
+                    ponies_gain_from_saplings, ponies_gain_from_trees, ponies_gain_from_scrub, ponies_gain_from_young_scrub, ponies_gain_from_grass, 
+                    cattle_reproduce, cows_gain_from_grass, cows_gain_from_trees, cows_gain_from_scrub, cows_gain_from_saplings, cows_gain_from_young_scrub, 
+                    fallow_deer_reproduce, fallow_deer_gain_from_saplings, fallow_deer_gain_from_trees, fallow_deer_gain_from_scrub, fallow_deer_gain_from_young_scrub, fallow_deer_gain_from_grass,
+                    red_deer_reproduce, red_deer_gain_from_saplings, red_deer_gain_from_trees, red_deer_gain_from_scrub, red_deer_gain_from_young_scrub, red_deer_gain_from_grass,
+                    tamworth_pig_reproduce, tamworth_pig_gain_from_saplings,tamworth_pig_gain_from_trees,tamworth_pig_gain_from_scrub,tamworth_pig_gain_from_young_scrub,tamworth_pig_gain_from_grass,
+                    european_bison_reproduce, european_bison_gain_from_grass, european_bison_gain_from_trees, european_bison_gain_from_scrub, european_bison_gain_from_saplings, european_bison_gain_from_young_scrub,
+                    european_elk_reproduce, european_elk_gain_from_grass, european_elk_gain_from_trees, european_elk_gain_from_scrub, european_elk_gain_from_saplings, european_elk_gain_from_young_scrub,
+                    reindeer_reproduce, reindeer_gain_from_grass, reindeer_gain_from_trees, reindeer_gain_from_scrub, reindeer_gain_from_saplings, reindeer_gain_from_young_scrub,
+                    fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
+                    fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, introduced_species_stocking_forecast,
+                    max_time = 784, reintroduction = True, introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
+      
         model.run_model()
 
         results = model.datacollector.get_model_vars_dataframe()
@@ -1106,35 +1076,31 @@ def graph_results():
 
 
 
-
-
     # What happens to habitats if there are no herbivores?
 
     final_results_list = []
     run_number = 0
     number_simulations = 10
-    no_roe = 0
+    initial_roe = 0
     for _ in range(number_simulations):
         # keep track of the runs 
         run_number += 1
         print(run_number)
-        model = KneppModel(
-            chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
-            chance_scrubOutcompetedByTree, chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
-            no_roe, initial_grassland, initial_woodland, initial_scrubland, 
-            roeDeer_reproduce, roeDeer_gain_from_grass, roeDeer_gain_from_Trees, roeDeer_gain_from_Scrub, roeDeer_gain_from_Saplings, roeDeer_gain_from_YoungScrub,
-            ponies_gain_from_grass, ponies_gain_from_Trees, ponies_gain_from_Scrub, ponies_gain_from_Saplings, ponies_gain_from_YoungScrub, 
-            cows_reproduce, cows_gain_from_grass, cows_gain_from_Trees, cows_gain_from_Scrub, cows_gain_from_Saplings, cows_gain_from_YoungScrub, 
-            fallowDeer_reproduce, fallowDeer_gain_from_grass, fallowDeer_gain_from_Trees, fallowDeer_gain_from_Scrub, fallowDeer_gain_from_Saplings, fallowDeer_gain_from_YoungScrub, 
-            redDeer_reproduce, redDeer_gain_from_grass, redDeer_gain_from_Trees, redDeer_gain_from_Scrub, redDeer_gain_from_Saplings, redDeer_gain_from_YoungScrub, 
-            pigs_reproduce, pigs_gain_from_grass, pigs_gain_from_Trees, pigs_gain_from_Scrub, pigs_gain_from_Saplings, pigs_gain_from_YoungScrub, 
-            fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
-            reproduce_bison, bison_gain_from_grass, bison_gain_from_Trees, bison_gain_from_Scrub, bison_gain_from_Saplings, bison_gain_from_YoungScrub,
-            reproduce_elk, elk_gain_from_grass, elk_gain_from_Trees, elk_gain_from_Scrub, elk_gain_from_Saplings, elk_gain_from_YoungScrub,
-            reproduce_reindeer, reindeer_gain_from_grass, reindeer_gain_from_Trees, reindeer_gain_from_Scrub, reindeer_gain_from_Saplings, reindeer_gain_from_YoungScrub,
-            fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, reindeer_stocking_forecast, roeDeer_stocking_forecast,
-            width = 25, height = 18, max_time = 1200, reintroduction = False,
-            introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False, cull_roe = False)
+
+        model = KneppModel(initial_roe, roe_deer_reproduce, roe_deer_gain_from_saplings, roe_deer_gain_from_trees, roe_deer_gain_from_scrub, roe_deer_gain_from_young_scrub, roe_deer_gain_from_grass,
+                    chance_youngScrubMatures, chance_saplingBecomingTree, chance_reproduceSapling,chance_reproduceYoungScrub, chance_regrowGrass, 
+                    chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_scrubOutcompetedByTree, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByTree, chance_youngScrubOutcompetedByScrub, 
+                    ponies_gain_from_saplings, ponies_gain_from_trees, ponies_gain_from_scrub, ponies_gain_from_young_scrub, ponies_gain_from_grass, 
+                    cattle_reproduce, cows_gain_from_grass, cows_gain_from_trees, cows_gain_from_scrub, cows_gain_from_saplings, cows_gain_from_young_scrub, 
+                    fallow_deer_reproduce, fallow_deer_gain_from_saplings, fallow_deer_gain_from_trees, fallow_deer_gain_from_scrub, fallow_deer_gain_from_young_scrub, fallow_deer_gain_from_grass,
+                    red_deer_reproduce, red_deer_gain_from_saplings, red_deer_gain_from_trees, red_deer_gain_from_scrub, red_deer_gain_from_young_scrub, red_deer_gain_from_grass,
+                    tamworth_pig_reproduce, tamworth_pig_gain_from_saplings,tamworth_pig_gain_from_trees,tamworth_pig_gain_from_scrub,tamworth_pig_gain_from_young_scrub,tamworth_pig_gain_from_grass,
+                    european_bison_reproduce, european_bison_gain_from_grass, european_bison_gain_from_trees, european_bison_gain_from_scrub, european_bison_gain_from_saplings, european_bison_gain_from_young_scrub,
+                    european_elk_reproduce, european_elk_gain_from_grass, european_elk_gain_from_trees, european_elk_gain_from_scrub, european_elk_gain_from_saplings, european_elk_gain_from_young_scrub,
+                    reindeer_reproduce, reindeer_gain_from_grass, reindeer_gain_from_trees, reindeer_gain_from_scrub, reindeer_gain_from_saplings, reindeer_gain_from_young_scrub,
+                    fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
+                    fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, introduced_species_stocking_forecast,
+                    max_time = 1200, reintroduction = True, introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
 
         model.run_model()
 
@@ -1251,23 +1217,21 @@ def graph_results():
         # keep track of the runs 
         run_number += 1
         print(run_number)
-        model = KneppModel(
-            chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
-            chance_scrubOutcompetedByTree, chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
-            initial_roeDeer, initial_grassland, initial_woodland, initial_scrubland, 
-            roeDeer_reproduce, roeDeer_gain_from_grass, roeDeer_gain_from_Trees, roeDeer_gain_from_Scrub, roeDeer_gain_from_Saplings, roeDeer_gain_from_YoungScrub,
-            ponies_gain_from_grass, ponies_gain_from_Trees, ponies_gain_from_Scrub, ponies_gain_from_Saplings, ponies_gain_from_YoungScrub, 
-            cows_reproduce, cows_gain_from_grass, cows_gain_from_Trees, cows_gain_from_Scrub, cows_gain_from_Saplings, cows_gain_from_YoungScrub, 
-            fallowDeer_reproduce, fallowDeer_gain_from_grass, fallowDeer_gain_from_Trees, fallowDeer_gain_from_Scrub, fallowDeer_gain_from_Saplings, fallowDeer_gain_from_YoungScrub, 
-            redDeer_reproduce, redDeer_gain_from_grass, redDeer_gain_from_Trees, redDeer_gain_from_Scrub, redDeer_gain_from_Saplings, redDeer_gain_from_YoungScrub, 
-            pigs_reproduce, pigs_gain_from_grass, pigs_gain_from_Trees, pigs_gain_from_Scrub, pigs_gain_from_Saplings, pigs_gain_from_YoungScrub, 
-            fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
-            reproduce_bison, bison_gain_from_grass, bison_gain_from_Trees, bison_gain_from_Scrub, bison_gain_from_Saplings, bison_gain_from_YoungScrub,
-            reproduce_elk, elk_gain_from_grass, elk_gain_from_Trees, elk_gain_from_Scrub, elk_gain_from_Saplings, elk_gain_from_YoungScrub,
-            reproduce_reindeer, reindeer_gain_from_grass, reindeer_gain_from_Trees, reindeer_gain_from_Scrub, reindeer_gain_from_Saplings, reindeer_gain_from_YoungScrub,
-            fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, reindeer_stocking_forecast, roeDeer_stocking_forecast,
-            width = 25, height = 18, max_time = 784, reintroduction = False,
-            introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False, cull_roe = False)
+        model = KneppModel(initial_roe, roe_deer_reproduce, roe_deer_gain_from_saplings, roe_deer_gain_from_trees, roe_deer_gain_from_scrub, roe_deer_gain_from_young_scrub, roe_deer_gain_from_grass,
+                    chance_youngScrubMatures, chance_saplingBecomingTree, chance_reproduceSapling,chance_reproduceYoungScrub, chance_regrowGrass, 
+                    chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_scrubOutcompetedByTree, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByTree, chance_youngScrubOutcompetedByScrub, 
+                    ponies_gain_from_saplings, ponies_gain_from_trees, ponies_gain_from_scrub, ponies_gain_from_young_scrub, ponies_gain_from_grass, 
+                    cattle_reproduce, cows_gain_from_grass, cows_gain_from_trees, cows_gain_from_scrub, cows_gain_from_saplings, cows_gain_from_young_scrub, 
+                    fallow_deer_reproduce, fallow_deer_gain_from_saplings, fallow_deer_gain_from_trees, fallow_deer_gain_from_scrub, fallow_deer_gain_from_young_scrub, fallow_deer_gain_from_grass,
+                    red_deer_reproduce, red_deer_gain_from_saplings, red_deer_gain_from_trees, red_deer_gain_from_scrub, red_deer_gain_from_young_scrub, red_deer_gain_from_grass,
+                    tamworth_pig_reproduce, tamworth_pig_gain_from_saplings,tamworth_pig_gain_from_trees,tamworth_pig_gain_from_scrub,tamworth_pig_gain_from_young_scrub,tamworth_pig_gain_from_grass,
+                    european_bison_reproduce, european_bison_gain_from_grass, european_bison_gain_from_trees, european_bison_gain_from_scrub, european_bison_gain_from_saplings, european_bison_gain_from_young_scrub,
+                    european_elk_reproduce, european_elk_gain_from_grass, european_elk_gain_from_trees, european_elk_gain_from_scrub, european_elk_gain_from_saplings, european_elk_gain_from_young_scrub,
+                    reindeer_reproduce, reindeer_gain_from_grass, reindeer_gain_from_trees, reindeer_gain_from_scrub, reindeer_gain_from_saplings, reindeer_gain_from_young_scrub,
+                    fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
+                    fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, introduced_species_stocking_forecast,
+                    max_time = 784, reintroduction = False, introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
+
 
         model.run_model()
 
@@ -1389,23 +1353,21 @@ def graph_results():
         # keep track of the runs 
         run_number += 1
         print(run_number)
-        model = KneppModel(
-            chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
-            chance_scrubOutcompetedByTree, chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
-            initial_roeDeer, initial_grassland, initial_woodland, initial_scrubland, 
-            roeDeer_reproduce, roeDeer_gain_from_grass, roeDeer_gain_from_Trees, roeDeer_gain_from_Scrub, roeDeer_gain_from_Saplings, roeDeer_gain_from_YoungScrub,
-            ponies_gain_from_grass, ponies_gain_from_Trees, ponies_gain_from_Scrub, ponies_gain_from_Saplings, ponies_gain_from_YoungScrub, 
-            cows_reproduce, cows_gain_from_grass, cows_gain_from_Trees, cows_gain_from_Scrub, cows_gain_from_Saplings, cows_gain_from_YoungScrub, 
-            fallowDeer_reproduce, fallowDeer_gain_from_grass, fallowDeer_gain_from_Trees, fallowDeer_gain_from_Scrub, fallowDeer_gain_from_Saplings, fallowDeer_gain_from_YoungScrub, 
-            redDeer_reproduce, redDeer_gain_from_grass, redDeer_gain_from_Trees, redDeer_gain_from_Scrub, redDeer_gain_from_Saplings, redDeer_gain_from_YoungScrub, 
-            pigs_reproduce, pigs_gain_from_grass, pigs_gain_from_Trees, pigs_gain_from_Scrub, pigs_gain_from_Saplings, pigs_gain_from_YoungScrub, 
-            fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
-            reproduce_bison, bison_gain_from_grass, bison_gain_from_Trees, bison_gain_from_Scrub, bison_gain_from_Saplings, bison_gain_from_YoungScrub,
-            reproduce_elk, elk_gain_from_grass, elk_gain_from_Trees, elk_gain_from_Scrub, elk_gain_from_Saplings, elk_gain_from_YoungScrub,
-            reproduce_reindeer, reindeer_gain_from_grass, reindeer_gain_from_Trees, reindeer_gain_from_Scrub, reindeer_gain_from_Saplings, reindeer_gain_from_YoungScrub,
-            fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, reindeer_stocking_forecast, roeDeer_stocking_forecast,
-            width = 25, height = 18, max_time = 184, reintroduction = True,
-            introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False, cull_roe = False)
+        model = KneppModel(initial_roe, roe_deer_reproduce, roe_deer_gain_from_saplings, roe_deer_gain_from_trees, roe_deer_gain_from_scrub, roe_deer_gain_from_young_scrub, roe_deer_gain_from_grass,
+                    chance_youngScrubMatures, chance_saplingBecomingTree, chance_reproduceSapling,chance_reproduceYoungScrub, chance_regrowGrass, 
+                    chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_scrubOutcompetedByTree, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByTree, chance_youngScrubOutcompetedByScrub, 
+                    ponies_gain_from_saplings, ponies_gain_from_trees, ponies_gain_from_scrub, ponies_gain_from_young_scrub, ponies_gain_from_grass, 
+                    cattle_reproduce, cows_gain_from_grass, cows_gain_from_trees, cows_gain_from_scrub, cows_gain_from_saplings, cows_gain_from_young_scrub, 
+                    fallow_deer_reproduce, fallow_deer_gain_from_saplings, fallow_deer_gain_from_trees, fallow_deer_gain_from_scrub, fallow_deer_gain_from_young_scrub, fallow_deer_gain_from_grass,
+                    red_deer_reproduce, red_deer_gain_from_saplings, red_deer_gain_from_trees, red_deer_gain_from_scrub, red_deer_gain_from_young_scrub, red_deer_gain_from_grass,
+                    tamworth_pig_reproduce, tamworth_pig_gain_from_saplings,tamworth_pig_gain_from_trees,tamworth_pig_gain_from_scrub,tamworth_pig_gain_from_young_scrub,tamworth_pig_gain_from_grass,
+                    european_bison_reproduce, european_bison_gain_from_grass, european_bison_gain_from_trees, european_bison_gain_from_scrub, european_bison_gain_from_saplings, european_bison_gain_from_young_scrub,
+                    european_elk_reproduce, european_elk_gain_from_grass, european_elk_gain_from_trees, european_elk_gain_from_scrub, european_elk_gain_from_saplings, european_elk_gain_from_young_scrub,
+                    reindeer_reproduce, reindeer_gain_from_grass, reindeer_gain_from_trees, reindeer_gain_from_scrub, reindeer_gain_from_saplings, reindeer_gain_from_young_scrub,
+                    fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
+                    fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, introduced_species_stocking_forecast,
+                    max_time = 184, reintroduction = True, introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
+
 
         model.run_model()
 
@@ -1508,96 +1470,6 @@ def graph_results():
     g.fig.suptitle('Reality check: Overloaded herbivores (habitat elements)')
     plt.tight_layout()
     plt.savefig('what_if_manyHerbs_numbers.png')
-    plt.show()
-
-
-
-
-
-
-    #  No primary producers
-
-    final_results_list = []
-    run_number = 0
-    initial_grassland = 0
-    initial_woodland = 0
-    initial_scrubland = 0
-    chance_regrowGrass = 0
-    number_simulations = 10
-    for _ in range(number_simulations):
-        # keep track of the runs 
-        run_number += 1
-        print(run_number)
-        model = KneppModel(
-            chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
-            chance_scrubOutcompetedByTree, chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
-            initial_roeDeer, initial_grassland, initial_woodland, initial_scrubland, 
-            roeDeer_reproduce, roeDeer_gain_from_grass, roeDeer_gain_from_Trees, roeDeer_gain_from_Scrub, roeDeer_gain_from_Saplings, roeDeer_gain_from_YoungScrub,
-            ponies_gain_from_grass, ponies_gain_from_Trees, ponies_gain_from_Scrub, ponies_gain_from_Saplings, ponies_gain_from_YoungScrub, 
-            cows_reproduce, cows_gain_from_grass, cows_gain_from_Trees, cows_gain_from_Scrub, cows_gain_from_Saplings, cows_gain_from_YoungScrub, 
-            fallowDeer_reproduce, fallowDeer_gain_from_grass, fallowDeer_gain_from_Trees, fallowDeer_gain_from_Scrub, fallowDeer_gain_from_Saplings, fallowDeer_gain_from_YoungScrub, 
-            redDeer_reproduce, redDeer_gain_from_grass, redDeer_gain_from_Trees, redDeer_gain_from_Scrub, redDeer_gain_from_Saplings, redDeer_gain_from_YoungScrub, 
-            pigs_reproduce, pigs_gain_from_grass, pigs_gain_from_Trees, pigs_gain_from_Scrub, pigs_gain_from_Saplings, pigs_gain_from_YoungScrub, 
-            fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
-            reproduce_bison, bison_gain_from_grass, bison_gain_from_Trees, bison_gain_from_Scrub, bison_gain_from_Saplings, bison_gain_from_YoungScrub,
-            reproduce_elk, elk_gain_from_grass, elk_gain_from_Trees, elk_gain_from_Scrub, elk_gain_from_Saplings, elk_gain_from_YoungScrub,
-            reproduce_reindeer, reindeer_gain_from_grass, reindeer_gain_from_Trees, reindeer_gain_from_Scrub, reindeer_gain_from_Saplings, reindeer_gain_from_YoungScrub,
-            fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, reindeer_stocking_forecast, roeDeer_stocking_forecast,
-            width = 25, height = 18, max_time = 184, reintroduction = True,
-            introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False, cull_roe = False)
-
-        model.run_model()
-
-        # first graph:  does it pass the filters? looking at the number of individual trees, etc.
-        results = model.datacollector.get_model_vars_dataframe()
-        final_results_list.append(results)
-
-    final_results = pd.concat(final_results_list)
-
-    # y values - number of trees, scrub, etc. 
-    y_values_conditions =  final_results[["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"]].values.flatten()            
-    species_list_conditions = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"], 185*number_simulations) 
-    indices_conditions = np.repeat(final_results['Time'], 10)
-    final_df = pd.DataFrame(
-    {'Abundance': y_values_conditions, 'Ecosystem Element': species_list_conditions, 'Time': indices_conditions})
-    # calculate median 
-    m = final_df.groupby(['Time', 'Ecosystem Element'])[['Abundance']].apply(np.median)
-    m.name = 'Median'
-    final_df = final_df.join(m, on=['Time', 'Ecosystem Element'])
-    # calculate quantiles
-    perc1 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance'].quantile(.95)
-    perc1.name = 'ninetyfivePerc'
-    final_df = final_df.join(perc1, on=['Time', 'Ecosystem Element'])
-    perc2 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance'].quantile(.05)
-    perc2.name = "fivePerc"
-    final_df = final_df.join(perc2, on=['Time','Ecosystem Element'])
-    final_df = final_df.reset_index(drop=True)
-
-    colors = ["#6788ee"]
-    g = sns.FacetGrid(final_df, col="Ecosystem Element", palette = colors, col_wrap=4, sharey = False)
-    g.map(sns.lineplot, 'Time', 'Median')
-    g.map(sns.lineplot, 'Time', 'fivePerc')
-    g.map(sns.lineplot, 'Time', 'ninetyfivePerc')    # add subplot titles
-    for ax in g.axes.flat:
-        ax.fill_between(ax.lines[1].get_xdata(),ax.lines[1].get_ydata(), ax.lines[2].get_ydata(), color="#6788ee", alpha=0.2)
-        ax.set_ylabel('Abundance')
-    axes = g.axes.flatten()
-    # fill between the quantiles
-    axes = g.axes.flatten()
-    axes[0].set_title("Roe deer")
-    axes[1].set_title("Exmoor pony")
-    axes[2].set_title("Fallow deer")
-    axes[3].set_title("Longhorn cattle")
-    axes[4].set_title("Red deer")
-    axes[5].set_title("Tamworth pigs")
-    axes[6].set_title("Grassland")
-    axes[7].set_title("Woodland")
-    axes[8].set_title("Thorny scrub")
-    axes[9].set_title("Bare ground")
-    # stop the plots from overlapping
-    g.fig.suptitle('Reality check: No primary producers')
-    plt.tight_layout()
-    plt.savefig('what_if_no_primary_producers.png')
     plt.show()
 
     return output_parameters
