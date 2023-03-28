@@ -25,24 +25,24 @@ class FieldAgent(mg.GeoAgent):
 
         # now set number of individual habitat components
         if self.condition == 'grassland': 
-            self.trees_here = random.randint(0, 49)*(self.size_of_patch/10000)
+            self.trees_here = int(random.randint(0, 749)*(self.size_of_patch/10000))
             self.saplings_here = 0
-            self.scrub_here = random.randint(0, 99)*(self.size_of_patch/10000)
+            self.scrub_here = int(random.randint(0, 749)*(self.size_of_patch/10000))
             self.youngscrub_here = 0
             self.perc_grass_here = random.randint(50, 100)
             self.perc_bareground_here = 100 - self.perc_grass_here
         elif self.condition == "thorny_scrubland": 
-            self.trees_here = random.randint(0, 49)*(self.size_of_patch/10000)
-            self.saplings_here = random.randint(0, 500)*(self.size_of_patch/10000)
-            self.scrub_here = random.randint(100, 800)*(self.size_of_patch/10000)
-            self.youngscrub_here = random.randint(0, 500)*(self.size_of_patch/10000)
+            self.trees_here = int(random.randint(0, 749)*(self.size_of_patch/10000))
+            self.saplings_here = int(random.randint(0, 5000)*(self.size_of_patch/10000))
+            self.scrub_here = int(random.randint(750, 4000)*(self.size_of_patch/10000))
+            self.youngscrub_here = int(random.randint(0, 5000)*(self.size_of_patch/10000))
             self.perc_grass_here = random.randint(0, 100)
             self.perc_bareground_here = 100 - self.perc_grass_here
         elif self.condition == "woodland":  
-            self.trees_here = random.randint(50, 400)*(self.size_of_patch/10000)
-            self.saplings_here = random.randint(0, 500)*(self.size_of_patch/10000)
-            self.scrub_here = random.randint(0, 80)*(self.size_of_patch/10000)
-            self.youngscrub_here = random.randint(0, 500)*(self.size_of_patch/10000)
+            self.trees_here = int(random.randint(750, 4000)*(self.size_of_patch/10000))
+            self.saplings_here = int(random.randint(0, 5000)*(self.size_of_patch/10000))
+            self.scrub_here = int(random.randint(0, 4000)*(self.size_of_patch/10000))
+            self.youngscrub_here = int(random.randint(0, 5000)*(self.size_of_patch/10000))
             self.perc_grass_here = random.randint(0, 100)
             self.perc_bareground_here = 100 - self.perc_grass_here
         # this is the food available for herbivores in this habitat agent
@@ -58,6 +58,7 @@ class FieldAgent(mg.GeoAgent):
         self.habs_outcompeted_byTrees= defaultdict(int)
         self.habs_outcompeted_byScrub = defaultdict(int)
         self.habs_grew_up = defaultdict(int)
+
 
     # define a random point to add herbivores to
     def random_point(self):
@@ -79,29 +80,29 @@ class FieldAgent(mg.GeoAgent):
 
         # chance of 1 young scrub becoming 1 mature scrub
         number_scrub_maturing = np.random.binomial(n=self.edibles["youngScrub"], p=self.model.chance_youngScrubMatures)
-        # don't let it go over 800 mature shrubs
-        number_scrub_maturing = min(number_scrub_maturing, 800 - self.edibles['scrub'])
+        # don't let it go over 4000 mature shrubs
+        number_scrub_maturing = min(number_scrub_maturing, int((4000*(self.size_of_patch/10000)) - self.edibles['scrub']))
         self.edibles['scrub'] += number_scrub_maturing
         self.edibles["youngScrub"] -= number_scrub_maturing
         self.habs_grew_up["youngScrub"] += number_scrub_maturing
 
         # chance of sapling becoming tree
         number_saplings_maturing = np.random.binomial(n=self.edibles["saplings"], p=self.model.chance_saplingBecomingTree)
-        # don't let it go over 400 trees
-        number_saplings_maturing = min(number_saplings_maturing, 400 - self.edibles["trees"])
+        # don't let it go over 4000 trees
+        number_saplings_maturing = min(number_saplings_maturing, int((4000*(self.size_of_patch/10000)) - self.edibles["trees"]))
         self.edibles["trees"] += number_saplings_maturing
         self.edibles["saplings"] -= number_saplings_maturing
         self.habs_grew_up["saplings"] += number_saplings_maturing
 
         # chance of reproducing saplings or young shrubs
         my_field = self.model.space.get_region_by_id(self.unique_id)
-        next_moves = self.model.space.get_neighbors_within_distance(my_field, 1)
+        next_moves = self.model.saved_neighbors[my_field.unique_id]
         neighboring_habitats = [agent for agent in next_moves if (isinstance(agent, FieldAgent))]
 
         # chance of reproducing saplings
         number_reproduce_trees = np.random.binomial(n=self.edibles["trees"], p=self.model.chance_reproduceSapling)
-        # are there any that aren't full of other saplings/trees?
-        available_sapling_cell = [i for i in neighboring_habitats if i.edibles["saplings"] < 5000 and i.edibles["trees"] < 400]
+        # are there any that aren't full of other saplings?
+        available_sapling_cell = [i for i in neighboring_habitats if i.edibles["saplings"] < (5000*(self.size_of_patch/10000))]
         if len(available_sapling_cell) > 0: 
             list_of_choices = random.choices(available_sapling_cell, k = number_reproduce_trees)
             for i in range(number_reproduce_trees):
@@ -112,7 +113,7 @@ class FieldAgent(mg.GeoAgent):
         # chance of reproducing scrub
         number_reproduce_shrubs = np.random.binomial(n=self.edibles['scrub'], p=self.model.chance_reproduceYoungScrub)
         # are there any that aren't full of other scrub/young scrub?
-        available_youngscrub_cell = [i for i in neighboring_habitats if i.edibles["youngScrub"] < 5000 and i.edibles['scrub'] < 800]
+        available_youngscrub_cell = [i for i in neighboring_habitats if i.edibles["youngScrub"] < (5000*(self.size_of_patch/10000))]
         if len(available_youngscrub_cell) > 0:
             list_of_choices = random.choices(available_youngscrub_cell, k = number_reproduce_shrubs)
             for i in range(number_reproduce_shrubs):
@@ -125,15 +126,15 @@ class FieldAgent(mg.GeoAgent):
         self.edibles["bare_ground"] -= number_reproduce_bareGround
 
         # chance of grass being outcompeted by mature trees and scrub
-        outcompeted_by_trees = ((self.edibles["trees"]/400)*self.model.chance_grassOutcompetedByTree) 
+        outcompeted_by_trees = (self.edibles["trees"]/(4000*(self.size_of_patch/10000)))*self.model.chance_grassOutcompetedByTree
         if outcompeted_by_trees>1: outcompeted_by_trees=1
         outcompeted_grass_byTrees = np.random.binomial(n=self.edibles["grass"], p=outcompeted_by_trees)
         if self.edibles["grass"] - outcompeted_grass_byTrees < 0: outcompeted_grass_byTrees = self.edibles["grass"]
         self.edibles["grass"] -= outcompeted_grass_byTrees
         self.edibles["bare_ground"] += outcompeted_grass_byTrees
         self.habs_outcompeted_byTrees["grass"] += outcompeted_grass_byTrees
-        #shrubs
-        outcompeted_by_shrubs = ((self.edibles['scrub']/800)*self.model.chance_grassOutcompetedByScrub)
+        # shrubs
+        outcompeted_by_shrubs = ((self.edibles['scrub']/(4000*(self.size_of_patch/10000)))*self.model.chance_grassOutcompetedByScrub)
         if outcompeted_by_shrubs>1: outcompeted_by_shrubs=1
         outcompeted_grass_byScrub = np.random.binomial(n=self.edibles["grass"], p=outcompeted_by_shrubs)
         if self.edibles["grass"] - outcompeted_grass_byScrub < 0: outcompeted_grass_byScrub = self.edibles["grass"]
@@ -142,47 +143,49 @@ class FieldAgent(mg.GeoAgent):
         self.habs_outcompeted_byScrub["grass"] += outcompeted_grass_byScrub
 
         # chance of mature scrub being outcompeted by trees 
-        prob=(self.edibles["trees"]/400)*self.model.chance_scrubOutcompetedByTree
+        prob=(self.edibles["trees"]/(4000*(self.size_of_patch/10000)))*self.model.chance_scrubOutcompetedByTree
         if prob>1: prob=1
         mature_scrub_outcompeted = np.random.binomial(n=self.edibles['scrub'], p=prob)
+        if self.edibles["scrub"] - mature_scrub_outcompeted < 0: mature_scrub_outcompeted = self.edibles["scrub"]
         self.edibles['scrub'] -= mature_scrub_outcompeted
         self.habs_outcompeted_byTrees["scrub"] += mature_scrub_outcompeted
 
-        # saplings being outcompeted by scrub/trees
-        outcompeted_by_trees = ((self.edibles["trees"]/400)*self.model.chance_saplingOutcompetedByTree) 
-        if outcompeted_by_trees>1: outcompeted_by_trees=1
-        outcompeted_saplings_byTrees = np.random.binomial(n=self.edibles["saplings"], p=outcompeted_by_trees)
-        if self.edibles["saplings"] - outcompeted_saplings_byTrees < 0: outcompeted_saplings_byTrees = self.edibles["saplings"]
-        self.edibles["saplings"] -= outcompeted_saplings_byTrees
-        self.habs_outcompeted_byTrees["saplings"] += outcompeted_saplings_byTrees
+        # # saplings being outcompeted by scrub/trees
+        # outcompeted_by_trees = ((self.edibles["trees"]/(4000*(self.size_of_patch/10000)))*self.model.chance_saplingOutcompetedByTree) 
+        # if outcompeted_by_trees>1: outcompeted_by_trees=1
+        # outcompeted_saplings_byTrees = np.random.binomial(n=self.edibles["saplings"], p=outcompeted_by_trees)
+        # if self.edibles["saplings"] - outcompeted_saplings_byTrees < 0: outcompeted_saplings_byTrees = self.edibles["saplings"]
+        # self.edibles["saplings"] -= outcompeted_saplings_byTrees
+        # self.habs_outcompeted_byTrees["saplings"] += outcompeted_saplings_byTrees
 
-        outcompeted_by_shrubs = ((self.edibles['scrub']/800)*self.model.chance_saplingOutcompetedByScrub)
-        if outcompeted_by_shrubs>1: outcompeted_by_shrubs=1
-        outcompeted_saplings_byScrub = np.random.binomial(n=self.edibles["saplings"], p=outcompeted_by_shrubs)
-        if self.edibles["saplings"] - outcompeted_saplings_byScrub < 0: outcompeted_saplings_byScrub = self.edibles["saplings"]
-        self.edibles["saplings"] -= outcompeted_saplings_byScrub
-        self.habs_outcompeted_byScrub["saplings"] += outcompeted_saplings_byScrub
+        # outcompeted_by_shrubs = ((self.edibles['scrub']/(4000*(self.size_of_patch/10000)))*self.model.chance_saplingOutcompetedByScrub)
+        # if outcompeted_by_shrubs>1: outcompeted_by_shrubs=1
+        # outcompeted_saplings_byScrub = np.random.binomial(n=self.edibles["saplings"], p=outcompeted_by_shrubs)
+        # if self.edibles["saplings"] - outcompeted_saplings_byScrub < 0: outcompeted_saplings_byScrub = self.edibles["saplings"]
+        # self.edibles["saplings"] -= outcompeted_saplings_byScrub
+        # self.habs_outcompeted_byScrub["saplings"] += outcompeted_saplings_byScrub
 
-        # young scrub being outcompeted by scrub/trees
-        outcompeted_by_trees = ((self.edibles["trees"]/400)*self.model.chance_youngScrubOutcompetedByTree) 
-        if outcompeted_by_trees > 1: outcompeted_by_trees = 1
-        outcompeted_youngScrub_byTrees = np.random.binomial(n=self.edibles["youngScrub"], p=outcompeted_by_trees)
-        self.edibles["youngScrub"] -= outcompeted_youngScrub_byTrees
-        self.habs_outcompeted_byTrees["youngScrub"] += outcompeted_youngScrub_byTrees
-        outcompeted_by_shrubs = ((self.edibles['scrub']/800)*self.model.chance_youngScrubOutcompetedByScrub)
-        if outcompeted_by_shrubs>1: outcompeted_by_shrubs=1
-        outcompeted_youngScrub_byScrub = np.random.binomial(n=self.edibles["youngScrub"], p=outcompeted_by_shrubs)
-        self.edibles["youngScrub"] -= outcompeted_youngScrub_byScrub
-        self.habs_outcompeted_byScrub["youngScrub"] += outcompeted_youngScrub_byScrub
+        # # young scrub being outcompeted by scrub/trees
+        # outcompeted_by_trees = ((self.edibles["trees"]/(4000*(self.size_of_patch/10000)))*self.model.chance_youngScrubOutcompetedByTree) 
+        # if outcompeted_by_trees > 1: outcompeted_by_trees = 1
+        # outcompeted_youngScrub_byTrees = np.random.binomial(n=self.edibles["youngScrub"], p=outcompeted_by_trees)
+        # self.edibles["youngScrub"] -= outcompeted_youngScrub_byTrees
+        # self.habs_outcompeted_byTrees["youngScrub"] += outcompeted_youngScrub_byTrees
+        # outcompeted_by_shrubs = ((self.edibles['scrub']/(4000*(self.size_of_patch/10000)))*self.model.chance_youngScrubOutcompetedByScrub)
+        # if outcompeted_by_shrubs>1: outcompeted_by_shrubs=1
+        # outcompeted_youngScrub_byScrub = np.random.binomial(n=self.edibles["youngScrub"], p=outcompeted_by_shrubs)
+        # self.edibles["youngScrub"] -= outcompeted_youngScrub_byScrub
+        # self.habs_outcompeted_byScrub["youngScrub"] += outcompeted_youngScrub_byScrub
+
 
         # reassess habitat condition
-        if self.edibles["trees"] < 50*(self.size_of_patch/10000) and self.edibles["scrub"] < 100*(self.size_of_patch/10000) and self.edibles["grass"] >= 50*(self.size_of_patch/10000):
+        if self.edibles["trees"] < 750*(self.size_of_patch/10000) and self.edibles["scrub"] < 750*(self.size_of_patch/10000) and self.edibles["grass"] >= 50*(self.size_of_patch/10000):
             self.condition = "grassland"
-        elif self.edibles["trees"] < 50*(self.size_of_patch/10000) and self.edibles["scrub"] >= 100*(self.size_of_patch/10000):
+        elif self.edibles["trees"] < 750*(self.size_of_patch/10000) and self.edibles["scrub"] >= 750*(self.size_of_patch/10000):
             self.condition = "thorny_scrubland"
-        elif self.edibles["trees"] >= 50*(self.size_of_patch/10000):
+        elif self.edibles["trees"] >= 750*(self.size_of_patch/10000):
             self.condition = "woodland" 
-        elif self.edibles["trees"] < 50*(self.size_of_patch/10000) and self.edibles["scrub"] < 100*(self.size_of_patch/10000) and self.edibles["bare_ground"] > 50*(self.size_of_patch/10000):
+        elif self.edibles["trees"] < 750*(self.size_of_patch/10000) and self.edibles["scrub"] < 750*(self.size_of_patch/10000) and self.edibles["bare_ground"] > 50*(self.size_of_patch/10000):
             self.condition = "bare_ground"
         
 
@@ -203,7 +206,7 @@ class roe_deer_agent(mg.GeoAgent):
         self.energy -= 1
         # eat
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
-        self.energy = eat_habitats(self, habitat_patch, gain_from_saplings = self.model.roe_deer_gain_from_saplings, gain_from_trees=self.model.roe_deer_gain_from_trees, gain_from_scrub=self.model.roe_deer_gain_from_scrub, gain_from_young_scrub=self.model.roe_deer_gain_from_young_scrub, gain_from_grass=self.model.roe_deer_gain_from_grass)
+        self.energy += eat_habitats(self, habitat_patch, my_dietary_preference="browser", gain_from_saplings = self.model.roe_deer_gain_from_saplings, gain_from_trees=self.model.roe_deer_gain_from_trees, gain_from_scrub=self.model.roe_deer_gain_from_scrub, gain_from_young_scrub=self.model.roe_deer_gain_from_young_scrub, gain_from_grass=self.model.roe_deer_gain_from_grass)
         # if roe deer's energy is less than 0, die 
         if self.energy <= 0:
             self.model.space.remove_herbivore_agent(self)
@@ -232,7 +235,7 @@ class exmoor_pony_agent(mg.GeoAgent):
         self.energy -= 1
         # eat
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
-        self.energy = eat_habitats(self, habitat_patch, gain_from_saplings = self.model.ponies_gain_from_saplings, gain_from_trees=self.model.ponies_gain_from_trees, gain_from_scrub=self.model.ponies_gain_from_scrub, gain_from_young_scrub=self.model.ponies_gain_from_young_scrub, gain_from_grass=self.model.ponies_gain_from_grass)
+        self.energy += eat_habitats(self, habitat_patch, my_dietary_preference="grazer", gain_from_saplings = self.model.ponies_gain_from_saplings, gain_from_trees=self.model.ponies_gain_from_trees, gain_from_scrub=self.model.ponies_gain_from_scrub, gain_from_young_scrub=self.model.ponies_gain_from_young_scrub, gain_from_grass=self.model.ponies_gain_from_grass)
         # if energy is less than 0, die 
         if self.energy <= 0:
             self.model.space.remove_herbivore_agent(self)
@@ -254,7 +257,7 @@ class longhorn_cattle_agent(mg.GeoAgent):
         self.energy -= 1
         # eat
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
-        self.energy = eat_habitats(self, habitat_patch, gain_from_saplings = self.model.cows_gain_from_saplings, gain_from_trees=self.model.cows_gain_from_trees, gain_from_scrub=self.model.cows_gain_from_scrub, gain_from_young_scrub=self.model.cows_gain_from_young_scrub, gain_from_grass=self.model.cows_gain_from_grass)
+        self.energy += eat_habitats(self, habitat_patch, my_dietary_preference="grazer", gain_from_saplings = self.model.cows_gain_from_saplings, gain_from_trees=self.model.cows_gain_from_trees, gain_from_scrub=self.model.cows_gain_from_scrub, gain_from_young_scrub=self.model.cows_gain_from_young_scrub, gain_from_grass=self.model.cows_gain_from_grass)
         # if energy is less than 0, die 
         if self.energy <= 0:
             self.model.space.remove_herbivore_agent(self)
@@ -284,15 +287,16 @@ class fallow_deer_agent(mg.GeoAgent):
         self.energy -= 1
         # eat
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
-        self.energy = eat_habitats(self, habitat_patch, gain_from_saplings = self.model.fallow_deer_gain_from_saplings, gain_from_trees=self.model.fallow_deer_gain_from_trees, gain_from_scrub=self.model.fallow_deer_gain_from_scrub, gain_from_young_scrub=self.model.fallow_deer_gain_from_young_scrub, gain_from_grass=self.model.fallow_deer_gain_from_grass)
+        self.energy += eat_habitats(self, habitat_patch, my_dietary_preference="intermediate_feeder", gain_from_saplings = self.model.fallow_deer_gain_from_saplings, gain_from_trees=self.model.fallow_deer_gain_from_trees, gain_from_scrub=self.model.fallow_deer_gain_from_scrub, gain_from_young_scrub=self.model.fallow_deer_gain_from_young_scrub, gain_from_grass=self.model.fallow_deer_gain_from_grass)
         # if energy is less than 0, die 
         if self.energy <= 0:
             self.model.space.remove_herbivore_agent(self)
             self.model.schedule.remove(self)
             living = False
         # I can reproduce in May and June (years run March-March)
+        # if living and (random.random() < self.model.fallow_deer_reproduce) and (3 <= self.model.get_month() < 5):
         if living and (random.random() < self.model.fallow_deer_reproduce/np.log10(self.model.schedule.get_breed_count(fallow_deer_agent)+ 1)) and (3 <= self.model.get_month() < 5):
-            # Create a new roe deer and divide energy:
+            # Create a new deer and divide energy:
             self.energy = np.random.uniform(0, self.energy)
             fawn = fallow_deer_agent(uuid.uuid4().int, self.model, crs=self.crs, geometry=self.geometry, field_id=self.field_id, energy=self.energy)
             self.model.space.add_herbivore_agent(fawn, field_id=self.field_id)
@@ -314,7 +318,7 @@ class red_deer_agent(mg.GeoAgent):
         self.energy -= 1
         # eat
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
-        self.energy = eat_habitats(self, habitat_patch, gain_from_saplings = self.model.red_deer_gain_from_saplings, gain_from_trees=self.model.red_deer_gain_from_trees, gain_from_scrub=self.model.red_deer_gain_from_scrub, gain_from_young_scrub=self.model.red_deer_gain_from_young_scrub, gain_from_grass=self.model.red_deer_gain_from_grass)
+        self.energy += eat_habitats(self, habitat_patch, my_dietary_preference="intermediate_feeder", gain_from_saplings = self.model.red_deer_gain_from_saplings, gain_from_trees=self.model.red_deer_gain_from_trees, gain_from_scrub=self.model.red_deer_gain_from_scrub, gain_from_young_scrub=self.model.red_deer_gain_from_young_scrub, gain_from_grass=self.model.red_deer_gain_from_grass)
         # if energy is less than 0, die 
         if self.energy <= 0:
             self.model.space.remove_herbivore_agent(self)
@@ -322,6 +326,8 @@ class red_deer_agent(mg.GeoAgent):
             living = False
         # I can reproduce in May and June (years run March-March)
         if living and (random.random() < self.model.red_deer_reproduce/np.log10(self.model.schedule.get_breed_count(red_deer_agent)+ 1)) and (3 <= self.model.get_month() < 5):
+        # if living and (random.random() < self.model.red_deer_reproduce) and (3 <= self.model.get_month() < 5):
+
             # Create a new roe deer and divide energy:
             self.energy = np.random.uniform(0, self.energy)
             fawn = red_deer_agent(uuid.uuid4().int, self.model, crs=self.crs, geometry=self.geometry, field_id=self.field_id, energy=self.energy)
@@ -347,7 +353,7 @@ class tamworth_pig_agent(mg.GeoAgent):
         self.energy -= 1
         # eat
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
-        self.energy = eat_habitats(self, habitat_patch, gain_from_saplings = self.model.tamworth_pig_gain_from_saplings, gain_from_trees=self.model.tamworth_pig_gain_from_trees, gain_from_scrub=self.model.tamworth_pig_gain_from_scrub, gain_from_young_scrub=self.model.tamworth_pig_gain_from_young_scrub, gain_from_grass=self.model.tamworth_pig_gain_from_grass)
+        self.energy += eat_habitats(self, habitat_patch, my_dietary_preference="random", gain_from_saplings = self.model.tamworth_pig_gain_from_saplings, gain_from_trees=self.model.tamworth_pig_gain_from_trees, gain_from_scrub=self.model.tamworth_pig_gain_from_scrub, gain_from_young_scrub=self.model.tamworth_pig_gain_from_young_scrub, gain_from_grass=self.model.tamworth_pig_gain_from_grass)
         # if energy is less than 0, die 
         if self.energy <= 0:
             self.model.space.remove_herbivore_agent(self)
@@ -397,7 +403,7 @@ class reindeer_agent(mg.GeoAgent):
         self.energy -= 1
         # eat
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
-        self.energy = eat_habitats(self, habitat_patch, gain_from_saplings = self.model.reindeer_gain_from_saplings, gain_from_trees=self.model.reindeer_gain_from_trees, gain_from_scrub=self.model.reindeer_gain_from_scrub, gain_from_young_scrub=self.model.reindeer_gain_from_young_scrub, gain_from_grass=self.model.reindeer_gain_from_grass)
+        self.energy += eat_habitats(self, habitat_patch, my_dietary_preference="intermediate_feeder", gain_from_saplings = self.model.reindeer_gain_from_saplings, gain_from_trees=self.model.reindeer_gain_from_trees, gain_from_scrub=self.model.reindeer_gain_from_scrub, gain_from_young_scrub=self.model.reindeer_gain_from_young_scrub, gain_from_grass=self.model.reindeer_gain_from_grass)
         # if energy is less than 0, die 
         if self.energy <= 0:
             self.model.space.remove_herbivore_agent(self)
@@ -427,7 +433,7 @@ class european_elk_agent(mg.GeoAgent):
         self.energy -= 1
         # eat
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
-        self.energy = eat_habitats(self, habitat_patch, gain_from_saplings = self.model.european_elk_gain_from_saplings, gain_from_trees=self.model.european_elk_gain_from_trees, gain_from_scrub=self.model.european_elk_gain_from_scrub, gain_from_young_scrub=self.model.european_elk_gain_from_young_scrub, gain_from_grass=self.model.european_elk_gain_from_grass)
+        self.energy += eat_habitats(self, habitat_patch, my_dietary_preference="browser", gain_from_saplings = self.model.european_elk_gain_from_saplings, gain_from_trees=self.model.european_elk_gain_from_trees, gain_from_scrub=self.model.european_elk_gain_from_scrub, gain_from_young_scrub=self.model.european_elk_gain_from_young_scrub, gain_from_grass=self.model.european_elk_gain_from_grass)
         # if energy is less than 0, die 
         if self.energy <= 0:
             self.model.space.remove_herbivore_agent(self)
@@ -456,7 +462,7 @@ class european_bison_agent(mg.GeoAgent):
         self.energy -= 1
         # eat
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
-        self.energy = eat_habitats(self, habitat_patch, gain_from_saplings = self.model.european_bison_gain_from_saplings, gain_from_trees=self.model.european_bison_gain_from_trees, gain_from_scrub=self.model.european_bison_gain_from_scrub, gain_from_young_scrub=self.model.european_bison_gain_from_young_scrub, gain_from_grass=self.model.european_bison_gain_from_grass)
+        self.energy += eat_habitats(self, habitat_patch, my_dietary_preference="intermediate_feeder", gain_from_saplings = self.model.european_bison_gain_from_saplings, gain_from_trees=self.model.european_bison_gain_from_trees, gain_from_scrub=self.model.european_bison_gain_from_scrub, gain_from_young_scrub=self.model.european_bison_gain_from_young_scrub, gain_from_grass=self.model.european_bison_gain_from_grass)
         # if energy is less than 0, die 
         if self.energy <= 0:
             self.model.space.remove_herbivore_agent(self)

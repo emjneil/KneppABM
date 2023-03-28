@@ -6,6 +6,7 @@ from geneticalgorithm import geneticalgorithm as ga
 import seaborn as sns
 import matplotlib.pyplot as plt
 import sys
+import statistics
 
 # ------ Optimization of the Knepp ABM model --------
 
@@ -57,9 +58,9 @@ def objectiveFunction(x):
     cows_gain_from_saplings = x[39]
     cows_gain_from_young_scrub = x[40]
     tamworth_pig_reproduce = x[41]
-    tamworth_pig_gain_from_trees = x[42]
-    tamworth_pig_gain_from_scrub = x[43]
-    tamworth_pig_gain_from_grass =x[44]
+    tamworth_pig_gain_from_grass =x[42]
+    tamworth_pig_gain_from_trees = x[43]
+    tamworth_pig_gain_from_scrub = x[44]
     tamworth_pig_gain_from_saplings =x[45]
     tamworth_pig_gain_from_young_scrub = x[46]
     european_bison_reproduce = 0
@@ -100,6 +101,10 @@ def objectiveFunction(x):
     exmoor_stocking_forecast = 15
     roeDeer_stocking_forecast = 12
     introduced_species_stocking_forecast = 0
+    # tree mortality
+    chance_tree_survival = x[47]
+    chance_scrub_survival = x[48]
+    chance_scrub_saves_saplings = x[49]
 
     # run the model
     model = KneppModel(initial_roe, roe_deer_reproduce, roe_deer_gain_from_saplings, roe_deer_gain_from_trees, roe_deer_gain_from_scrub, roe_deer_gain_from_young_scrub, roe_deer_gain_from_grass,
@@ -115,268 +120,54 @@ def objectiveFunction(x):
                         reindeer_reproduce, reindeer_gain_from_grass, reindeer_gain_from_trees, reindeer_gain_from_scrub, reindeer_gain_from_saplings, reindeer_gain_from_young_scrub,
                         fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
                         fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, introduced_species_stocking_forecast,
-                        max_time = 185, reintroduction = True, introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
+                        chance_tree_survival, chance_scrub_survival,chance_scrub_saves_saplings,
+                        max_time = 184, reintroduction = True, introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
 
     model.run_model()
 
     # remember the results of the model (dominant conditions, # of agents)
     results = model.datacollector.get_model_vars_dataframe()
-    
+
     # find the middle of each filter
     filtered_result = (
         # pre-reintro model
         ((((list(results.loc[results['Time'] == 49, 'Roe deer'])[0])-26)/26)**2) +
         ((((list(results.loc[results['Time'] == 49, 'Grassland'])[0])-58.4)/58.4)**2) +
-        ((((list(results.loc[results['Time'] == 49, 'Thorny Scrub'])[0])-12.7)/12.7)**2) +
+        ((((list(results.loc[results['Time'] == 49, 'Thorny Scrub'])[0])-28.1)/28.1)**2) +
         ((((list(results.loc[results['Time'] == 49, 'Woodland'])[0])-11.4)/11.4)**2) +
+        # ((((list(results.loc[results['Time'] == 49, 'Mature Scrub'])[0])-63983)/63983)**2) +
+        # ((((list(results.loc[results['Time'] == 49, 'Trees'])[0])-12989)/12989)**2) +
 
-        # # post-reintro model: April 2015
-        # ((((list(results.loc[results['Time'] == 123, 'Longhorn cattle'])[0])-115)/115)**2) +
-        # ((((list(results.loc[results['Time'] == 123, 'Tamworth pigs'])[0])-22)/22)**2) +
-        ((((list(results.loc[results['Time'] == 123, 'Exmoor pony'])[0])-10)/10)**2) +
-        # # # May 2015
-        # ((((list(results.loc[results['Time'] == 124, 'Exmoor pony'])[0])-10)/10)**2) +
-        # ((((list(results.loc[results['Time'] == 124, 'Longhorn cattle'])[0])-129)/129)**2) +
-        # ((((list(results.loc[results['Time'] == 124, 'Tamworth pigs'])[0])-14)/14)**2) +
-        # # June 2015
-        # ((((list(results.loc[results['Time'] == 125, 'Exmoor pony'])[0])-10)/10)**2) +
-        # ((((list(results.loc[results['Time'] == 125, 'Longhorn cattle'])[0])-129)/129)**2) +
-        # ((((list(results.loc[results['Time'] == 125, 'Tamworth pigs'])[0])-14)/14)**2) +
-        # July 2015
-        # ((((list(results.loc[results['Time'] == 126, 'Exmoor pony'])[0])-10)/10)**2) +
-        # ((((list(results.loc[results['Time'] == 126, 'Longhorn cattle'])[0])-129)/129)**2) +
-        # ((((list(results.loc[results['Time'] == 126, 'Tamworth pigs'])[0])-14)/14)**2) +
-        # # Aug 2015
-        # ((((list(results.loc[results['Time'] == 127, 'Exmoor pony'])[0])-10)/10)**2) +
-        # ((((list(results.loc[results['Time'] == 127, 'Longhorn cattle'])[0])-129)/129)**2) +
-        # ((((list(results.loc[results['Time'] == 127, 'Tamworth pigs'])[0])-14)/14)**2) +
-        # # # Sept 2015
-        # ((((list(results.loc[results['Time'] == 128, 'Exmoor pony'])[0])-10)/10)**2) +
-        # ((((list(results.loc[results['Time'] == 128, 'Longhorn cattle'])[0])-130)/130)**2) +
-        # ((((list(results.loc[results['Time'] == 128, 'Tamworth pigs'])[0])-14)/14)**2) +
-        # # # Oct 2015
-        # ((((list(results.loc[results['Time'] == 129, 'Exmoor pony'])[0])-10)/10)**2) +
-        # ((((list(results.loc[results['Time'] == 129, 'Longhorn cattle'])[0])-91)/91)**2) +
-        # ((((list(results.loc[results['Time'] == 129, 'Tamworth pigs'])[0])-14)/14)**2) +
-        # # Nov 2015
-        # ((((list(results.loc[results['Time'] == 130, 'Exmoor pony'])[0])-10)/10)**2) +
-        # ((((list(results.loc[results['Time'] == 130, 'Longhorn cattle'])[0])-91)/91)**2) +
-        # ((((list(results.loc[results['Time'] == 130, 'Tamworth pigs'])[0])-13)/13)**2) +
-        # # # Dec 2015
-        # ((((list(results.loc[results['Time'] == 131, 'Exmoor pony'])[0])-10)/10)**2) +
-        # ((((list(results.loc[results['Time'] == 131, 'Longhorn cattle'])[0])-86)/86)**2) +
-        # ((((list(results.loc[results['Time'] == 131, 'Tamworth pigs'])[0])-13)/13)**2) +
-        # # # Jan 2016
-        # ((((list(results.loc[results['Time'] == 132, 'Exmoor pony'])[0])-10)/10)**2) +
-        # ((((list(results.loc[results['Time'] == 132, 'Longhorn cattle'])[0])-86)/86)**2) +
-        # ((((list(results.loc[results['Time'] == 132, 'Tamworth pigs'])[0])-10)/10)**2) +
-        # # # Feb 2016
-        # ((((list(results.loc[results['Time'] == 133, 'Exmoor pony'])[0])-10)/10)**2) +
-        # ((((list(results.loc[results['Time'] == 133, 'Longhorn cattle'])[0])-86)/86)**2) +
-        # ((((list(results.loc[results['Time'] == 133, 'Tamworth pigs'])[0])-8)/8)**2) +
-        # March 2016
-        # ((((list(results.loc[results['Time'] == 134, 'Fallow deer'])[0])-140)/140)**2) +
-        # ((((list(results.loc[results['Time'] == 134, 'Red deer'])[0])-26)/26)**2) +
-        # ((((list(results.loc[results['Time'] == 134, 'Tamworth pigs'])[0])-9)/9)**2) +
-        # ((((list(results.loc[results['Time'] == 134, 'Longhorn cattle'])[0])-86)/86)**2) +
-        ((((list(results.loc[results['Time'] == 134, 'Exmoor pony'])[0])-11)/11)**2) +
-        # # # # April 2016
-        # ((((list(results.loc[results['Time'] == 135, 'Longhorn cattle'])[0])-103)/103)**2) +
-        # ((((list(results.loc[results['Time'] == 135, 'Exmoor pony'])[0])-11)/11)**2) +
-        # ((((list(results.loc[results['Time'] == 135, 'Tamworth pigs'])[0])-9)/9)**2) +
-        # # # # May 2016
-        # ((((list(results.loc[results['Time'] == 136, 'Longhorn cattle'])[0])-108)/108)**2) +
-        # ((((list(results.loc[results['Time'] == 136, 'Tamworth pigs'])[0])-17)/17)**2) +
-        # ((((list(results.loc[results['Time'] == 136, 'Exmoor pony'])[0])-11)/11)**2) +
-        # # # June 2016
-        # ((((list(results.loc[results['Time'] == 137, 'Longhorn cattle'])[0])-89)/89)**2) +
-        # ((((list(results.loc[results['Time'] == 137, 'Exmoor pony'])[0])-11)/11)**2) +
-        # ((((list(results.loc[results['Time'] == 137, 'Tamworth pigs'])[0])-17)/17)**2) +
-        # # July 2016
-        # ((((list(results.loc[results['Time'] == 138, 'Exmoor pony'])[0])-11)/11)**2) +
-        # ((((list(results.loc[results['Time'] == 138, 'Tamworth pigs'])[0])-17)/17)**2) +
-        # ((((list(results.loc[results['Time'] == 138, 'Longhorn cattle'])[0])-87)/87)**2) +
-        # # # August 2016
-        # ((((list(results.loc[results['Time'] == 139, 'Exmoor pony'])[0])-11)/11)**2) +
-        # ((((list(results.loc[results['Time'] == 139, 'Tamworth pigs'])[0])-17)/17)**2) +
-        # ((((list(results.loc[results['Time'] == 139, 'Longhorn cattle'])[0])-87)/87)**2) +
-        # # # September 2016
-        # ((((list(results.loc[results['Time'] == 140, 'Exmoor pony'])[0])-11)/11)**2) +
-        # ((((list(results.loc[results['Time'] == 140, 'Tamworth pigs'])[0])-17)/17)**2) +
-        # ((((list(results.loc[results['Time'] == 140, 'Longhorn cattle'])[0])-97)/97)**2) +
-        # # # Oct 2016
-        # ((((list(results.loc[results['Time'] == 141, 'Exmoor pony'])[0])-11)/11)**2) +
-        # ((((list(results.loc[results['Time'] == 141, 'Tamworth pigs'])[0])-17)/17)**2) +
-        # ((((list(results.loc[results['Time'] == 141, 'Longhorn cattle'])[0])-97)/97)**2) +
-        # # # Nov 2016
-        # ((((list(results.loc[results['Time'] == 142, 'Exmoor pony'])[0])-11)/11)**2) +
-        # ((((list(results.loc[results['Time'] == 142, 'Tamworth pigs'])[0])-17)/17)**2) +
-        # ((((list(results.loc[results['Time'] == 142, 'Longhorn cattle'])[0])-92)/92)**2) +
-        # # # Dec 2016
-        # ((((list(results.loc[results['Time'] == 143, 'Exmoor pony'])[0])-11)/11)**2) +
-        # ((((list(results.loc[results['Time'] == 143, 'Tamworth pigs'])[0])-13)/13)**2) +
-        # ((((list(results.loc[results['Time'] == 143, 'Longhorn cattle'])[0])-79)/79)**2) +
-        # # # Jan 2017
-        # ((((list(results.loc[results['Time'] == 144, 'Exmoor pony'])[0])-11)/11)**2) +
-        # ((((list(results.loc[results['Time'] == 144, 'Tamworth pigs'])[0])-9)/9)**2) +
-        # ((((list(results.loc[results['Time'] == 144, 'Longhorn cattle'])[0])-79)/79)**2) +
-        # # # Feb 2017
-        # ((((list(results.loc[results['Time'] == 145, 'Exmoor pony'])[0])-11)/11)**2) +
-        # ((((list(results.loc[results['Time'] == 145, 'Tamworth pigs'])[0])-7)/7)**2) +
-        # ((((list(results.loc[results['Time'] == 145, 'Longhorn cattle'])[0])-79)/79)**2) +
-        # March 2017
-        # ((((list(results.loc[results['Time'] == 146, 'Fallow deer'])[0])-165)/165)**2) +
-        # ((((list(results.loc[results['Time'] == 146, 'Longhorn cattle'])[0])-79)/79)**2) +
-        # ((((list(results.loc[results['Time'] == 146, 'Tamworth pigs'])[0])-7)/7)**2) +
-        ((((list(results.loc[results['Time'] == 146, 'Exmoor pony'])[0])-10)/10)**2) +
-        # # # April 2017
-        # ((((list(results.loc[results['Time'] == 147, 'Longhorn cattle'])[0])-100)/100)**2) +
-        # ((((list(results.loc[results['Time'] == 147, 'Tamworth pigs'])[0])-22)/22)**2) +
-        ((((list(results.loc[results['Time'] == 147, 'Exmoor pony'])[0])-10)/10)**2) +
-        # # # May 2017
-        # ((((list(results.loc[results['Time'] == 148, 'Longhorn cattle'])[0])-109)/109)**2) +
-        ((((list(results.loc[results['Time'] == 148, 'Exmoor pony'])[0])-10)/10)**2) +
-        # ((((list(results.loc[results['Time'] == 148, 'Tamworth pigs'])[0])-22)/22)**2) +
-        # # June 2017
-        # ((((list(results.loc[results['Time'] == 149, 'Longhorn cattle'])[0])-94)/94)**2) +
-        ((((list(results.loc[results['Time'] == 149, 'Exmoor pony'])[0])-10)/10)**2) +
-        # ((((list(results.loc[results['Time'] == 149, 'Tamworth pigs'])[0])-22)/22)**2) +
-        # # # July 2017
-        ((((list(results.loc[results['Time'] == 150, 'Exmoor pony'])[0])-10)/10)**2) +
-        # ((((list(results.loc[results['Time'] == 150, 'Longhorn cattle'])[0])-94)/94)**2) +
-        # ((((list(results.loc[results['Time'] == 150, 'Tamworth pigs'])[0])-22)/22)**2) +
-        # # Aug 2017
-        ((((list(results.loc[results['Time'] == 151, 'Exmoor pony'])[0])-10)/10)**2) +
-        # ((((list(results.loc[results['Time'] == 151, 'Longhorn cattle'])[0])-94)/94)**2) +
-        # ((((list(results.loc[results['Time'] == 151, 'Tamworth pigs'])[0])-22)/22)**2) +
-        # # # Sept 2017
-        ((((list(results.loc[results['Time'] == 152, 'Exmoor pony'])[0])-10)/10)**2) +
-        # ((((list(results.loc[results['Time'] == 152, 'Longhorn cattle'])[0])-90)/90)**2) +
-        # ((((list(results.loc[results['Time'] == 152, 'Tamworth pigs'])[0])-22)/22)**2) +
-        # # # Oct 2017
-        ((((list(results.loc[results['Time'] == 153, 'Exmoor pony'])[0])-10)/10)**2) +
-        # ((((list(results.loc[results['Time'] == 153, 'Longhorn cattle'])[0])-88)/88)**2) +
-        # ((((list(results.loc[results['Time'] == 153, 'Tamworth pigs'])[0])-22)/22)**2) +
-        # # # Nov 2017
-        ((((list(results.loc[results['Time'] == 154, 'Exmoor pony'])[0])-10)/10)**2) +
-        # ((((list(results.loc[results['Time'] == 154, 'Longhorn cattle'])[0])-88)/88)**2) +
-        # ((((list(results.loc[results['Time'] == 154, 'Tamworth pigs'])[0])-22)/22)**2) +
-        # # # Dec 2017
-        # ((((list(results.loc[results['Time'] == 155, 'Exmoor pony'])[0])-10)/10)**2) +
-        # ((((list(results.loc[results['Time'] == 155, 'Longhorn cattle'])[0])-88)/88)**2) +
-        # ((((list(results.loc[results['Time'] == 155, 'Tamworth pigs'])[0])-18)/18)**2) +
-        # # # Jan 2018
-        # ((((list(results.loc[results['Time'] == 156, 'Tamworth pigs'])[0])-11)/11)**2) +
-        ((((list(results.loc[results['Time'] == 156, 'Exmoor pony'])[0])-10)/10)**2) +
-        # ((((list(results.loc[results['Time'] == 156, 'Longhorn cattle'])[0])-88)/88)**2) +
-        # # # Feb 2018
-        ((((list(results.loc[results['Time'] == 157, 'Exmoor pony'])[0])-10)/10)**2) +
-        # ((((list(results.loc[results['Time'] == 157, 'Tamworth pigs'])[0])-16)/16)**2) +
-        # ((((list(results.loc[results['Time'] == 157, 'Longhorn cattle'])[0])-88)/88)**2) +
-        # March 2018
-        # ((((list(results.loc[results['Time'] == 158, 'Red deer'])[0])-24)/24)**2) +
-        # ((((list(results.loc[results['Time'] == 158, 'Longhorn cattle'])[0])-88)/88)**2) +
-        # ((((list(results.loc[results['Time'] == 158, 'Tamworth pigs'])[0])-16)/16)**2) +
-        ((((list(results.loc[results['Time'] == 158, 'Exmoor pony'])[0])-9)/9)**2) +
-        # # # April 2018
-        # # ((((list(results.loc[results['Time'] == 159, 'Longhorn cattle'])[0])-101)/101)**2) +
-        # ((((list(results.loc[results['Time'] == 159, 'Exmoor pony'])[0])-9)/9)**2) +
-        # ((((list(results.loc[results['Time'] == 159, 'Tamworth pigs'])[0])-16)/16)**2) +
-        # # # May 2018
-        # ((((list(results.loc[results['Time'] == 160, 'Longhorn cattle'])[0])-117)/117)**2) +
-        # ((((list(results.loc[results['Time'] == 160, 'Tamworth pigs'])[0])-23)/23)**2) +
-        # ((((list(results.loc[results['Time'] == 160, 'Exmoor pony'])[0])-9)/9)**2) +
-        # # # June 2018
-        # ((((list(results.loc[results['Time'] == 161, 'Longhorn cattle'])[0])-103)/103)**2) +
-        # ((((list(results.loc[results['Time'] == 161, 'Exmoor pony'])[0])-9)/9)**2) +
-        # ((((list(results.loc[results['Time'] == 161, 'Tamworth pigs'])[0])-23)/23)**2) +
-        # # # July 2019
-        ((((list(results.loc[results['Time'] == 162, 'Exmoor pony'])[0])-9)/9)**2) +
-        # ((((list(results.loc[results['Time'] == 162, 'Longhorn cattle'])[0])-103)/103)**2) +
-        # ((((list(results.loc[results['Time'] == 162, 'Tamworth pigs'])[0])-22)/22)**2) +
-        # # # # Aug 2019
-        # ((((list(results.loc[results['Time'] == 163, 'Longhorn cattle'])[0])-102)/102)**2) +
-        # ((((list(results.loc[results['Time'] == 163, 'Tamworth pigs'])[0])-22)/22)**2) +
-        # # # Sept 2019
-        # ((((list(results.loc[results['Time'] == 164, 'Longhorn cattle'])[0])-106)/106)**2) +
-        # ((((list(results.loc[results['Time'] == 164, 'Tamworth pigs'])[0])-22)/22)**2) +
-        # # # # Oct 2019
-        # ((((list(results.loc[results['Time'] == 165, 'Longhorn cattle'])[0])-101)/101)**2) +
-        # ((((list(results.loc[results['Time'] == 165, 'Tamworth pigs'])[0])-21)/21)**2) +
-        # # # # Nov 2019
-        # ((((list(results.loc[results['Time'] == 166, 'Longhorn cattle'])[0])-93)/93)**2) +
-        # ((((list(results.loc[results['Time'] == 166, 'Tamworth pigs'])[0])-9)/9)**2) +
-        # # # # Dec 2019
-        # ((((list(results.loc[results['Time'] == 167, 'Longhorn cattle'])[0])-89)/89)**2) +
-        # ((((list(results.loc[results['Time'] == 167, 'Tamworth pigs'])[0])-9)/9)**2) +
-        # # # # Jan 2020
-        # ((((list(results.loc[results['Time'] == 168, 'Longhorn cattle'])[0])-89)/89)**2) +
-        # ((((list(results.loc[results['Time'] == 168, 'Tamworth pigs'])[0])-9)/9)**2) +
-        # # # # Feb 2020
-        # ((((list(results.loc[results['Time'] == 169, 'Longhorn cattle'])[0])-87)/87)**2) +
-        # ((((list(results.loc[results['Time'] == 169, 'Tamworth pigs'])[0])-10)/10)**2) +
         # March 2019
-        # ((((list(results.loc[results['Time'] == 170, 'Fallow deer'])[0])-278)/278)**2) +
-        # ((((list(results.loc[results['Time'] == 170, 'Red deer'])[0])-37)/37)**2) +
-        # ((((list(results.loc[results['Time'] == 170, 'Longhorn cattle'])[0])-87)/87)**2) +
-        # ((((list(results.loc[results['Time'] == 170, 'Tamworth pigs'])[0])-9)/9)**2) +
-        # # # # April 2019
-        # ((((list(results.loc[results['Time'] == 171, 'Longhorn cattle'])[0])-101)/101)**2) +
-        # ((((list(results.loc[results['Time'] == 171, 'Tamworth pigs'])[0])-8)/8)**2) +
-        # # # # May 2019
-        # ((((list(results.loc[results['Time'] == 172, 'Longhorn cattle'])[0])-110)/110)**2) +
-        # ((((list(results.loc[results['Time'] == 172, 'Tamworth pigs'])[0])-8)/8)**2) +
-        # # # # June 2019
-        # ((((list(results.loc[results['Time'] == 173, 'Longhorn cattle'])[0])-89)/89)**2) +
-        # ((((list(results.loc[results['Time'] == 173, 'Tamworth pigs'])[0])-8)/8)**2) +
-        # # # # July 2019        
-        # ((((list(results.loc[results['Time'] == 174, 'Tamworth pigs'])[0])-9)/9)**2) +
-        # ((((list(results.loc[results['Time'] == 174, 'Longhorn cattle'])[0])-91)/91)**2) +
-        # # # Aug 2019 
-        # ((((list(results.loc[results['Time'] == 175, 'Longhorn cattle'])[0])-91)/91)**2) +
-        # ((((list(results.loc[results['Time'] == 175, 'Tamworth pigs'])[0])-9)/9)**2) +
-        # # # Sept 2019 
-        # ((((list(results.loc[results['Time'] == 176, 'Longhorn cattle'])[0])-93)/93)**2) +
-        # ((((list(results.loc[results['Time'] == 176, 'Tamworth pigs'])[0])-9)/9)**2) +
-        # # # Oct 2019 
-        # ((((list(results.loc[results['Time'] == 177, 'Longhorn cattle'])[0])-88)/88)**2) +
-        # ((((list(results.loc[results['Time'] == 177, 'Tamworth pigs'])[0])-9)/9)**2) +
-        # # Nov 2019 
-        # ((((list(results.loc[results['Time'] == 178, 'Longhorn cattle'])[0])-87)/87)**2) +
-        # ((((list(results.loc[results['Time'] == 178, 'Tamworth pigs'])[0])-9)/9)**2) +
-        # # # Dec 2019 
-        # ((((list(results.loc[results['Time'] == 179, 'Longhorn cattle'])[0])-80)/80)**2) +
-        # ((((list(results.loc[results['Time'] == 179, 'Tamworth pigs'])[0])-10)/10)**2) +
-        # # # Jan 2020 
-        # ((((list(results.loc[results['Time'] == 180, 'Longhorn cattle'])[0])-80)/80)**2) +
-        # ((((list(results.loc[results['Time'] == 180, 'Tamworth pigs'])[0])-10)/10)**2) +
-        # # # Feb 2020 
-        # ((((list(results.loc[results['Time'] == 181, 'Longhorn cattle'])[0])-79)/79)**2) +
-        # ((((list(results.loc[results['Time'] == 181, 'Tamworth pigs'])[0])-8)/8)**2) +
-        # # March 2021 
-        # ((((list(results.loc[results['Time'] == 182, 'Fallow deer'])[0])-247)/247)**2) +
-        # ((((list(results.loc[results['Time'] == 182, 'Red deer'])[0])-35)/35)**2) +
-        # ((((list(results.loc[results['Time'] == 182, 'Tamworth pigs'])[0])-7)/7)**2) +
-        # ((((list(results.loc[results['Time'] == 182, 'Longhorn cattle'])[0])-81)/81)**2) +
-        # # # April 2021
-        # ((((list(results.loc[results['Time'] == 183, 'Tamworth pigs'])[0])-7)/7)**2) +
-        # ((((list(results.loc[results['Time'] == 183, 'Longhorn cattle'])[0])-81)/81)**2) +
+        ((((list(results.loc[results['Time'] == 169, 'Fallow deer'])[0])-278)/278)**2) +
+        ((((list(results.loc[results['Time'] == 169, 'Red deer'])[0])-37)/37)**2) +
+        # March 2020
+        ((((list(results.loc[results['Time'] == 181, 'Fallow deer'])[0])-247)/247)**2) +
+        ((((list(results.loc[results['Time'] == 181, 'Red deer'])[0])-35)/35)**2) +
+        ((((list(results.loc[results['Time'] == 181, 'Longhorn cattle'])[0])-81)/81)**2) +
+
+        # try adding extra woodland ones
+        ((((list(results.loc[results['Time'] == 100, 'Woodland'])[0])-15.9)/15.9)**2) +
+        ((((list(results.loc[results['Time'] == 155, 'Woodland'])[0])-18.5)/18.5)**2) +
+
+        # May 2020
         ((((list(results.loc[results['Time'] == 183, 'Exmoor pony'])[0])-15)/15)**2) +
-        # May 2021
-        ((((list(results.loc[results['Time'] == 184, 'Exmoor pony'])[0])-15)/15)**2)
-        # ((((list(results.loc[results['Time'] == 184, 'Tamworth pigs'])[0])-19)/19)**2) +
-        # ((((list(results.loc[results['Time'] == 184, 'Longhorn cattle'])[0])-81)/81)**2) +
-        # ((((list(results.loc[results['Time'] == 184, 'Roe deer'])[0])-50)/50)**2) +
-        # ((((list(results.loc[results['Time'] == 184, 'Grassland'])[0])-26.8)/26.8)**2) +
-        # ((((list(results.loc[results['Time'] == 184, 'Thorny Scrub'])[0])-51.8)/51.8)**2) +
-        # ((((list(results.loc[results['Time'] == 184, 'Woodland'])[0])-21.5)/21.5)**2)      
+        ((((list(results.loc[results['Time'] == 183, 'Longhorn cattle'])[0])-81)/81)**2) +
+        ((((list(results.loc[results['Time'] == 183, 'Roe deer'])[0])-50)/50)**2) +
+        ((((list(results.loc[results['Time'] == 183, 'Grassland'])[0])-26.8)/26.8)**2) +
+        ((((list(results.loc[results['Time'] == 183, 'Thorny Scrub'])[0])-51.8)/51.8)**2) +
+        ((((list(results.loc[results['Time'] == 183, 'Woodland'])[0])-21.5)/21.5)**2) +
+        # ((((list(results.loc[results['Time'] == 183, 'Mature Scrub'])[0])-117948)/117948)**2) +
+        # ((((list(results.loc[results['Time'] == 183, 'Trees'])[0])-24477)/24477)**2) +
+        # Tamworth pigs: average pop between 2015-2021 (based monthly data) = 15 
+        ((((statistics.mean(list(results.loc[results['Time'] > 121, 'Tamworth pigs'])))-15)/15)**2)
          )
 
     # only print the last year's result if it's reasonably close to the filters
-    if filtered_result < 10:
+    if filtered_result < 2:
         print("r:", filtered_result)
         with pd.option_context('display.max_columns',None):
-            just_nodes = results[results['Time'] == 184]
+            just_nodes = results[results['Time'] == 183]
             print(just_nodes[["Time", "Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"]])
     else:
         print("n:", int(filtered_result))
@@ -384,58 +175,59 @@ def objectiveFunction(x):
     return filtered_result
    
 
+# assumptions: 
+## herbivores need to eat >5 young scrub/saplings per month if no other food
+## inter-habitat competition and reproduction of saplings/scrbu capped at 10% per month to allow herbivory to have a tangible impact
+## first and last filters for (roe, habitats), last two sets of filters for each introduced species. So each species targeted with 2 filters. Last two were chosen as these were hardest to pass for fallow/red deer
+
+
+# try high herbivory, low competition 1%
 def run_optimizer():
     # Define the bounds
     bds = np.array([
-        [0,0.15],[0,0.15],[0.1,1],[0.001,0.005],[0.0025,0.025],
-        [0,0.1], # mature scrub competition
-        [0,0.1],[0,0.1], # grass
-        [0,0.1],[0,0.1], # saplings
-        [0,0.1],[0,0.1], # young scrub 
-        # roe deer parameters
-        [0.13,0.2],[0.7,1],[0.7,1],[0.5,1],[0,0.5],[0,0.5],
+        [0,1],[0,1],[0,1],[0.0017,0.0033],[0.0024,0.028],
+        [0,1], # mature scrub competition
+        [0,1],[0,1], # grass
+        [0,1],[0,0], # saplings # no neg impact from scrub
+        [0,1],[0,1], # young scrub 
+        # roe parameters
+        [0,0.5],[0,1],[0,0.33],[0,0.33],[0,0.033],[0,0.033],
         # fallow deer parameters
-        [0.28,0.3],[0.5,1],[0.4,1],[0.1,1],[0,0.5],[0,0.5],
-        # red deer parameters
-        [0.3,0.35],[0.4,1],[0.4,1],[0.1,1],[0,0.5],[0,0.5],
+        [0.4,0.6],[0,1],[0,0.33],[0,0.33],[0,0.033],[0,0.033],
+        # red deer
+        [0.4,0.55],[0,1],[0,0.33],[0,0.33],[0,0.033],[0,0.033],
         # exmoor pony parameters
-                    [0.3,1],[0.4,1],[0.1,1],[0,0.5],[0,0.5],
+                [0,1],[0,0.33],[0,0.33],[0,0.033],[0,0.033],
         # cattle parameters
-        [0.18,0.2],[0.25,1],[0.3,1],[0.1,1],[0,0.5],[0,0.5],
+        [0.1,0.5],[0,1],[0,0.33],[0,0.33],[0,0.033],[0,0.033],
         # pig parameters
-        [0.33,0.35],[0.1,1],[0,1],[0,1],[0,0.5],[0,0.5]])
+        [0,0.6],[0,1],[0,0.33],[0,0.33],[0,0.033],[0,0.033],
+        # chance of trees and mature scrub surviving herbivory
+        [0,0],[0,0],
+        # sapling protection parameter
+        [0,1]])
 
-#  [0.10719667 0.03794083 0.99782111 0.00129944 0.03545324 0.36514799
-#  0.54504865 0.61012509 0.82048947 0.27410968 0.7761421  0.11078935
-#  0.12223506 0.48985377 0.52272807 0.75623978 0.203387   0.9963075
-#  0.29123401 0.62614995 0.54106028 0.67277476 0.75364159 0.69184503
-#  0.3397313  0.48804847 0.429809   0.61966094 0.07756558 0.62974428
-#  0.63742293 0.6993552  0.32279283 0.29488305 0.63867909 0.19191731
-#  0.56828674 0.12692419 0.17619645 0.53204822 0.33129289 0.33975284
-#  0.53624514 0.87668461 0.08158304 0.40413896 0.25088916]
 
-#  Objective function:
-#  0.30540294465712925
-
-    # popsize and maxiter are defined at the top of the page
-    algorithm_param = {'max_num_iteration': 1,\
-                    'population_size':1,\
+    # popsize and maxiter are defined at the top of the page, was 10x100
+    algorithm_param = {'max_num_iteration':10,
+                    'population_size':50,\
                     'mutation_probability':0.1,\
                     'elit_ratio': 0.01,\
                     'crossover_probability': 0.5,\
                     'parents_portion': 0.3,\
                     'crossover_type':'uniform',\
-                    'max_iteration_without_improv': None}
+                    'max_iteration_without_improv': 5}
 
 
-    optimization =  ga(function = objectiveFunction, dimension = 47, variable_type = 'real',variable_boundaries= bds, algorithm_parameters = algorithm_param, function_timeout=6000)
+    optimization =  ga(function = objectiveFunction, dimension = 50, variable_type = 'real',variable_boundaries= bds, algorithm_parameters = algorithm_param, function_timeout=6000)
     optimization.run()
-    with open('optim_outputs.txt', 'w') as f:
-        print('Optimization_outputs:', optimization.output_dict, file=f)
-    print(optimization)
+    outputs = list(optimization.output_dict["variable"]) + [(optimization.output_dict["function"])]
+    # return excel with rows = output values and number of filters passed
+    pd.DataFrame(outputs).to_excel('optim_outputs_2.xlsx', header=False, index=False)
     return optimization.output_dict
 
 
+# run_optimizer()
 
 
 def graph_results():
@@ -443,6 +235,63 @@ def graph_results():
 
     # define the parameters
     initial_roe = 12
+
+    # chance_reproduceSapling = 1.41890462e-01
+    # chance_reproduceYoungScrub =8.78682534e-01
+    # chance_regrowGrass =1.33254987e-01
+    # chance_saplingBecomingTree =3.17101191e-03
+    # chance_youngScrubMatures =1.64282982e-02
+    # chance_scrubOutcompetedByTree =8.98345684e-01
+    # chance_grassOutcompetedByTree = 4.00819339e-01
+    # chance_grassOutcompetedByScrub =6.12899477e-01
+    # chance_saplingOutcompetedByTree =6.80437153e-01
+    # chance_saplingOutcompetedByScrub = 6.04113601e-01
+    # chance_youngScrubOutcompetedByScrub = 1.09793240e-01
+    # chance_youngScrubOutcompetedByTree =8.09854704e-02
+
+    # consumer values
+    # roe_deer_reproduce =8.99601286e-02
+    # roe_deer_gain_from_grass =9.44265276e-02
+    # roe_deer_gain_from_trees =3.88935949e-02
+    # roe_deer_gain_from_scrub =9.19111136e-02
+    # roe_deer_gain_from_saplings =2.42724410e-02
+    # roe_deer_gain_from_young_scrub =5.31596432e-03
+
+    # fallow_deer_reproduce = 4.02237131e-01
+    # fallow_deer_gain_from_grass = 2.86919726e-01
+    # fallow_deer_gain_from_trees = 2.48128756e-01
+    # fallow_deer_gain_from_scrub =2.38515317e-01
+    # fallow_deer_gain_from_saplings =6.03986195e-04
+    # fallow_deer_gain_from_young_scrub =7.78437696e-03
+
+    # red_deer_reproduce =5.00095843e-01
+    # red_deer_gain_from_grass =3.76268023e-01
+    # red_deer_gain_from_trees = 8.93990218e-02
+    # red_deer_gain_from_scrub = 1.41866811e-01
+    # red_deer_gain_from_saplings = 9.19660481e-03
+    # red_deer_gain_from_young_scrub = 1.02171367e-02
+    # ponies_gain_from_grass =6.56998558e-01
+    # ponies_gain_from_trees = 2.27118712e-01
+    # ponies_gain_from_scrub = 1.83439919e-01
+    # ponies_gain_from_saplings = 2.61606243e-02
+    # ponies_gain_from_young_scrub =1.10671188e-02
+    # cattle_reproduce =1.86416433e-01
+
+    # cows_gain_from_grass =7.43458785e-01
+    # cows_gain_from_trees = 2.39296104e-01
+    # cows_gain_from_scrub = 2.48340969e-01
+    # cows_gain_from_saplings = 5.30229092e-03
+    # cows_gain_from_young_scrub = 4.62844250e-03
+    # tamworth_pig_reproduce = 3.03275307e-01
+    # tamworth_pig_gain_from_grass = 7.87763605e-02
+    # tamworth_pig_gain_from_trees =5.72342048e-02
+    # tamworth_pig_gain_from_scrub =2.23989118e-01
+    # tamworth_pig_gain_from_saplings = 2.91198731e-02
+    # tamworth_pig_gain_from_young_scrub = 9.82922632e-03
+    # chance_tree_survival =5.83661922e-01
+    # chance_scrub_survival =9.66556332e-01
+
+
     chance_reproduceSapling = output_parameters["variable"][0]
     chance_reproduceYoungScrub = output_parameters["variable"][1]
     chance_regrowGrass =output_parameters["variable"][2]
@@ -455,6 +304,7 @@ def graph_results():
     chance_saplingOutcompetedByScrub = output_parameters["variable"][9]
     chance_youngScrubOutcompetedByScrub = output_parameters["variable"][10]
     chance_youngScrubOutcompetedByTree =output_parameters["variable"][11]
+
     # consumer values
     roe_deer_reproduce =output_parameters["variable"][12]
     roe_deer_gain_from_grass =output_parameters["variable"][13]
@@ -486,11 +336,14 @@ def graph_results():
     cows_gain_from_saplings = output_parameters["variable"][39]
     cows_gain_from_young_scrub = output_parameters["variable"][40]
     tamworth_pig_reproduce = output_parameters["variable"][41]
-    tamworth_pig_gain_from_trees = output_parameters["variable"][42]
-    tamworth_pig_gain_from_scrub = output_parameters["variable"][43]
-    tamworth_pig_gain_from_grass =output_parameters["variable"][44]
+    tamworth_pig_gain_from_grass =output_parameters["variable"][42]
+    tamworth_pig_gain_from_trees = output_parameters["variable"][43]
+    tamworth_pig_gain_from_scrub = output_parameters["variable"][44]
     tamworth_pig_gain_from_saplings =output_parameters["variable"][45]
     tamworth_pig_gain_from_young_scrub = output_parameters["variable"][46]
+    chance_tree_survival = output_parameters["variable"][47]
+    chance_scrub_survival = output_parameters["variable"][48]
+    chance_scrub_saves_saplings = output_parameters["variable"][49]
     # stocking values
     fallowDeer_stocking = 247
     cattle_stocking = 81
@@ -531,7 +384,7 @@ def graph_results():
     introduced_species_stocking_forecast = 0
     final_results_list = []
     run_number = 0
-    number_simulations = 2
+    number_simulations = 3
 
     for _ in range(number_simulations):
         # keep track of the runs 
@@ -550,20 +403,49 @@ def graph_results():
                         reindeer_reproduce, reindeer_gain_from_grass, reindeer_gain_from_trees, reindeer_gain_from_scrub, reindeer_gain_from_saplings, reindeer_gain_from_young_scrub,
                         fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
                         fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, introduced_species_stocking_forecast,
-                        max_time = 184, reintroduction = True, introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
+                        chance_tree_survival,chance_scrub_survival,chance_scrub_saves_saplings,
+                        max_time = 500, reintroduction = True, introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
 
         model.run_model()
 
         # first graph:  does it pass the filters? looking at the number of individual trees, etc.
         results = model.datacollector.get_model_vars_dataframe()
+
+        # print( (
+        # # pre-reintro model
+        # ((((list(results.loc[results['Time'] == 49, 'Roe deer'])[0])-26)/26)**2) +
+        # ((((list(results.loc[results['Time'] == 49, 'Grassland'])[0])-58.4)/58.4)**2) +
+        # ((((list(results.loc[results['Time'] == 49, 'Thorny Scrub'])[0])-12.7)/12.7)**2) +
+        # ((((list(results.loc[results['Time'] == 49, 'Woodland'])[0])-11.4)/11.4)**2) +
+        # # March 2019
+        # ((((list(results.loc[results['Time'] == 169, 'Fallow deer'])[0])-278)/278)**2) +
+        # ((((list(results.loc[results['Time'] == 169, 'Red deer'])[0])-37)/37)**2) +
+        # # March 2020
+        # ((((list(results.loc[results['Time'] == 181, 'Fallow deer'])[0])-247)/247)**2) +
+        # ((((list(results.loc[results['Time'] == 181, 'Red deer'])[0])-35)/35)**2) +
+        # ((((list(results.loc[results['Time'] == 181, 'Longhorn cattle'])[0])-81)/81)**2) +
+        # # May 2020
+        # ((((list(results.loc[results['Time'] == 183, 'Exmoor pony'])[0])-15)/15)**2) +
+        # ((((list(results.loc[results['Time'] == 183, 'Longhorn cattle'])[0])-81)/81)**2) +
+        # ((((list(results.loc[results['Time'] == 183, 'Roe deer'])[0])-50)/50)**2) +
+        # ((((list(results.loc[results['Time'] == 183, 'Grassland'])[0])-26.8)/26.8)**2) +
+        # ((((list(results.loc[results['Time'] == 183, 'Thorny Scrub'])[0])-51.8)/51.8)**2) +
+        # ((((list(results.loc[results['Time'] == 183, 'Woodland'])[0])-21.5)/21.5)**2) +
+        # # Tamworth pigs: average pop between 2015-2021 (based monthly data) = 15 
+        # ((((statistics.mean(list(results.loc[results['Time'] > 121, 'Tamworth pigs'])))-15)/15)**2)
+        #  ))
+
+
         final_results_list.append(results)
 
+
+        
+
     final_results = pd.concat(final_results_list)
-    final_results.to_excel('final_results_DE.xlsx')
 
     # y values - number of trees, scrub, etc. 
     y_values = final_results[["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas"]].values.flatten()
-    species_list = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas"], 185*number_simulations) 
+    species_list = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas"], 501*number_simulations) 
     indices = np.repeat(final_results['Time'], 12)
 
     final_df = pd.DataFrame(
@@ -615,7 +497,7 @@ def graph_results():
     # does it pass the filters - conditions?
     y_values_conditions =  final_results[["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"]].values.flatten()            
     # species list. this should be +1 the number of simulations
-    species_list_conditions = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"], 185*number_simulations) 
+    species_list_conditions = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"], 501*number_simulations) 
     # indices
     indices_conditions = np.repeat(final_results['Time'], 10)
     final_df_condit = pd.DataFrame(
@@ -659,7 +541,7 @@ def graph_results():
     f.axes[0].vlines(x=50,ymin=6,ymax=40, color='r')
     f.axes[6].vlines(x=50,ymin=16.8,ymax=89.9, color='r')
     f.axes[7].vlines(x=50,ymin=5.8,ymax=17, color='r')
-    f.axes[8].vlines(x=50,ymin=4.3,ymax=21, color='r')
+    f.axes[8].vlines(x=50,ymin=4.3,ymax=51.8, color='r')
     f.axes[1].vlines(x=123,ymin=9,ymax=11, color='r')
     f.axes[3].vlines(x=123,ymin=90,ymax=140, color='r')
     f.axes[5].vlines(x=123,ymin=12,ymax=32, color='r')
@@ -897,7 +779,7 @@ def graph_results():
     f.axes[3].vlines(x=184,ymin=56,ymax=106, color='r')
     f.axes[5].vlines(x=184,ymin=9,ymax=29, color='r')
     f.axes[6].vlines(x=184,ymin=16.8,ymax=36.8, color='r')
-    f.axes[7].vlines(x=184,ymin=19,ymax=21.5, color='r')
+    f.axes[7].vlines(x=184,ymin=16.5,ymax=26.5, color='r')
     f.axes[8].vlines(x=184,ymin=41.8,ymax=61.8, color='r')
     # stop the plots from overlapping
     f.fig.suptitle("Optimizer Outputs")
@@ -918,7 +800,7 @@ def graph_results():
     sapling_average.plot.bar(x='Time', stacked=True, color=col_map.colors)
     plt.xticks([25, 50, 75, 100, 125, 150, 175])
     plt.ylabel('Amount Died')
-    plt.title('What kills saplings?')
+    plt.title('Mortality ratio: What kills saplings?')
     plt.box(False)
     plt.tight_layout()
     plt.savefig('what_eats_saplings.png')
@@ -932,7 +814,7 @@ def graph_results():
     youngScrub_average.plot.bar(x='Time', stacked=True, color=col_map.colors)
     plt.xticks([25, 50, 75, 100, 125, 150, 175])
     plt.ylabel('Amount Died')
-    plt.title('What kills young scrub?')
+    plt.title('Mortality ratio: What kills young scrub?')
     plt.box(False)
     plt.tight_layout()
     plt.savefig('what_eats_youngScrub.png')
@@ -946,7 +828,7 @@ def graph_results():
     grass_average.plot.bar(x='Time', stacked=True, color=col_map.colors)
     plt.xticks([25, 50, 75, 100, 125, 150, 175])
     plt.ylabel('Amount Died')
-    plt.title('What kills grass?')
+    plt.title('Mortality ratio: What kills grass?')
     plt.box(False)
     plt.tight_layout()
     plt.savefig('what_eats_grass.png')
@@ -961,7 +843,7 @@ def graph_results():
     plt.xticks([25, 50, 75, 100, 125, 150, 175])
     plt.ylabel('Amount Died')
     plt.box(False)
-    plt.title('What kills scrub?')
+    plt.title('Mortality ratio: What kills scrub?')
     plt.tight_layout()
     plt.savefig('what_eats_scrub.png')
     plt.show()
@@ -975,7 +857,7 @@ def graph_results():
     plt.xticks([25, 50, 75, 100, 125, 150, 175])
     plt.ylabel('Amount Died')
     plt.box(False)
-    plt.title('What kills trees?')
+    plt.title('Mortality ratio: What kills trees?')
     plt.tight_layout()
     plt.savefig('what_eats_trees.png')
     plt.show()
@@ -983,496 +865,496 @@ def graph_results():
 
 
 
-    # forecasting
+#     # forecasting
 
-    final_results_list = []
-    run_number = 0
-    number_simulations = 5
+#     final_results_list = []
+#     run_number = 0
+#     number_simulations = 25
 
-    for _ in range(number_simulations):
-        # keep track of the runs 
-        run_number += 1
-        print(run_number)
+#     for _ in range(number_simulations):
+#         # keep track of the runs 
+#         run_number += 1
+#         print(run_number)
 
-        model = KneppModel(initial_roe, roe_deer_reproduce, roe_deer_gain_from_saplings, roe_deer_gain_from_trees, roe_deer_gain_from_scrub, roe_deer_gain_from_young_scrub, roe_deer_gain_from_grass,
-                    chance_youngScrubMatures, chance_saplingBecomingTree, chance_reproduceSapling,chance_reproduceYoungScrub, chance_regrowGrass, 
-                    chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_scrubOutcompetedByTree, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByTree, chance_youngScrubOutcompetedByScrub, 
-                    ponies_gain_from_saplings, ponies_gain_from_trees, ponies_gain_from_scrub, ponies_gain_from_young_scrub, ponies_gain_from_grass, 
-                    cattle_reproduce, cows_gain_from_grass, cows_gain_from_trees, cows_gain_from_scrub, cows_gain_from_saplings, cows_gain_from_young_scrub, 
-                    fallow_deer_reproduce, fallow_deer_gain_from_saplings, fallow_deer_gain_from_trees, fallow_deer_gain_from_scrub, fallow_deer_gain_from_young_scrub, fallow_deer_gain_from_grass,
-                    red_deer_reproduce, red_deer_gain_from_saplings, red_deer_gain_from_trees, red_deer_gain_from_scrub, red_deer_gain_from_young_scrub, red_deer_gain_from_grass,
-                    tamworth_pig_reproduce, tamworth_pig_gain_from_saplings,tamworth_pig_gain_from_trees,tamworth_pig_gain_from_scrub,tamworth_pig_gain_from_young_scrub,tamworth_pig_gain_from_grass,
-                    european_bison_reproduce, european_bison_gain_from_grass, european_bison_gain_from_trees, european_bison_gain_from_scrub, european_bison_gain_from_saplings, european_bison_gain_from_young_scrub,
-                    european_elk_reproduce, european_elk_gain_from_grass, european_elk_gain_from_trees, european_elk_gain_from_scrub, european_elk_gain_from_saplings, european_elk_gain_from_young_scrub,
-                    reindeer_reproduce, reindeer_gain_from_grass, reindeer_gain_from_trees, reindeer_gain_from_scrub, reindeer_gain_from_saplings, reindeer_gain_from_young_scrub,
-                    fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
-                    fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, introduced_species_stocking_forecast,
-                    max_time = 784, reintroduction = True, introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
+#         model = KneppModel(initial_roe, roe_deer_reproduce, roe_deer_gain_from_saplings, roe_deer_gain_from_trees, roe_deer_gain_from_scrub, roe_deer_gain_from_young_scrub, roe_deer_gain_from_grass,
+#                     chance_youngScrubMatures, chance_saplingBecomingTree, chance_reproduceSapling,chance_reproduceYoungScrub, chance_regrowGrass, 
+#                     chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_scrubOutcompetedByTree, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByTree, chance_youngScrubOutcompetedByScrub, 
+#                     ponies_gain_from_saplings, ponies_gain_from_trees, ponies_gain_from_scrub, ponies_gain_from_young_scrub, ponies_gain_from_grass, 
+#                     cattle_reproduce, cows_gain_from_grass, cows_gain_from_trees, cows_gain_from_scrub, cows_gain_from_saplings, cows_gain_from_young_scrub, 
+#                     fallow_deer_reproduce, fallow_deer_gain_from_saplings, fallow_deer_gain_from_trees, fallow_deer_gain_from_scrub, fallow_deer_gain_from_young_scrub, fallow_deer_gain_from_grass,
+#                     red_deer_reproduce, red_deer_gain_from_saplings, red_deer_gain_from_trees, red_deer_gain_from_scrub, red_deer_gain_from_young_scrub, red_deer_gain_from_grass,
+#                     tamworth_pig_reproduce, tamworth_pig_gain_from_saplings,tamworth_pig_gain_from_trees,tamworth_pig_gain_from_scrub,tamworth_pig_gain_from_young_scrub,tamworth_pig_gain_from_grass,
+#                     european_bison_reproduce, european_bison_gain_from_grass, european_bison_gain_from_trees, european_bison_gain_from_scrub, european_bison_gain_from_saplings, european_bison_gain_from_young_scrub,
+#                     european_elk_reproduce, european_elk_gain_from_grass, european_elk_gain_from_trees, european_elk_gain_from_scrub, european_elk_gain_from_saplings, european_elk_gain_from_young_scrub,
+#                     reindeer_reproduce, reindeer_gain_from_grass, reindeer_gain_from_trees, reindeer_gain_from_scrub, reindeer_gain_from_saplings, reindeer_gain_from_young_scrub,
+#                     fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
+#                     fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, introduced_species_stocking_forecast,
+#                     max_time = 784, reintroduction = True, introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
       
-        model.run_model()
+#         model.run_model()
 
-        results = model.datacollector.get_model_vars_dataframe()
-        results['run_number'] = run_number
-        final_results_list.append(results)
+#         results = model.datacollector.get_model_vars_dataframe()
+#         results['run_number'] = run_number
+#         final_results_list.append(results)
 
-    forecasting = pd.concat(final_results_list)
+#     forecasting = pd.concat(final_results_list)
 
-    palette=['#db5f57', '#57d3db', '#57db5f','#5f57db', '#db57d3']
+#     palette=['#db5f57', '#57d3db', '#57db5f','#5f57db', '#db57d3']
 
-    # graph that
-    final_results = forecasting[["Time", "Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground", "run_number"]]
-    grouping_variable = np.repeat(final_results['run_number'], 10)
-    y_values = final_results.drop(['run_number', 'Time'], axis=1).values.flatten()
-    species_list = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"], 785*number_simulations)
-    indices = np.repeat(final_results['Time'], 10)
+#     # graph that
+#     final_results = forecasting[["Time", "Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground", "run_number"]]
+#     grouping_variable = np.repeat(final_results['run_number'], 10)
+#     y_values = final_results.drop(['run_number', 'Time'], axis=1).values.flatten()
+#     species_list = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"], 785*number_simulations)
+#     indices = np.repeat(final_results['Time'], 10)
 
-    final_df = pd.DataFrame(
-    {'Abundance %': y_values, 'runNumber': grouping_variable, 'Ecosystem Element': species_list, 'Time': indices})
-    # calculate median
-    m = final_df.groupby(['Time', 'Ecosystem Element'])[['Abundance %']].apply(np.median)
-    m.name = 'Median'
-    final_df = final_df.join(m, on=['Time', 'Ecosystem Element'])
-    # calculate quantiles
-    perc1 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance %'].quantile(.95)
-    perc1.name = 'ninetyfivePerc'
-    final_df = final_df.join(perc1, on=['Time', 'Ecosystem Element'])
-    perc2 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance %'].quantile(.05)
-    perc2.name = "fivePerc"
-    final_df = final_df.join(perc2, on=['Time', 'Ecosystem Element'])
+#     final_df = pd.DataFrame(
+#     {'Abundance %': y_values, 'runNumber': grouping_variable, 'Ecosystem Element': species_list, 'Time': indices})
+#     # calculate median
+#     m = final_df.groupby(['Time', 'Ecosystem Element'])[['Abundance %']].apply(np.median)
+#     m.name = 'Median'
+#     final_df = final_df.join(m, on=['Time', 'Ecosystem Element'])
+#     # calculate quantiles
+#     perc1 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance %'].quantile(.95)
+#     perc1.name = 'ninetyfivePerc'
+#     final_df = final_df.join(perc1, on=['Time', 'Ecosystem Element'])
+#     perc2 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance %'].quantile(.05)
+#     perc2.name = "fivePerc"
+#     final_df = final_df.join(perc2, on=['Time', 'Ecosystem Element'])
 
-    final_df = final_df.reset_index(drop=True)
-    final_df.to_csv("forecasting_experiment.csv")
+#     final_df = final_df.reset_index(drop=True)
+#     final_df.to_csv("forecasting_experiment.csv")
 
-    counterfactual_graph = final_df.reset_index(drop=True)
-    f = sns.FacetGrid(final_df, col="Ecosystem Element", palette = palette, col_wrap=4, sharey = False)
-    f.map(sns.lineplot, 'Time', 'Median') 
-    # 0
-    f.map(sns.lineplot, 'Time', 'fivePerc') 
-    # 1
-    f.map(sns.lineplot, 'Time', 'ninetyfivePerc')
-    # 2
-    for ax in f.axes.flat:
-        ax.fill_between(ax.lines[1].get_xdata(),ax.lines[1].get_ydata(), ax.lines[2].get_ydata(), color="#db5f57",alpha =0.2)
-        ax.set_ylabel('Abundance')
-    # add subplot titles
-    axes = f.axes.flatten()
-    # fill between the quantiles
-    axes[0].set_title("Roe deer")
-    axes[1].set_title("Exmoor pony")
-    axes[2].set_title("Fallow deer")
-    axes[3].set_title("Longhorn cattle")
-    axes[4].set_title("Red deer")
-    axes[5].set_title("Tamworth pigs")
-    axes[6].set_title("Grassland")
-    axes[7].set_title("Woodland")
-    axes[8].set_title("Thorny scrub")
-    axes[9].set_title("Bare ground")
+#     counterfactual_graph = final_df.reset_index(drop=True)
+#     f = sns.FacetGrid(final_df, col="Ecosystem Element", palette = palette, col_wrap=4, sharey = False)
+#     f.map(sns.lineplot, 'Time', 'Median') 
+#     # 0
+#     f.map(sns.lineplot, 'Time', 'fivePerc') 
+#     # 1
+#     f.map(sns.lineplot, 'Time', 'ninetyfivePerc')
+#     # 2
+#     for ax in f.axes.flat:
+#         ax.fill_between(ax.lines[1].get_xdata(),ax.lines[1].get_ydata(), ax.lines[2].get_ydata(), color="#db5f57",alpha =0.2)
+#         ax.set_ylabel('Abundance')
+#     # add subplot titles
+#     axes = f.axes.flatten()
+#     # fill between the quantiles
+#     axes[0].set_title("Roe deer")
+#     axes[1].set_title("Exmoor pony")
+#     axes[2].set_title("Fallow deer")
+#     axes[3].set_title("Longhorn cattle")
+#     axes[4].set_title("Red deer")
+#     axes[5].set_title("Tamworth pigs")
+#     axes[6].set_title("Grassland")
+#     axes[7].set_title("Woodland")
+#     axes[8].set_title("Thorny scrub")
+#     axes[9].set_title("Bare ground")
 
-    f.fig.suptitle('Forecasting ten years ahead')
-    plt.tight_layout()
-    plt.savefig('forecasting_experiment_test.png')
-    plt.show()
-
-
-
-
-    # What happens to habitats if there are no herbivores?
-
-    final_results_list = []
-    run_number = 0
-    number_simulations = 10
-    initial_roe = 0
-    for _ in range(number_simulations):
-        # keep track of the runs 
-        run_number += 1
-        print(run_number)
-
-        model = KneppModel(initial_roe, roe_deer_reproduce, roe_deer_gain_from_saplings, roe_deer_gain_from_trees, roe_deer_gain_from_scrub, roe_deer_gain_from_young_scrub, roe_deer_gain_from_grass,
-                    chance_youngScrubMatures, chance_saplingBecomingTree, chance_reproduceSapling,chance_reproduceYoungScrub, chance_regrowGrass, 
-                    chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_scrubOutcompetedByTree, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByTree, chance_youngScrubOutcompetedByScrub, 
-                    ponies_gain_from_saplings, ponies_gain_from_trees, ponies_gain_from_scrub, ponies_gain_from_young_scrub, ponies_gain_from_grass, 
-                    cattle_reproduce, cows_gain_from_grass, cows_gain_from_trees, cows_gain_from_scrub, cows_gain_from_saplings, cows_gain_from_young_scrub, 
-                    fallow_deer_reproduce, fallow_deer_gain_from_saplings, fallow_deer_gain_from_trees, fallow_deer_gain_from_scrub, fallow_deer_gain_from_young_scrub, fallow_deer_gain_from_grass,
-                    red_deer_reproduce, red_deer_gain_from_saplings, red_deer_gain_from_trees, red_deer_gain_from_scrub, red_deer_gain_from_young_scrub, red_deer_gain_from_grass,
-                    tamworth_pig_reproduce, tamworth_pig_gain_from_saplings,tamworth_pig_gain_from_trees,tamworth_pig_gain_from_scrub,tamworth_pig_gain_from_young_scrub,tamworth_pig_gain_from_grass,
-                    european_bison_reproduce, european_bison_gain_from_grass, european_bison_gain_from_trees, european_bison_gain_from_scrub, european_bison_gain_from_saplings, european_bison_gain_from_young_scrub,
-                    european_elk_reproduce, european_elk_gain_from_grass, european_elk_gain_from_trees, european_elk_gain_from_scrub, european_elk_gain_from_saplings, european_elk_gain_from_young_scrub,
-                    reindeer_reproduce, reindeer_gain_from_grass, reindeer_gain_from_trees, reindeer_gain_from_scrub, reindeer_gain_from_saplings, reindeer_gain_from_young_scrub,
-                    fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
-                    fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, introduced_species_stocking_forecast,
-                    max_time = 1200, reintroduction = True, introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
-
-        model.run_model()
-
-        # first graph:  does it pass the filters? looking at the number of individual trees, etc.
-        results = model.datacollector.get_model_vars_dataframe()
-        final_results_list.append(results)
-
-    final_results = pd.concat(final_results_list)
-
-    # y values - number of trees, scrub, etc. 
-    y_values_conditions =  final_results[["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"]].values.flatten()            
-    species_list_conditions = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"], 1201*number_simulations) 
-    indices_conditions = np.repeat(final_results['Time'], 10)
-    final_df = pd.DataFrame(
-    {'Abundance': y_values_conditions, 'Ecosystem Element': species_list_conditions, 'Time': indices_conditions})
-    # calculate median 
-    m = final_df.groupby(['Time', 'Ecosystem Element'])[['Abundance']].apply(np.median)
-    m.name = 'Median'
-    final_df = final_df.join(m, on=['Time', 'Ecosystem Element'])
-    # calculate quantiles
-    perc1 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance'].quantile(.95)
-    perc1.name = 'ninetyfivePerc'
-    final_df = final_df.join(perc1, on=['Time', 'Ecosystem Element'])
-    perc2 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance'].quantile(.05)
-    perc2.name = "fivePerc"
-    final_df = final_df.join(perc2, on=['Time','Ecosystem Element'])
-    final_df = final_df.reset_index(drop=True)
-
-    colors = ["#6788ee"]
-    g = sns.FacetGrid(final_df, col="Ecosystem Element", palette = colors, col_wrap=4, sharey = False)
-    g.map(sns.lineplot, 'Time', 'Median')
-    g.map(sns.lineplot, 'Time', 'fivePerc')
-    g.map(sns.lineplot, 'Time', 'ninetyfivePerc')    # add subplot titles
-    for ax in g.axes.flat:
-        ax.fill_between(ax.lines[1].get_xdata(),ax.lines[1].get_ydata(), ax.lines[2].get_ydata(), color="#6788ee", alpha=0.2)
-        ax.set_ylabel('Abundance')
-    axes = g.axes.flatten()
-    # fill between the quantiles
-    axes = g.axes.flatten()
-    axes[0].set_title("Roe deer")
-    axes[1].set_title("Exmoor pony")
-    axes[2].set_title("Fallow deer")
-    axes[3].set_title("Longhorn cattle")
-    axes[4].set_title("Red deer")
-    axes[5].set_title("Tamworth pigs")
-    axes[6].set_title("Grassland")
-    axes[7].set_title("Woodland")
-    axes[8].set_title("Thorny scrub")
-    axes[9].set_title("Bare ground")
-    # stop the plots from overlapping
-    g.fig.suptitle('Reality check: No herbivores (conditions)')
-    plt.tight_layout()
-    plt.savefig('what_if_no_herbs')
-    plt.show()
-
-    # y values - number of trees, scrub, etc. 
-    y_values = final_results[["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas"]].values.flatten()
-    species_list = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas"], 1201*number_simulations) 
-    indices = np.repeat(final_results['Time'], 12)
-    final_df = pd.DataFrame(
-    {'Abundance': y_values, 'Ecosystem Element': species_list, 'Time': indices})
-    # calculate median 
-    m = final_df.groupby(['Time', 'Ecosystem Element'])[['Abundance']].apply(np.median)
-    m.name = 'Median'
-    final_df = final_df.join(m, on=['Time', 'Ecosystem Element'])
-    # calculate quantiles
-    perc1 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance'].quantile(.95)
-    perc1.name = 'ninetyfivePerc'
-    final_df = final_df.join(perc1, on=['Time', 'Ecosystem Element'])
-    perc2 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance'].quantile(.05)
-    perc2.name = "fivePerc"
-    final_df = final_df.join(perc2, on=['Time','Ecosystem Element'])
-    final_df = final_df.reset_index(drop=True)
-
-    colors = ["#6788ee"]
-    g = sns.FacetGrid(final_df, col="Ecosystem Element", palette = colors, col_wrap=4, sharey = False)
-    g.map(sns.lineplot, 'Time', 'Median')
-    g.map(sns.lineplot, 'Time', 'fivePerc')
-    g.map(sns.lineplot, 'Time', 'ninetyfivePerc')    # add subplot titles
-    for ax in g.axes.flat:
-        ax.fill_between(ax.lines[1].get_xdata(),ax.lines[1].get_ydata(), ax.lines[2].get_ydata(), color="#6788ee", alpha=0.2)
-        ax.set_ylabel('Abundance')
-    axes = g.axes.flatten()
-    # fill between the quantiles
-    axes = g.axes.flatten()
-    axes[0].set_title("Roe deer")
-    axes[1].set_title("Exmoor pony")
-    axes[2].set_title("Fallow deer")
-    axes[3].set_title("Longhorn cattle")
-    axes[4].set_title("Red deer")
-    axes[5].set_title("Tamworth pigs")
-    axes[6].set_title("Grass")
-    axes[7].set_title("Mature Trees")
-    axes[8].set_title("Mature Scrub")
-    axes[9].set_title("Saplings")
-    axes[10].set_title("Young Scrub")
-    axes[11].set_title("Bare Areas")
-    # stop the plots from overlapping
-    g.fig.suptitle('Reality check: No herbivores (habitat elements)')
-    plt.tight_layout()
-    plt.savefig('what_if_no_herbs_numbers_conditions.png')
-    plt.show()
+#     f.fig.suptitle('Forecasting ten years ahead')
+#     plt.tight_layout()
+#     plt.savefig('forecasting_experiment_test.png')
+#     plt.show()
 
 
 
 
+#     # What happens to habitats if there are no herbivores?
 
+#     final_results_list = []
+#     run_number = 0
+#     number_simulations = 25
+#     initial_roe = 0
+#     for _ in range(number_simulations):
+#         # keep track of the runs 
+#         run_number += 1
+#         print(run_number)
 
-    # what if we run it a long time with no reintroductions
-    final_results_list = []
-    run_number = 0
-    number_simulations = 10
-    for _ in range(number_simulations):
-        # keep track of the runs 
-        run_number += 1
-        print(run_number)
-        model = KneppModel(initial_roe, roe_deer_reproduce, roe_deer_gain_from_saplings, roe_deer_gain_from_trees, roe_deer_gain_from_scrub, roe_deer_gain_from_young_scrub, roe_deer_gain_from_grass,
-                    chance_youngScrubMatures, chance_saplingBecomingTree, chance_reproduceSapling,chance_reproduceYoungScrub, chance_regrowGrass, 
-                    chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_scrubOutcompetedByTree, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByTree, chance_youngScrubOutcompetedByScrub, 
-                    ponies_gain_from_saplings, ponies_gain_from_trees, ponies_gain_from_scrub, ponies_gain_from_young_scrub, ponies_gain_from_grass, 
-                    cattle_reproduce, cows_gain_from_grass, cows_gain_from_trees, cows_gain_from_scrub, cows_gain_from_saplings, cows_gain_from_young_scrub, 
-                    fallow_deer_reproduce, fallow_deer_gain_from_saplings, fallow_deer_gain_from_trees, fallow_deer_gain_from_scrub, fallow_deer_gain_from_young_scrub, fallow_deer_gain_from_grass,
-                    red_deer_reproduce, red_deer_gain_from_saplings, red_deer_gain_from_trees, red_deer_gain_from_scrub, red_deer_gain_from_young_scrub, red_deer_gain_from_grass,
-                    tamworth_pig_reproduce, tamworth_pig_gain_from_saplings,tamworth_pig_gain_from_trees,tamworth_pig_gain_from_scrub,tamworth_pig_gain_from_young_scrub,tamworth_pig_gain_from_grass,
-                    european_bison_reproduce, european_bison_gain_from_grass, european_bison_gain_from_trees, european_bison_gain_from_scrub, european_bison_gain_from_saplings, european_bison_gain_from_young_scrub,
-                    european_elk_reproduce, european_elk_gain_from_grass, european_elk_gain_from_trees, european_elk_gain_from_scrub, european_elk_gain_from_saplings, european_elk_gain_from_young_scrub,
-                    reindeer_reproduce, reindeer_gain_from_grass, reindeer_gain_from_trees, reindeer_gain_from_scrub, reindeer_gain_from_saplings, reindeer_gain_from_young_scrub,
-                    fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
-                    fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, introduced_species_stocking_forecast,
-                    max_time = 784, reintroduction = False, introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
+#         model = KneppModel(initial_roe, roe_deer_reproduce, roe_deer_gain_from_saplings, roe_deer_gain_from_trees, roe_deer_gain_from_scrub, roe_deer_gain_from_young_scrub, roe_deer_gain_from_grass,
+#                     chance_youngScrubMatures, chance_saplingBecomingTree, chance_reproduceSapling,chance_reproduceYoungScrub, chance_regrowGrass, 
+#                     chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_scrubOutcompetedByTree, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByTree, chance_youngScrubOutcompetedByScrub, 
+#                     ponies_gain_from_saplings, ponies_gain_from_trees, ponies_gain_from_scrub, ponies_gain_from_young_scrub, ponies_gain_from_grass, 
+#                     cattle_reproduce, cows_gain_from_grass, cows_gain_from_trees, cows_gain_from_scrub, cows_gain_from_saplings, cows_gain_from_young_scrub, 
+#                     fallow_deer_reproduce, fallow_deer_gain_from_saplings, fallow_deer_gain_from_trees, fallow_deer_gain_from_scrub, fallow_deer_gain_from_young_scrub, fallow_deer_gain_from_grass,
+#                     red_deer_reproduce, red_deer_gain_from_saplings, red_deer_gain_from_trees, red_deer_gain_from_scrub, red_deer_gain_from_young_scrub, red_deer_gain_from_grass,
+#                     tamworth_pig_reproduce, tamworth_pig_gain_from_saplings,tamworth_pig_gain_from_trees,tamworth_pig_gain_from_scrub,tamworth_pig_gain_from_young_scrub,tamworth_pig_gain_from_grass,
+#                     european_bison_reproduce, european_bison_gain_from_grass, european_bison_gain_from_trees, european_bison_gain_from_scrub, european_bison_gain_from_saplings, european_bison_gain_from_young_scrub,
+#                     european_elk_reproduce, european_elk_gain_from_grass, european_elk_gain_from_trees, european_elk_gain_from_scrub, european_elk_gain_from_saplings, european_elk_gain_from_young_scrub,
+#                     reindeer_reproduce, reindeer_gain_from_grass, reindeer_gain_from_trees, reindeer_gain_from_scrub, reindeer_gain_from_saplings, reindeer_gain_from_young_scrub,
+#                     fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
+#                     fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, introduced_species_stocking_forecast,
+#                     max_time = 1200, reintroduction = True, introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
 
+#         model.run_model()
 
-        model.run_model()
+#         # first graph:  does it pass the filters? looking at the number of individual trees, etc.
+#         results = model.datacollector.get_model_vars_dataframe()
+#         final_results_list.append(results)
 
-        # first graph:  does it pass the filters? looking at the number of individual trees, etc.
-        results = model.datacollector.get_model_vars_dataframe()
-        final_results_list.append(results)
+#     final_results = pd.concat(final_results_list)
 
-    final_results = pd.concat(final_results_list)
+#     # y values - number of trees, scrub, etc. 
+#     y_values_conditions =  final_results[["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"]].values.flatten()            
+#     species_list_conditions = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"], 1201*number_simulations) 
+#     indices_conditions = np.repeat(final_results['Time'], 10)
+#     final_df = pd.DataFrame(
+#     {'Abundance': y_values_conditions, 'Ecosystem Element': species_list_conditions, 'Time': indices_conditions})
+#     # calculate median 
+#     m = final_df.groupby(['Time', 'Ecosystem Element'])[['Abundance']].apply(np.median)
+#     m.name = 'Median'
+#     final_df = final_df.join(m, on=['Time', 'Ecosystem Element'])
+#     # calculate quantiles
+#     perc1 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance'].quantile(.95)
+#     perc1.name = 'ninetyfivePerc'
+#     final_df = final_df.join(perc1, on=['Time', 'Ecosystem Element'])
+#     perc2 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance'].quantile(.05)
+#     perc2.name = "fivePerc"
+#     final_df = final_df.join(perc2, on=['Time','Ecosystem Element'])
+#     final_df = final_df.reset_index(drop=True)
 
-    # y values - number of trees, scrub, etc. 
-    y_values_conditions =  final_results[["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"]].values.flatten()            
-    species_list_conditions = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"], 785*number_simulations) 
-    indices_conditions = np.repeat(final_results['Time'], 10)
-    final_df = pd.DataFrame(
-    {'Abundance': y_values_conditions, 'Ecosystem Element': species_list_conditions, 'Time': indices_conditions})
-    # calculate median 
-    m = final_df.groupby(['Time', 'Ecosystem Element'])[['Abundance']].apply(np.median)
-    m.name = 'Median'
-    final_df = final_df.join(m, on=['Time', 'Ecosystem Element'])
-    # calculate quantiles
-    perc1 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance'].quantile(.95)
-    perc1.name = 'ninetyfivePerc'
-    final_df = final_df.join(perc1, on=['Time', 'Ecosystem Element'])
-    perc2 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance'].quantile(.05)
-    perc2.name = "fivePerc"
-    final_df = final_df.join(perc2, on=['Time','Ecosystem Element'])
-    final_df = final_df.reset_index(drop=True)
+#     colors = ["#6788ee"]
+#     g = sns.FacetGrid(final_df, col="Ecosystem Element", palette = colors, col_wrap=4, sharey = False)
+#     g.map(sns.lineplot, 'Time', 'Median')
+#     g.map(sns.lineplot, 'Time', 'fivePerc')
+#     g.map(sns.lineplot, 'Time', 'ninetyfivePerc')    # add subplot titles
+#     for ax in g.axes.flat:
+#         ax.fill_between(ax.lines[1].get_xdata(),ax.lines[1].get_ydata(), ax.lines[2].get_ydata(), color="#6788ee", alpha=0.2)
+#         ax.set_ylabel('Abundance')
+#     axes = g.axes.flatten()
+#     # fill between the quantiles
+#     axes = g.axes.flatten()
+#     axes[0].set_title("Roe deer")
+#     axes[1].set_title("Exmoor pony")
+#     axes[2].set_title("Fallow deer")
+#     axes[3].set_title("Longhorn cattle")
+#     axes[4].set_title("Red deer")
+#     axes[5].set_title("Tamworth pigs")
+#     axes[6].set_title("Grassland")
+#     axes[7].set_title("Woodland")
+#     axes[8].set_title("Thorny scrub")
+#     axes[9].set_title("Bare ground")
+#     # stop the plots from overlapping
+#     g.fig.suptitle('Reality check: No herbivores (conditions)')
+#     plt.tight_layout()
+#     plt.savefig('what_if_no_herbs')
+#     plt.show()
 
-    colors = ["#6788ee"]
-    g = sns.FacetGrid(final_df, col="Ecosystem Element", palette = colors, col_wrap=4, sharey = False)
-    g.map(sns.lineplot, 'Time', 'Median')
-    g.map(sns.lineplot, 'Time', 'fivePerc')
-    g.map(sns.lineplot, 'Time', 'ninetyfivePerc')    # add subplot titles
-    for ax in g.axes.flat:
-        ax.fill_between(ax.lines[1].get_xdata(),ax.lines[1].get_ydata(), ax.lines[2].get_ydata(), color="#6788ee", alpha=0.2)
-        ax.set_ylabel('Abundance')
-    axes = g.axes.flatten()
-    # fill between the quantiles
-    axes = g.axes.flatten()
-    axes[0].set_title("Roe deer")
-    axes[1].set_title("Exmoor pony")
-    axes[2].set_title("Fallow deer")
-    axes[3].set_title("Longhorn cattle")
-    axes[4].set_title("Red deer")
-    axes[5].set_title("Tamworth pigs")
-    axes[6].set_title("Grassland")
-    axes[7].set_title("Woodland")
-    axes[8].set_title("Thorny scrub")
-    axes[9].set_title("Bare ground")
-    # stop the plots from overlapping
-    g.fig.suptitle('Reality check: Roe deer only')
-    plt.tight_layout()
-    plt.savefig('what_if_no_reintro.png')
-    plt.show()
+#     # y values - number of trees, scrub, etc. 
+#     y_values = final_results[["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas"]].values.flatten()
+#     species_list = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas"], 1201*number_simulations) 
+#     indices = np.repeat(final_results['Time'], 12)
+#     final_df = pd.DataFrame(
+#     {'Abundance': y_values, 'Ecosystem Element': species_list, 'Time': indices})
+#     # calculate median 
+#     m = final_df.groupby(['Time', 'Ecosystem Element'])[['Abundance']].apply(np.median)
+#     m.name = 'Median'
+#     final_df = final_df.join(m, on=['Time', 'Ecosystem Element'])
+#     # calculate quantiles
+#     perc1 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance'].quantile(.95)
+#     perc1.name = 'ninetyfivePerc'
+#     final_df = final_df.join(perc1, on=['Time', 'Ecosystem Element'])
+#     perc2 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance'].quantile(.05)
+#     perc2.name = "fivePerc"
+#     final_df = final_df.join(perc2, on=['Time','Ecosystem Element'])
+#     final_df = final_df.reset_index(drop=True)
 
-
-    # y values - number of trees, scrub, etc. 
-    y_values = final_results[["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas"]].values.flatten()
-    species_list = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas"], 785*number_simulations) 
-    indices = np.repeat(final_results['Time'], 12)
-    final_df = pd.DataFrame(
-    {'Abundance': y_values, 'Ecosystem Element': species_list, 'Time': indices})
-    # calculate median 
-    m = final_df.groupby(['Time', 'Ecosystem Element'])[['Abundance']].apply(np.median)
-    m.name = 'Median'
-    final_df = final_df.join(m, on=['Time', 'Ecosystem Element'])
-    # calculate quantiles
-    perc1 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance'].quantile(.95)
-    perc1.name = 'ninetyfivePerc'
-    final_df = final_df.join(perc1, on=['Time', 'Ecosystem Element'])
-    perc2 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance'].quantile(.05)
-    perc2.name = "fivePerc"
-    final_df = final_df.join(perc2, on=['Time','Ecosystem Element'])
-    final_df = final_df.reset_index(drop=True)
-
-    colors = ["#6788ee"]
-    g = sns.FacetGrid(final_df, col="Ecosystem Element", palette = colors, col_wrap=4, sharey = False)
-    g.map(sns.lineplot, 'Time', 'Median')
-    g.map(sns.lineplot, 'Time', 'fivePerc')
-    g.map(sns.lineplot, 'Time', 'ninetyfivePerc')    # add subplot titles
-    for ax in g.axes.flat:
-        ax.fill_between(ax.lines[1].get_xdata(),ax.lines[1].get_ydata(), ax.lines[2].get_ydata(), color="#6788ee", alpha=0.2)
-        ax.set_ylabel('Abundance')
-    axes = g.axes.flatten()
-    # fill between the quantiles
-    axes = g.axes.flatten()
-    axes[0].set_title("Roe deer")
-    axes[1].set_title("Exmoor pony")
-    axes[2].set_title("Fallow deer")
-    axes[3].set_title("Longhorn cattle")
-    axes[4].set_title("Red deer")
-    axes[5].set_title("Tamworth pigs")
-    axes[6].set_title("Grass")
-    axes[7].set_title("Mature Trees")
-    axes[8].set_title("Mature Scrub")
-    axes[9].set_title("Saplings")
-    axes[10].set_title("Young Scrub")
-    axes[11].set_title("Bare Areas")
-    # stop the plots from overlapping
-    g.fig.suptitle('Reality check: Roe deer only (habitat elements)')
-    plt.tight_layout()
-    plt.savefig('what_if_no_reintro_numbers.png')
-    plt.show()
+#     colors = ["#6788ee"]
+#     g = sns.FacetGrid(final_df, col="Ecosystem Element", palette = colors, col_wrap=4, sharey = False)
+#     g.map(sns.lineplot, 'Time', 'Median')
+#     g.map(sns.lineplot, 'Time', 'fivePerc')
+#     g.map(sns.lineplot, 'Time', 'ninetyfivePerc')    # add subplot titles
+#     for ax in g.axes.flat:
+#         ax.fill_between(ax.lines[1].get_xdata(),ax.lines[1].get_ydata(), ax.lines[2].get_ydata(), color="#6788ee", alpha=0.2)
+#         ax.set_ylabel('Abundance')
+#     axes = g.axes.flatten()
+#     # fill between the quantiles
+#     axes = g.axes.flatten()
+#     axes[0].set_title("Roe deer")
+#     axes[1].set_title("Exmoor pony")
+#     axes[2].set_title("Fallow deer")
+#     axes[3].set_title("Longhorn cattle")
+#     axes[4].set_title("Red deer")
+#     axes[5].set_title("Tamworth pigs")
+#     axes[6].set_title("Grass")
+#     axes[7].set_title("Mature Trees")
+#     axes[8].set_title("Mature Scrub")
+#     axes[9].set_title("Saplings")
+#     axes[10].set_title("Young Scrub")
+#     axes[11].set_title("Bare Areas")
+#     # stop the plots from overlapping
+#     g.fig.suptitle('Reality check: No herbivores (habitat elements)')
+#     plt.tight_layout()
+#     plt.savefig('what_if_no_herbs_numbers_conditions.png')
+#     plt.show()
 
 
 
 
 
 
-    # Herbivore overload
-    final_results_list = []
-    run_number = 0
-    roeDeer_reproduce = 0.5
-    cows_reproduce = 0.5
-    fallowDeer_reproduce = 0.5
-    redDeer_reproduce = 0.5
-    pigs_reproduce = 0.5
-    for _ in range(number_simulations):
-        # keep track of the runs 
-        run_number += 1
-        print(run_number)
-        model = KneppModel(initial_roe, roe_deer_reproduce, roe_deer_gain_from_saplings, roe_deer_gain_from_trees, roe_deer_gain_from_scrub, roe_deer_gain_from_young_scrub, roe_deer_gain_from_grass,
-                    chance_youngScrubMatures, chance_saplingBecomingTree, chance_reproduceSapling,chance_reproduceYoungScrub, chance_regrowGrass, 
-                    chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_scrubOutcompetedByTree, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByTree, chance_youngScrubOutcompetedByScrub, 
-                    ponies_gain_from_saplings, ponies_gain_from_trees, ponies_gain_from_scrub, ponies_gain_from_young_scrub, ponies_gain_from_grass, 
-                    cattle_reproduce, cows_gain_from_grass, cows_gain_from_trees, cows_gain_from_scrub, cows_gain_from_saplings, cows_gain_from_young_scrub, 
-                    fallow_deer_reproduce, fallow_deer_gain_from_saplings, fallow_deer_gain_from_trees, fallow_deer_gain_from_scrub, fallow_deer_gain_from_young_scrub, fallow_deer_gain_from_grass,
-                    red_deer_reproduce, red_deer_gain_from_saplings, red_deer_gain_from_trees, red_deer_gain_from_scrub, red_deer_gain_from_young_scrub, red_deer_gain_from_grass,
-                    tamworth_pig_reproduce, tamworth_pig_gain_from_saplings,tamworth_pig_gain_from_trees,tamworth_pig_gain_from_scrub,tamworth_pig_gain_from_young_scrub,tamworth_pig_gain_from_grass,
-                    european_bison_reproduce, european_bison_gain_from_grass, european_bison_gain_from_trees, european_bison_gain_from_scrub, european_bison_gain_from_saplings, european_bison_gain_from_young_scrub,
-                    european_elk_reproduce, european_elk_gain_from_grass, european_elk_gain_from_trees, european_elk_gain_from_scrub, european_elk_gain_from_saplings, european_elk_gain_from_young_scrub,
-                    reindeer_reproduce, reindeer_gain_from_grass, reindeer_gain_from_trees, reindeer_gain_from_scrub, reindeer_gain_from_saplings, reindeer_gain_from_young_scrub,
-                    fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
-                    fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, introduced_species_stocking_forecast,
-                    max_time = 184, reintroduction = True, introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
+#     # what if we run it a long time with no reintroductions
+#     final_results_list = []
+#     run_number = 0
+#     number_simulations = 25
+#     for _ in range(number_simulations):
+#         # keep track of the runs 
+#         run_number += 1
+#         print(run_number)
+#         model = KneppModel(initial_roe, roe_deer_reproduce, roe_deer_gain_from_saplings, roe_deer_gain_from_trees, roe_deer_gain_from_scrub, roe_deer_gain_from_young_scrub, roe_deer_gain_from_grass,
+#                     chance_youngScrubMatures, chance_saplingBecomingTree, chance_reproduceSapling,chance_reproduceYoungScrub, chance_regrowGrass, 
+#                     chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_scrubOutcompetedByTree, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByTree, chance_youngScrubOutcompetedByScrub, 
+#                     ponies_gain_from_saplings, ponies_gain_from_trees, ponies_gain_from_scrub, ponies_gain_from_young_scrub, ponies_gain_from_grass, 
+#                     cattle_reproduce, cows_gain_from_grass, cows_gain_from_trees, cows_gain_from_scrub, cows_gain_from_saplings, cows_gain_from_young_scrub, 
+#                     fallow_deer_reproduce, fallow_deer_gain_from_saplings, fallow_deer_gain_from_trees, fallow_deer_gain_from_scrub, fallow_deer_gain_from_young_scrub, fallow_deer_gain_from_grass,
+#                     red_deer_reproduce, red_deer_gain_from_saplings, red_deer_gain_from_trees, red_deer_gain_from_scrub, red_deer_gain_from_young_scrub, red_deer_gain_from_grass,
+#                     tamworth_pig_reproduce, tamworth_pig_gain_from_saplings,tamworth_pig_gain_from_trees,tamworth_pig_gain_from_scrub,tamworth_pig_gain_from_young_scrub,tamworth_pig_gain_from_grass,
+#                     european_bison_reproduce, european_bison_gain_from_grass, european_bison_gain_from_trees, european_bison_gain_from_scrub, european_bison_gain_from_saplings, european_bison_gain_from_young_scrub,
+#                     european_elk_reproduce, european_elk_gain_from_grass, european_elk_gain_from_trees, european_elk_gain_from_scrub, european_elk_gain_from_saplings, european_elk_gain_from_young_scrub,
+#                     reindeer_reproduce, reindeer_gain_from_grass, reindeer_gain_from_trees, reindeer_gain_from_scrub, reindeer_gain_from_saplings, reindeer_gain_from_young_scrub,
+#                     fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
+#                     fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, introduced_species_stocking_forecast,
+#                     max_time = 784, reintroduction = False, introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
 
 
-        model.run_model()
+#         model.run_model()
 
-        # first graph:  does it pass the filters? looking at the number of individual trees, etc.
-        results = model.datacollector.get_model_vars_dataframe()
-        final_results_list.append(results)
+#         # first graph:  does it pass the filters? looking at the number of individual trees, etc.
+#         results = model.datacollector.get_model_vars_dataframe()
+#         final_results_list.append(results)
 
-    final_results = pd.concat(final_results_list)
+#     final_results = pd.concat(final_results_list)
 
-    # y values - number of trees, scrub, etc. 
-    y_values_conditions =  final_results[["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"]].values.flatten()            
-    species_list_conditions = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"], 185*number_simulations) 
-    indices_conditions = np.repeat(final_results['Time'], 10)
-    final_df = pd.DataFrame(
-    {'Abundance': y_values_conditions, 'Ecosystem Element': species_list_conditions, 'Time': indices_conditions})
-    # calculate median 
-    m = final_df.groupby(['Time', 'Ecosystem Element'])[['Abundance']].apply(np.median)
-    m.name = 'Median'
-    final_df = final_df.join(m, on=['Time', 'Ecosystem Element'])
-    # calculate quantiles
-    perc1 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance'].quantile(.95)
-    perc1.name = 'ninetyfivePerc'
-    final_df = final_df.join(perc1, on=['Time', 'Ecosystem Element'])
-    perc2 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance'].quantile(.05)
-    perc2.name = "fivePerc"
-    final_df = final_df.join(perc2, on=['Time','Ecosystem Element'])
-    final_df = final_df.reset_index(drop=True)
+#     # y values - number of trees, scrub, etc. 
+#     y_values_conditions =  final_results[["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"]].values.flatten()            
+#     species_list_conditions = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"], 785*number_simulations) 
+#     indices_conditions = np.repeat(final_results['Time'], 10)
+#     final_df = pd.DataFrame(
+#     {'Abundance': y_values_conditions, 'Ecosystem Element': species_list_conditions, 'Time': indices_conditions})
+#     # calculate median 
+#     m = final_df.groupby(['Time', 'Ecosystem Element'])[['Abundance']].apply(np.median)
+#     m.name = 'Median'
+#     final_df = final_df.join(m, on=['Time', 'Ecosystem Element'])
+#     # calculate quantiles
+#     perc1 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance'].quantile(.95)
+#     perc1.name = 'ninetyfivePerc'
+#     final_df = final_df.join(perc1, on=['Time', 'Ecosystem Element'])
+#     perc2 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance'].quantile(.05)
+#     perc2.name = "fivePerc"
+#     final_df = final_df.join(perc2, on=['Time','Ecosystem Element'])
+#     final_df = final_df.reset_index(drop=True)
 
-    colors = ["#6788ee"]
-    g = sns.FacetGrid(final_df, col="Ecosystem Element", palette = colors, col_wrap=4, sharey = False)
-    g.map(sns.lineplot, 'Time', 'Median')
-    g.map(sns.lineplot, 'Time', 'fivePerc')
-    g.map(sns.lineplot, 'Time', 'ninetyfivePerc')    # add subplot titles
-    for ax in g.axes.flat:
-        ax.fill_between(ax.lines[1].get_xdata(),ax.lines[1].get_ydata(), ax.lines[2].get_ydata(), color="#6788ee", alpha=0.2)
-        ax.set_ylabel('Abundance')
-    axes = g.axes.flatten()
-    # fill between the quantiles
-    axes = g.axes.flatten()
-    axes[0].set_title("Roe deer")
-    axes[1].set_title("Exmoor pony")
-    axes[2].set_title("Fallow deer")
-    axes[3].set_title("Longhorn cattle")
-    axes[4].set_title("Red deer")
-    axes[5].set_title("Tamworth pigs")
-    axes[6].set_title("Grassland")
-    axes[7].set_title("Woodland")
-    axes[8].set_title("Thorny scrub")
-    axes[9].set_title("Bare ground")
-    # stop the plots from overlapping
-    g.fig.suptitle('Reality check: Overloaded herbivores')
-    plt.tight_layout()
-    plt.savefig('what_if_manyHerbs_conditions.png')
-    plt.show()
+#     colors = ["#6788ee"]
+#     g = sns.FacetGrid(final_df, col="Ecosystem Element", palette = colors, col_wrap=4, sharey = False)
+#     g.map(sns.lineplot, 'Time', 'Median')
+#     g.map(sns.lineplot, 'Time', 'fivePerc')
+#     g.map(sns.lineplot, 'Time', 'ninetyfivePerc')    # add subplot titles
+#     for ax in g.axes.flat:
+#         ax.fill_between(ax.lines[1].get_xdata(),ax.lines[1].get_ydata(), ax.lines[2].get_ydata(), color="#6788ee", alpha=0.2)
+#         ax.set_ylabel('Abundance')
+#     axes = g.axes.flatten()
+#     # fill between the quantiles
+#     axes = g.axes.flatten()
+#     axes[0].set_title("Roe deer")
+#     axes[1].set_title("Exmoor pony")
+#     axes[2].set_title("Fallow deer")
+#     axes[3].set_title("Longhorn cattle")
+#     axes[4].set_title("Red deer")
+#     axes[5].set_title("Tamworth pigs")
+#     axes[6].set_title("Grassland")
+#     axes[7].set_title("Woodland")
+#     axes[8].set_title("Thorny scrub")
+#     axes[9].set_title("Bare ground")
+#     # stop the plots from overlapping
+#     g.fig.suptitle('Reality check: Roe deer only')
+#     plt.tight_layout()
+#     plt.savefig('what_if_no_reintro.png')
+#     plt.show()
 
 
-    # y values - number of trees, scrub, etc. 
-    y_values = final_results[["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas"]].values.flatten()
-    species_list = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas"], 185*number_simulations) 
-    indices = np.repeat(final_results['Time'], 12)
-    final_df = pd.DataFrame(
-    {'Abundance': y_values, 'Ecosystem Element': species_list, 'Time': indices})
-    # calculate median 
-    m = final_df.groupby(['Time', 'Ecosystem Element'])[['Abundance']].apply(np.median)
-    m.name = 'Median'
-    final_df = final_df.join(m, on=['Time', 'Ecosystem Element'])
-    # calculate quantiles
-    perc1 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance'].quantile(.95)
-    perc1.name = 'ninetyfivePerc'
-    final_df = final_df.join(perc1, on=['Time', 'Ecosystem Element'])
-    perc2 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance'].quantile(.05)
-    perc2.name = "fivePerc"
-    final_df = final_df.join(perc2, on=['Time','Ecosystem Element'])
-    final_df = final_df.reset_index(drop=True)
+#     # y values - number of trees, scrub, etc. 
+#     y_values = final_results[["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas"]].values.flatten()
+#     species_list = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas"], 785*number_simulations) 
+#     indices = np.repeat(final_results['Time'], 12)
+#     final_df = pd.DataFrame(
+#     {'Abundance': y_values, 'Ecosystem Element': species_list, 'Time': indices})
+#     # calculate median 
+#     m = final_df.groupby(['Time', 'Ecosystem Element'])[['Abundance']].apply(np.median)
+#     m.name = 'Median'
+#     final_df = final_df.join(m, on=['Time', 'Ecosystem Element'])
+#     # calculate quantiles
+#     perc1 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance'].quantile(.95)
+#     perc1.name = 'ninetyfivePerc'
+#     final_df = final_df.join(perc1, on=['Time', 'Ecosystem Element'])
+#     perc2 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance'].quantile(.05)
+#     perc2.name = "fivePerc"
+#     final_df = final_df.join(perc2, on=['Time','Ecosystem Element'])
+#     final_df = final_df.reset_index(drop=True)
 
-    colors = ["#6788ee"]
-    g = sns.FacetGrid(final_df, col="Ecosystem Element", palette = colors, col_wrap=4, sharey = False)
-    g.map(sns.lineplot, 'Time', 'Median')
-    g.map(sns.lineplot, 'Time', 'fivePerc')
-    g.map(sns.lineplot, 'Time', 'ninetyfivePerc')    # add subplot titles
-    for ax in g.axes.flat:
-        ax.fill_between(ax.lines[1].get_xdata(),ax.lines[1].get_ydata(), ax.lines[2].get_ydata(), color="#6788ee", alpha=0.2)
-        ax.set_ylabel('Abundance')
-    axes = g.axes.flatten()
-    # fill between the quantiles
-    axes = g.axes.flatten()
-    axes[0].set_title("Roe deer")
-    axes[1].set_title("Exmoor pony")
-    axes[2].set_title("Fallow deer")
-    axes[3].set_title("Longhorn cattle")
-    axes[4].set_title("Red deer")
-    axes[5].set_title("Tamworth pigs")
-    axes[6].set_title("Grass")
-    axes[7].set_title("Mature Trees")
-    axes[8].set_title("Mature Scrub")
-    axes[9].set_title("Saplings")
-    axes[10].set_title("Young Scrub")
-    axes[11].set_title("Bare Areas")
-    # stop the plots from overlapping
-    g.fig.suptitle('Reality check: Overloaded herbivores (habitat elements)')
-    plt.tight_layout()
-    plt.savefig('what_if_manyHerbs_numbers.png')
-    plt.show()
+#     colors = ["#6788ee"]
+#     g = sns.FacetGrid(final_df, col="Ecosystem Element", palette = colors, col_wrap=4, sharey = False)
+#     g.map(sns.lineplot, 'Time', 'Median')
+#     g.map(sns.lineplot, 'Time', 'fivePerc')
+#     g.map(sns.lineplot, 'Time', 'ninetyfivePerc')    # add subplot titles
+#     for ax in g.axes.flat:
+#         ax.fill_between(ax.lines[1].get_xdata(),ax.lines[1].get_ydata(), ax.lines[2].get_ydata(), color="#6788ee", alpha=0.2)
+#         ax.set_ylabel('Abundance')
+#     axes = g.axes.flatten()
+#     # fill between the quantiles
+#     axes = g.axes.flatten()
+#     axes[0].set_title("Roe deer")
+#     axes[1].set_title("Exmoor pony")
+#     axes[2].set_title("Fallow deer")
+#     axes[3].set_title("Longhorn cattle")
+#     axes[4].set_title("Red deer")
+#     axes[5].set_title("Tamworth pigs")
+#     axes[6].set_title("Grass")
+#     axes[7].set_title("Mature Trees")
+#     axes[8].set_title("Mature Scrub")
+#     axes[9].set_title("Saplings")
+#     axes[10].set_title("Young Scrub")
+#     axes[11].set_title("Bare Areas")
+#     # stop the plots from overlapping
+#     g.fig.suptitle('Reality check: Roe deer only (habitat elements)')
+#     plt.tight_layout()
+#     plt.savefig('what_if_no_reintro_numbers.png')
+#     plt.show()
 
-    return output_parameters
+
+
+
+
+
+#     # Herbivore overload
+#     final_results_list = []
+#     run_number = 0
+#     roeDeer_reproduce = 0.5
+#     cows_reproduce = 0.5
+#     fallowDeer_reproduce = 0.5
+#     redDeer_reproduce = 0.5
+#     pigs_reproduce = 0.5
+#     for _ in range(number_simulations):
+#         # keep track of the runs 
+#         run_number += 1
+#         print(run_number)
+#         model = KneppModel(initial_roe, roe_deer_reproduce, roe_deer_gain_from_saplings, roe_deer_gain_from_trees, roe_deer_gain_from_scrub, roe_deer_gain_from_young_scrub, roe_deer_gain_from_grass,
+#                     chance_youngScrubMatures, chance_saplingBecomingTree, chance_reproduceSapling,chance_reproduceYoungScrub, chance_regrowGrass, 
+#                     chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_scrubOutcompetedByTree, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByTree, chance_youngScrubOutcompetedByScrub, 
+#                     ponies_gain_from_saplings, ponies_gain_from_trees, ponies_gain_from_scrub, ponies_gain_from_young_scrub, ponies_gain_from_grass, 
+#                     cattle_reproduce, cows_gain_from_grass, cows_gain_from_trees, cows_gain_from_scrub, cows_gain_from_saplings, cows_gain_from_young_scrub, 
+#                     fallow_deer_reproduce, fallow_deer_gain_from_saplings, fallow_deer_gain_from_trees, fallow_deer_gain_from_scrub, fallow_deer_gain_from_young_scrub, fallow_deer_gain_from_grass,
+#                     red_deer_reproduce, red_deer_gain_from_saplings, red_deer_gain_from_trees, red_deer_gain_from_scrub, red_deer_gain_from_young_scrub, red_deer_gain_from_grass,
+#                     tamworth_pig_reproduce, tamworth_pig_gain_from_saplings,tamworth_pig_gain_from_trees,tamworth_pig_gain_from_scrub,tamworth_pig_gain_from_young_scrub,tamworth_pig_gain_from_grass,
+#                     european_bison_reproduce, european_bison_gain_from_grass, european_bison_gain_from_trees, european_bison_gain_from_scrub, european_bison_gain_from_saplings, european_bison_gain_from_young_scrub,
+#                     european_elk_reproduce, european_elk_gain_from_grass, european_elk_gain_from_trees, european_elk_gain_from_scrub, european_elk_gain_from_saplings, european_elk_gain_from_young_scrub,
+#                     reindeer_reproduce, reindeer_gain_from_grass, reindeer_gain_from_trees, reindeer_gain_from_scrub, reindeer_gain_from_saplings, reindeer_gain_from_young_scrub,
+#                     fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
+#                     fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, introduced_species_stocking_forecast,
+#                     max_time = 184, reintroduction = True, introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
+
+
+#         model.run_model()
+
+#         # first graph:  does it pass the filters? looking at the number of individual trees, etc.
+#         results = model.datacollector.get_model_vars_dataframe()
+#         final_results_list.append(results)
+
+#     final_results = pd.concat(final_results_list)
+
+#     # y values - number of trees, scrub, etc. 
+#     y_values_conditions =  final_results[["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"]].values.flatten()            
+#     species_list_conditions = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grassland", "Woodland", "Thorny Scrub", "Bare ground"], 185*number_simulations) 
+#     indices_conditions = np.repeat(final_results['Time'], 10)
+#     final_df = pd.DataFrame(
+#     {'Abundance': y_values_conditions, 'Ecosystem Element': species_list_conditions, 'Time': indices_conditions})
+#     # calculate median 
+#     m = final_df.groupby(['Time', 'Ecosystem Element'])[['Abundance']].apply(np.median)
+#     m.name = 'Median'
+#     final_df = final_df.join(m, on=['Time', 'Ecosystem Element'])
+#     # calculate quantiles
+#     perc1 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance'].quantile(.95)
+#     perc1.name = 'ninetyfivePerc'
+#     final_df = final_df.join(perc1, on=['Time', 'Ecosystem Element'])
+#     perc2 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance'].quantile(.05)
+#     perc2.name = "fivePerc"
+#     final_df = final_df.join(perc2, on=['Time','Ecosystem Element'])
+#     final_df = final_df.reset_index(drop=True)
+
+#     colors = ["#6788ee"]
+#     g = sns.FacetGrid(final_df, col="Ecosystem Element", palette = colors, col_wrap=4, sharey = False)
+#     g.map(sns.lineplot, 'Time', 'Median')
+#     g.map(sns.lineplot, 'Time', 'fivePerc')
+#     g.map(sns.lineplot, 'Time', 'ninetyfivePerc')    # add subplot titles
+#     for ax in g.axes.flat:
+#         ax.fill_between(ax.lines[1].get_xdata(),ax.lines[1].get_ydata(), ax.lines[2].get_ydata(), color="#6788ee", alpha=0.2)
+#         ax.set_ylabel('Abundance')
+#     axes = g.axes.flatten()
+#     # fill between the quantiles
+#     axes = g.axes.flatten()
+#     axes[0].set_title("Roe deer")
+#     axes[1].set_title("Exmoor pony")
+#     axes[2].set_title("Fallow deer")
+#     axes[3].set_title("Longhorn cattle")
+#     axes[4].set_title("Red deer")
+#     axes[5].set_title("Tamworth pigs")
+#     axes[6].set_title("Grassland")
+#     axes[7].set_title("Woodland")
+#     axes[8].set_title("Thorny scrub")
+#     axes[9].set_title("Bare ground")
+#     # stop the plots from overlapping
+#     g.fig.suptitle('Reality check: Overloaded herbivores')
+#     plt.tight_layout()
+#     plt.savefig('what_if_manyHerbs_conditions.png')
+#     plt.show()
+
+
+#     # y values - number of trees, scrub, etc. 
+#     y_values = final_results[["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas"]].values.flatten()
+#     species_list = np.tile(["Roe deer", "Exmoor pony", "Fallow deer", "Longhorn cattle", "Red deer", "Tamworth pigs", "Grass", "Trees", "Mature Scrub", "Saplings", "Young Scrub", "Bare Areas"], 185*number_simulations) 
+#     indices = np.repeat(final_results['Time'], 12)
+#     final_df = pd.DataFrame(
+#     {'Abundance': y_values, 'Ecosystem Element': species_list, 'Time': indices})
+#     # calculate median 
+#     m = final_df.groupby(['Time', 'Ecosystem Element'])[['Abundance']].apply(np.median)
+#     m.name = 'Median'
+#     final_df = final_df.join(m, on=['Time', 'Ecosystem Element'])
+#     # calculate quantiles
+#     perc1 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance'].quantile(.95)
+#     perc1.name = 'ninetyfivePerc'
+#     final_df = final_df.join(perc1, on=['Time', 'Ecosystem Element'])
+#     perc2 = final_df.groupby(['Time', 'Ecosystem Element'])['Abundance'].quantile(.05)
+#     perc2.name = "fivePerc"
+#     final_df = final_df.join(perc2, on=['Time','Ecosystem Element'])
+#     final_df = final_df.reset_index(drop=True)
+
+#     colors = ["#6788ee"]
+#     g = sns.FacetGrid(final_df, col="Ecosystem Element", palette = colors, col_wrap=4, sharey = False)
+#     g.map(sns.lineplot, 'Time', 'Median')
+#     g.map(sns.lineplot, 'Time', 'fivePerc')
+#     g.map(sns.lineplot, 'Time', 'ninetyfivePerc')    # add subplot titles
+#     for ax in g.axes.flat:
+#         ax.fill_between(ax.lines[1].get_xdata(),ax.lines[1].get_ydata(), ax.lines[2].get_ydata(), color="#6788ee", alpha=0.2)
+#         ax.set_ylabel('Abundance')
+#     axes = g.axes.flatten()
+#     # fill between the quantiles
+#     axes = g.axes.flatten()
+#     axes[0].set_title("Roe deer")
+#     axes[1].set_title("Exmoor pony")
+#     axes[2].set_title("Fallow deer")
+#     axes[3].set_title("Longhorn cattle")
+#     axes[4].set_title("Red deer")
+#     axes[5].set_title("Tamworth pigs")
+#     axes[6].set_title("Grass")
+#     axes[7].set_title("Mature Trees")
+#     axes[8].set_title("Mature Scrub")
+#     axes[9].set_title("Saplings")
+#     axes[10].set_title("Young Scrub")
+#     axes[11].set_title("Bare Areas")
+#     # stop the plots from overlapping
+#     g.fig.suptitle('Reality check: Overloaded herbivores (habitat elements)')
+#     plt.tight_layout()
+#     plt.savefig('what_if_manyHerbs_numbers.png')
+#     plt.show()
+
+#     return output_parameters
 
 
 
