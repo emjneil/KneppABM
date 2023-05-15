@@ -7,13 +7,16 @@ import uuid
 from agents import FieldAgent, roe_deer_agent, exmoor_pony_agent, longhorn_cattle_agent, fallow_deer_agent, red_deer_agent, tamworth_pig_agent, european_bison_agent, european_elk_agent, reindeer_agent
 from space import FieldSpace
 from schedule import RandomActivationByBreed
+from movements import browser_move, grazer_move, mixed_diet_move, eat_habitats, random_move
 from mesa.datacollection import DataCollector
+from random import randrange
 
 
 class KneppModel(mesa.Model):
+
     def __init__(self, initial_roe, roe_deer_reproduce, roe_deer_gain_from_saplings, roe_deer_gain_from_trees, roe_deer_gain_from_scrub, roe_deer_gain_from_young_scrub, roe_deer_gain_from_grass,
                         chance_youngScrubMatures, chance_saplingBecomingTree, chance_reproduceSapling,chance_reproduceYoungScrub, chance_regrowGrass, 
-                        chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_scrubOutcompetedByTree, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByTree, chance_youngScrubOutcompetedByScrub, 
+                        chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_scrubOutcompetedByTree, 
                         ponies_gain_from_saplings, ponies_gain_from_trees, ponies_gain_from_scrub, ponies_gain_from_young_scrub, ponies_gain_from_grass, 
                         cattle_reproduce, cows_gain_from_grass, cows_gain_from_trees, cows_gain_from_scrub, cows_gain_from_saplings, cows_gain_from_young_scrub, 
                         fallow_deer_reproduce, fallow_deer_gain_from_saplings, fallow_deer_gain_from_trees, fallow_deer_gain_from_scrub, fallow_deer_gain_from_young_scrub, fallow_deer_gain_from_grass,
@@ -24,9 +27,8 @@ class KneppModel(mesa.Model):
                         reindeer_reproduce, reindeer_gain_from_grass, reindeer_gain_from_trees, reindeer_gain_from_scrub, reindeer_gain_from_saplings, reindeer_gain_from_young_scrub,
                         fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
                         fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, introduced_species_stocking_forecast,
-                        chance_tree_survival, chance_scrub_survival,chance_scrub_saves_saplings,
+                        chance_scrub_saves_saplings,
                         max_time, reintroduction, introduce_euroBison, introduce_elk, introduce_reindeer):
- 
 
         # add the schedule and experiments 
         self.schedule = RandomActivationByBreed(self)
@@ -38,6 +40,7 @@ class KneppModel(mesa.Model):
 
         # first define the space and add the field polygon agents
         self.space = FieldSpace()
+
         ac = mg.AgentCreator(agent_class=FieldAgent, model=self, crs="epsg:27700")
         fields = ac.from_file("cleaned_shp.shp", unique_id="id")
         self.fields = fields 
@@ -66,10 +69,6 @@ class KneppModel(mesa.Model):
         self.chance_grassOutcompetedByTree = chance_grassOutcompetedByTree
         self.chance_grassOutcompetedByScrub = chance_grassOutcompetedByScrub
         self.chance_scrubOutcompetedByTree = chance_scrubOutcompetedByTree
-        self.chance_saplingOutcompetedByTree = chance_saplingOutcompetedByTree
-        self.chance_saplingOutcompetedByScrub = chance_saplingOutcompetedByScrub
-        self.chance_youngScrubOutcompetedByTree = chance_youngScrubOutcompetedByTree
-        self.chance_youngScrubOutcompetedByScrub = chance_youngScrubOutcompetedByScrub
         # pony parameters
         self.ponies_gain_from_saplings = ponies_gain_from_saplings
         self.ponies_gain_from_trees = ponies_gain_from_trees
@@ -139,9 +138,8 @@ class KneppModel(mesa.Model):
         self.exmoor_stocking_forecast = exmoor_stocking_forecast
         self.introduced_species_stocking_forecast = introduced_species_stocking_forecast
         # chance of tree and scrub mortality
-        self.chance_tree_survival = chance_tree_survival
-        self.chance_scrub_survival = chance_scrub_survival
         self.chance_scrub_saves_saplings = chance_scrub_saves_saplings
+
 
         # then add the herbivores as points
         for _ in range(initial_roe): # number of roe deer
@@ -153,7 +151,9 @@ class KneppModel(mesa.Model):
                 crs=self.space.crs,
                 geometry=field.random_point(),
                 field_id=field.unique_id,
-                energy = energy
+                energy = energy,
+                move = browser_move, 
+                eat = eat_habitats
                 )
             self.space.add_herbivore_agent(roe, field_id=field.unique_id)
             self.schedule.add(roe)
@@ -186,8 +186,6 @@ class KneppModel(mesa.Model):
             "Bare Areas": lambda m: self.count_habitat_numbers(m, "bare_ground"),
             # what's killing saplings?
             "Saplings grown up": lambda m: self.count_habitats_grew(m, "saplings"),
-            "Saplings Outcompeted by Trees": lambda m: self.count_habitats_outcompeted_trees(m, "saplings"),
-            "Saplings Outcompeted by Scrub": lambda m: self.count_habitats_outcompeted_scrub(m, "saplings"),
             "Saplings eaten by roe deer": lambda m: self.count_eaten(m, roe_deer_agent, "saplings"),
             "Saplings eaten by Exmoor pony": lambda m: self.count_eaten(m, exmoor_pony_agent, "saplings"),
             "Saplings eaten by Fallow deer": lambda m: self.count_eaten(m, fallow_deer_agent, "saplings"),
@@ -196,8 +194,6 @@ class KneppModel(mesa.Model):
             "Saplings eaten by pigs": lambda m: self.count_eaten(m, tamworth_pig_agent, "saplings"),
             # what about young scrub?
             "Young scrub grown up": lambda m: self.count_habitats_grew(m, "youngScrub"),
-            "Young Scrub Outcompeted by Trees": lambda m: self.count_habitats_outcompeted_trees(m, "youngScrub"), 
-            "Young Scrub Outcompeted by Scrub": lambda m: self.count_habitats_outcompeted_scrub(m, "youngScrub"), 
             "Young Scrub eaten by roe deer": lambda m: self.count_eaten(m, roe_deer_agent, "youngScrub"),
             "Young Scrub eaten by Exmoor pony": lambda m: self.count_eaten(m, exmoor_pony_agent, "youngScrub"),
             "Young Scrub eaten by Fallow deer": lambda m: self.count_eaten(m, fallow_deer_agent, "youngScrub"),
@@ -228,6 +224,11 @@ class KneppModel(mesa.Model):
             "Trees eaten by longhorn cattle": lambda m: self.count_eaten(m, longhorn_cattle_agent, "trees"),                   
             "Trees eaten by red deer": lambda m: self.count_eaten(m, red_deer_agent, "trees"),
             "Trees eaten by pigs": lambda m: self.count_eaten(m, tamworth_pig_agent, "trees"),
+            # count how many times woodland switched from scrub
+            "Woodland regenerated in scrub": lambda m: self.count_scrub_facilitation(m, FieldAgent),
+            # count how many times woodland switched from grass/bare ground
+            "Woodland regenerated elsewhere": lambda m: self.count_other_facilitation(m, FieldAgent),
+
             },
             # where are the animals at each timestep
             agent_reporters = {
@@ -235,8 +236,6 @@ class KneppModel(mesa.Model):
             "ID": lambda agent: agent.unique_id,
             "Energy": lambda agent: agent.energy if (agent.__class__.__name__ != "FieldAgent") else None,
             "Geometry": lambda agent: agent.geometry
-            # "X": lambda agent: agent.geometry.exterior.coords.xy[0],
-            # "Y": lambda agent: agent.geometry.exterior.coords.xy[1]
             }
             )
 
@@ -246,6 +245,22 @@ class KneppModel(mesa.Model):
 
 
     ### ------ functions related to data collection ---- ###
+    def count_other_facilitation(self, model, agent):
+        # want to count grass, wood, scrub, bare ground in each patch
+        count_other = 0
+        for key, value in model.schedule.agents_by_breed[FieldAgent].items():
+            count_other += value.other_to_wood
+        # return percentage of entire area (number of grid cells)
+        return count_other
+
+    def count_scrub_facilitation(self, model, agent):
+        # want to count grass, wood, scrub, bare ground in each patch
+        count_scrub = 0
+        for key, value in model.schedule.agents_by_breed[FieldAgent].items():
+            count_scrub += value.scrub_to_wood
+        # return percentage of entire area (number of grid cells)
+        return count_scrub
+
 
     def count_condition(self, model, habitat_condition):
         # want to count grass, wood, scrub, bare ground in each patch
@@ -337,7 +352,7 @@ class KneppModel(mesa.Model):
     def get_month(self):
         return (self.schedule.time % 12) + 1 
 
-    def add_herbivores(self, herbivore, count):
+    def add_herbivores(self, herbivore, count, movement):
         field = random.choice(self.fields)
         for i in range(count):
             to_add = herbivore(
@@ -346,7 +361,9 @@ class KneppModel(mesa.Model):
                 crs=self.space.crs,
                 geometry=field.random_point(),
                 field_id=field.unique_id,
-                energy = np.random.uniform(0, 1)
+                energy = np.random.uniform(0, 1),
+                move = movement, 
+                eat = eat_habitats
             )
             self.space.add_herbivore_agent(to_add, field_id=field.unique_id)
             self.schedule.add(to_add)
@@ -361,7 +378,7 @@ class KneppModel(mesa.Model):
             self.schedule.remove(my_choice)
 
 
-    def add_pig(self, herbivore, count_piglets, count_sow, count_boar):
+    def add_pig(self, herbivore, count_piglets, count_sow, count_boar, movement):
         # pick a field to put it in
         field = random.choice(self.fields)
         # assign energy
@@ -373,7 +390,9 @@ class KneppModel(mesa.Model):
                 geometry=field.random_point(),
                 field_id=field.unique_id,
                 energy = np.random.uniform(0, 1),
-                condition = "piglet"
+                condition = "piglet",
+                move = movement, 
+                eat = eat_habitats
             )
             self.space.add_herbivore_agent(to_add, field_id=field.unique_id)
             self.schedule.add(to_add)
@@ -385,7 +404,9 @@ class KneppModel(mesa.Model):
                 geometry=field.random_point(),
                 field_id=field.unique_id,
                 energy = np.random.uniform(0, 1),
-                condition = "sow"
+                condition = "sow",
+                move = movement, 
+                eat = eat_habitats
             )
             self.space.add_herbivore_agent(to_add, field_id=field.unique_id)
             self.schedule.add(to_add)
@@ -397,7 +418,9 @@ class KneppModel(mesa.Model):
                 geometry=field.random_point(),
                 field_id=field.unique_id,
                 energy = np.random.uniform(0, 1),
-                condition = "boar"
+                condition = "boar",
+                move = movement, 
+                eat = eat_habitats
             )
             self.space.add_herbivore_agent(to_add, field_id=field.unique_id)
             self.schedule.add(to_add)
@@ -432,41 +455,43 @@ class KneppModel(mesa.Model):
     ### ------ time steps ---- ###
 
     def step(self):
+
         self.datacollector.collect(self)
+
         self.schedule.step()
 
         # reintroduce species
         if self.reintroduction == True:
             # March 2009
             if self.schedule.time == 49:
-                self.add_herbivores(exmoor_pony_agent, 23) 
-                self.add_herbivores(longhorn_cattle_agent, 53)
+                self.add_herbivores(exmoor_pony_agent, 23, grazer_move) 
+                self.add_herbivores(longhorn_cattle_agent, 53, grazer_move)
                 number_sows = random.randint(4,8)
                 number_piglets = 20-number_sows
-                self.add_pig(tamworth_pig_agent,number_piglets, number_sows, 0)
+                self.add_pig(tamworth_pig_agent,number_piglets, number_sows, 0, random_move)
             # March 2010
             if self.schedule.time == 61:
                 outputs = self.datacollector.get_model_vars_dataframe()
                 # exmoor ponies
                 if outputs.iloc[61]['Exmoor pony'] < 13:
                     number_to_add = int(13 - outputs.iloc[61]['Exmoor pony'])
-                    self.add_herbivores(exmoor_pony_agent, number_to_add)
+                    self.add_herbivores(exmoor_pony_agent, number_to_add, grazer_move)
                 # longhorn cows
                 if outputs.iloc[61]['Longhorn cattle'] >= 77:
                     number_to_subtract = int(-77 + outputs.iloc[61]['Longhorn cattle'])
                     self.remove_herbivores(longhorn_cattle_agent, number_to_subtract)
                 else:
                     number_to_add = int(77 - outputs.iloc[61]['Longhorn cattle'])
-                    self.add_herbivores(longhorn_cattle_agent, number_to_add)
+                    self.add_herbivores(longhorn_cattle_agent, number_to_add, grazer_move)
                 # add fallow deer
-                self.add_herbivores(fallow_deer_agent, 53)
+                self.add_herbivores(fallow_deer_agent, 53, mixed_diet_move)
                 # tamworth pigs
                 if outputs.iloc[61]['Tamworth pigs'] >= 17:
                     number_to_subtract = int(-17 + outputs.iloc[61]['Tamworth pigs'])
                     self.remove_pig(tamworth_pig_agent, number_to_subtract, 0, 0)
                 else:
                     number_to_add = int(17 - outputs.iloc[61]['Tamworth pigs'])
-                    self.add_pig(tamworth_pig_agent, number_to_add, 0, 0)
+                    self.add_pig(tamworth_pig_agent, number_to_add, 0, 0, random_move)
             # March 2011
             if self.schedule.time == 73:
                 outputs = self.datacollector.get_model_vars_dataframe()
@@ -476,28 +501,28 @@ class KneppModel(mesa.Model):
                     self.remove_herbivores(exmoor_pony_agent, number_to_subtract)
                 else:
                     number_to_add = int(15 - outputs.iloc[73]['Exmoor pony'])
-                    self.add_herbivores(exmoor_pony_agent, number_to_add)
+                    self.add_herbivores(exmoor_pony_agent, number_to_add, grazer_move)
                 # longhorn cattle
                 if outputs.iloc[73]['Longhorn cattle'] >= 92:
                     number_to_subtract = int(-92 + outputs.iloc[73]['Longhorn cattle'])
                     self.remove_herbivores(longhorn_cattle_agent, number_to_subtract)
                 else:
                     number_to_add = int(92 - outputs.iloc[73]['Longhorn cattle'])
-                    self.add_herbivores(longhorn_cattle_agent, number_to_add)
+                    self.add_herbivores(longhorn_cattle_agent, number_to_add, grazer_move)
                 # fallow deer
                 if outputs.iloc[73]['Fallow deer'] >= 81:
                     number_to_subtract = int(-81 + outputs.iloc[73]['Fallow deer'])
                     self.remove_herbivores(fallow_deer_agent, number_to_subtract)
                 else:
                     number_to_add = int(81 - outputs.iloc[73]['Fallow deer'])
-                    self.add_herbivores(fallow_deer_agent, number_to_add)
+                    self.add_herbivores(fallow_deer_agent, number_to_add, mixed_diet_move)
                 # tamworth pigs
                 if outputs.iloc[73]['Tamworth pigs'] >= 22:
                     number_to_subtract = int(-22 + outputs.iloc[73]['Tamworth pigs'])
                     self.remove_pig(tamworth_pig_agent, number_to_subtract, 0, 0)
                 else:
                     number_to_add = int(22 - outputs.iloc[73]['Tamworth pigs'])
-                    self.add_pig(tamworth_pig_agent, number_to_add, 0, 0)
+                    self.add_pig(tamworth_pig_agent, number_to_add, 0, 0, random_move)
             # March 2012
             if self.schedule.time == 85:
                 outputs = self.datacollector.get_model_vars_dataframe()
@@ -506,25 +531,25 @@ class KneppModel(mesa.Model):
                     self.remove_herbivores(exmoor_pony_agent, number_to_subtract)
                 else:
                     number_to_add = int(17 - outputs.iloc[85]['Exmoor pony'])
-                    self.add_herbivores(exmoor_pony_agent, number_to_add)
+                    self.add_herbivores(exmoor_pony_agent, number_to_add, grazer_move)
                 if outputs.iloc[85]['Longhorn cattle'] >= 116:
                     number_to_subtract = int(-116 + outputs.iloc[85]['Longhorn cattle'])
                     self.remove_herbivores(longhorn_cattle_agent, number_to_subtract)
                 else:
                     number_to_add = int(116 - outputs.iloc[85]['Longhorn cattle'])
-                    self.add_herbivores(longhorn_cattle_agent, number_to_add)
+                    self.add_herbivores(longhorn_cattle_agent, number_to_add, grazer_move)
                 if outputs.iloc[85]['Fallow deer'] >= 100:
                     number_to_subtract = int(-100 + outputs.iloc[85]['Fallow deer'])
                     self.remove_herbivores(fallow_deer_agent, number_to_subtract)
                 else:
                     number_to_add = int(100 - outputs.iloc[85]['Fallow deer'])
-                    self.add_herbivores(fallow_deer_agent, number_to_add)
+                    self.add_herbivores(fallow_deer_agent, number_to_add, mixed_diet_move)
                 if outputs.iloc[85]['Tamworth pigs'] >= 33:
                     number_to_subtract = int(-33 + outputs.iloc[85]['Tamworth pigs'])
                     self.remove_pig(tamworth_pig_agent, number_to_subtract, 0, 0)
                 else:
                     number_to_add = int(33 - outputs.iloc[85]['Tamworth pigs'])
-                    self.add_pig(tamworth_pig_agent, number_to_add, 0, 0)
+                    self.add_pig(tamworth_pig_agent, number_to_add, 0, 0, random_move)
 
             # March 2013
             if self.schedule.time == 97:
@@ -535,30 +560,30 @@ class KneppModel(mesa.Model):
                     self.remove_herbivores(exmoor_pony_agent, number_to_subtract)
                 else:
                     number_to_add = int(10 - outputs.iloc[97]['Exmoor pony'])
-                    self.add_herbivores(exmoor_pony_agent, number_to_add)
+                    self.add_herbivores(exmoor_pony_agent, number_to_add, grazer_move)
                 # red deer
-                self.add_herbivores(red_deer_agent, 13)
+                self.add_herbivores(red_deer_agent, 13, mixed_diet_move)
                 # longhorn cattle
                 if outputs.iloc[97]['Longhorn cattle'] >= 129:
                     number_to_subtract = int(-129 + outputs.iloc[97]['Longhorn cattle'])
                     self.remove_herbivores(longhorn_cattle_agent, number_to_subtract)
                 else:
                     number_to_add = int(129 - outputs.iloc[97]['Longhorn cattle'])
-                    self.add_herbivores(longhorn_cattle_agent, number_to_add)
+                    self.add_herbivores(longhorn_cattle_agent, number_to_add, grazer_move)
                 # fallow deer
                 if outputs.iloc[97]['Fallow deer'] >= 100:
                     number_to_subtract = int(-100 + outputs.iloc[97]['Fallow deer'])
                     self.remove_herbivores(fallow_deer_agent, number_to_subtract)
                 else:
                     number_to_add = int(100 - outputs.iloc[97]['Fallow deer'])
-                    self.add_herbivores(fallow_deer_agent, number_to_add)
+                    self.add_herbivores(fallow_deer_agent, number_to_add, mixed_diet_move)
                 # tamworth pigs
                 if outputs.iloc[97]['Tamworth pigs'] >= 6:
                     number_to_subtract = int(-6 + outputs.iloc[97]['Tamworth pigs'])
                     self.remove_pig(tamworth_pig_agent, number_to_subtract, 0, 0)
                 else:
                     number_to_add = int(6 - outputs.iloc[97]['Tamworth pigs'])
-                    self.add_pig(tamworth_pig_agent, number_to_add, 0, 0)
+                    self.add_pig(tamworth_pig_agent, number_to_add, 0, 0, random_move)
             # March 2014
             if self.schedule.time == 109:
                 outputs = self.datacollector.get_model_vars_dataframe()
@@ -567,37 +592,37 @@ class KneppModel(mesa.Model):
                     self.remove_herbivores(exmoor_pony_agent, number_to_subtract)
                 else:
                     number_to_add = int(10 - outputs.iloc[109]['Exmoor pony'])
-                    self.add_herbivores(exmoor_pony_agent, number_to_add)
+                    self.add_herbivores(exmoor_pony_agent, number_to_add, grazer_move)
                 if outputs.iloc[109]['Longhorn cattle'] >= 264:
                     number_to_subtract = int(-264 + outputs.iloc[109]['Longhorn cattle'])
                     self.remove_herbivores(longhorn_cattle_agent, number_to_subtract)
                 else:
                     number_to_add = int(264 - outputs.iloc[109]['Longhorn cattle'])
-                    self.add_herbivores(longhorn_cattle_agent, number_to_add)
+                    self.add_herbivores(longhorn_cattle_agent, number_to_add, grazer_move)
                 if outputs.iloc[109]['Fallow deer'] >= 100:
                     number_to_subtract = int(-100 + outputs.iloc[109]['Fallow deer'])
                     self.remove_herbivores(fallow_deer_agent, number_to_subtract)
                 else:
                     number_to_add = int(100 - outputs.iloc[109]['Fallow deer'])
-                    self.add_herbivores(fallow_deer_agent, number_to_add)
+                    self.add_herbivores(fallow_deer_agent, number_to_add, mixed_diet_move)
                 if outputs.iloc[109]['Tamworth pigs'] >= 18:
                     number_to_subtract = int(-18 + outputs.iloc[109]['Tamworth pigs'])
                     self.remove_pig(tamworth_pig_agent, number_to_subtract, 0, 0)
                 else:
                     number_to_add = int(18 - outputs.iloc[109]['Tamworth pigs'])
-                    self.add_pig(tamworth_pig_agent, number_to_add, 0, 0)
+                    self.add_pig(tamworth_pig_agent, number_to_add, 0, 0, random_move)
                 if outputs.iloc[109]['Red deer'] >= 13:
                     number_to_subtract = int(-13 + outputs.iloc[109]['Red deer'])
                     self.remove_herbivores(red_deer_agent, number_to_subtract)
                 else:
                     number_to_add = int(13 - outputs.iloc[109]['Red deer'])
-                    self.add_herbivores(red_deer_agent, number_to_add)
+                    self.add_herbivores(red_deer_agent, number_to_add, mixed_diet_move)
             
                                     # # # # # # # 2015 # # # # # # #
 
             # Jan 2015 - assumed 1 boar added 
             if self.schedule.time == 119:
-                self.add_pig(tamworth_pig_agent, 0, 0, 1)
+                self.add_pig(tamworth_pig_agent, 0, 0, 1, random_move)
             # Feb 2015 - assumed 1 boar removed, -2 cows
             if self.schedule.time == 120:
                 self.remove_pig(tamworth_pig_agent, 0, 0, 1)
@@ -610,21 +635,21 @@ class KneppModel(mesa.Model):
                     self.remove_herbivores(exmoor_pony_agent, number_to_subtract)
                 else:
                     number_to_add = int(10 - outputs.iloc[121]['Exmoor pony'])
-                    self.add_herbivores(exmoor_pony_agent, number_to_add)
+                    self.add_herbivores(exmoor_pony_agent, number_to_add, grazer_move)
                 # longhorn cattle
                 if outputs.iloc[121]['Longhorn cattle'] >= 107:
                     number_to_subtract = int(-107 + outputs.iloc[121]['Longhorn cattle'])
                     self.remove_herbivores(longhorn_cattle_agent, number_to_subtract)
                 else:
                     number_to_add = int(107 - outputs.iloc[121]['Longhorn cattle'])
-                    self.add_herbivores(longhorn_cattle_agent, number_to_add)
+                    self.add_herbivores(longhorn_cattle_agent, number_to_add, grazer_move)
                 # fallow deer
                 if outputs.iloc[121]['Fallow deer'] >= 100:
                     number_to_subtract = int(-100 + outputs.iloc[121]['Fallow deer'])
                     self.remove_herbivores(fallow_deer_agent, number_to_subtract)
                 else:
                     number_to_add = int(100 - outputs.iloc[121]['Fallow deer'])
-                    self.add_herbivores(fallow_deer_agent, number_to_add)
+                    self.add_herbivores(fallow_deer_agent, number_to_add, mixed_diet_move)
                 # tamworth pigs
                 total_pigs = self.schedule.agents_by_breed[tamworth_pig_agent].items()
                 number_piglets = [i for (k, i) in total_pigs if i.condition == "piglet"]
@@ -634,20 +659,20 @@ class KneppModel(mesa.Model):
                     self.remove_pig(tamworth_pig_agent, number_to_subtract_piglets, 0, 0)
                 else:
                     number_to_add_piglets = 13 - len(number_piglets)
-                    self.add_pig(tamworth_pig_agent, number_to_add_piglets, 0, 0)
+                    self.add_pig(tamworth_pig_agent, number_to_add_piglets, 0, 0, random_move)
                 if len(number_sows) >= 5:
                     number_to_subtract_sows = -5 + len(number_sows)
                     self.remove_pig(tamworth_pig_agent, 0, number_to_subtract_sows, 0)
                 else:
                     number_to_add_sows = 5 - len(number_sows)
-                    self.add_pig(tamworth_pig_agent, 0, number_to_add_sows, 0)
+                    self.add_pig(tamworth_pig_agent, 0, number_to_add_sows, 0, random_move)
                 # red deer
                 if outputs.iloc[121]['Red deer'] >= 13:
                     number_to_subtract = int(-13 + outputs.iloc[121]['Red deer'])
                     self.remove_herbivores(red_deer_agent, number_to_subtract)
                 else:
                     number_to_add = int(13 - outputs.iloc[121]['Red deer'])
-                    self.add_herbivores(red_deer_agent, number_to_add)
+                    self.add_herbivores(red_deer_agent, number_to_add, mixed_diet_move)
             # April 2015
             if self.schedule.time == 122:
                 self.remove_pig(tamworth_pig_agent, 0, 1, 0)
@@ -664,7 +689,7 @@ class KneppModel(mesa.Model):
             # September 2015: 2 male fallow deer culled; 2 cattle culled and 3 bulls added
             if self.schedule.time == 128:
                 self.remove_herbivores(fallow_deer_agent, 2)
-                self.add_herbivores(longhorn_cattle_agent, 1)
+                self.add_herbivores(longhorn_cattle_agent, 1, grazer_move)
             # Oct 2015: 2 female and 1 male fallow deer culled; 38 female cows and 1 bull removed
             if self.schedule.time == 128:
                 self.remove_herbivores(fallow_deer_agent, 3)
@@ -681,7 +706,7 @@ class KneppModel(mesa.Model):
             if self.schedule.time == 131:
                 self.remove_herbivores(fallow_deer_agent, 7) 
                 self.remove_pig(tamworth_pig_agent, 4, 0, 0)
-                self.add_pig(tamworth_pig_agent, 0, 0, 1)
+                self.add_pig(tamworth_pig_agent, 0, 0, 1, random_move)
             # Feb 2016: 10 fallow deer culled; 2 pigs culled
             if self.schedule.time == 132:
                 self.remove_herbivores(fallow_deer_agent, 10)
@@ -692,12 +717,12 @@ class KneppModel(mesa.Model):
 
             # March 2016
             if self.schedule.time == 133:
-                self.add_herbivores(exmoor_pony_agent, 1)
+                self.add_herbivores(exmoor_pony_agent, 1, grazer_move)
                 self.remove_pig(tamworth_pig_agent, 1, 0, 1)
-                self.add_pig(tamworth_pig_agent, 0, 3, 0)
+                self.add_pig(tamworth_pig_agent, 0, 3, 0, random_move)
             # April 2016
             if self.schedule.time == 134:
-                self.add_herbivores(longhorn_cattle_agent, 1)
+                self.add_herbivores(longhorn_cattle_agent, 1, grazer_move)
             # May 2016
             if self.schedule.time == 135:
                 self.remove_herbivores(longhorn_cattle_agent, 2)
@@ -712,7 +737,7 @@ class KneppModel(mesa.Model):
                 self.remove_herbivores(fallow_deer_agent, 5)
             # September & Oct 2016
             if self.schedule.time == 139:
-                self.add_herbivores(longhorn_cattle_agent, 9)
+                self.add_herbivores(longhorn_cattle_agent, 9, grazer_move)
             # November 2016
             if self.schedule.time == 141:
                 self.remove_herbivores(fallow_deer_agent, 3)
@@ -725,7 +750,7 @@ class KneppModel(mesa.Model):
             # January 2017
             if self.schedule.time == 143:
                 self.remove_pig(tamworth_pig_agent, 2, 2, 0)
-                self.add_pig(tamworth_pig_agent, 0, 0, 1)
+                self.add_pig(tamworth_pig_agent, 0, 0, 1, random_move)
             # February 2017
             if self.schedule.time == 144:
                 self.remove_herbivores(fallow_deer_agent, 8)
@@ -743,10 +768,10 @@ class KneppModel(mesa.Model):
                     self.remove_herbivores(red_deer_agent, number_to_subtract)
                 else:
                     number_to_add = int(14 - outputs.iloc[145]['Red deer'])
-                    self.add_herbivores(red_deer_agent, number_to_add)
+                    self.add_herbivores(red_deer_agent, number_to_add, mixed_diet_move)
             # April 2017
             if self.schedule.time == 146:
-                self.add_herbivores(longhorn_cattle_agent, 3)
+                self.add_herbivores(longhorn_cattle_agent, 3, grazer_move)
             # June & July 2017
             if self.schedule.time == 148:
                 self.remove_herbivores(longhorn_cattle_agent, 21)
@@ -772,7 +797,7 @@ class KneppModel(mesa.Model):
             # January 2018
             if self.schedule.time == 155:
                 self.remove_pig(tamworth_pig_agent, 9, 0, 0)
-                self.add_pig(tamworth_pig_agent, 0, 0, 1)
+                self.add_pig(tamworth_pig_agent, 0, 0, 1, random_move)
             # February 2018
             if self.schedule.time == 156:
                 self.remove_herbivores(fallow_deer_agent, 14)
@@ -791,13 +816,13 @@ class KneppModel(mesa.Model):
                     self.remove_herbivores(fallow_deer_agent, number_to_subtract)
                 else:
                     number_to_add = int(251 - output.iloc[157]['Fallow deer'])
-                    self.add_herbivores(fallow_deer_agent, number_to_add)
+                    self.add_herbivores(fallow_deer_agent, number_to_add,mixed_diet_move)
                 self.remove_pig(tamworth_pig_agent, 3, 0, 0)
-                self.add_pig(tamworth_pig_agent, 0, 3, 0)
+                self.add_pig(tamworth_pig_agent, 0, 3, 0, random_move)
 
             # April 2018
             if self.schedule.time == 158:
-                self.add_herbivores(longhorn_cattle_agent, 1)
+                self.add_herbivores(longhorn_cattle_agent, 1, grazer_move)
             # June 2018
             if self.schedule.time == 160:
                 self.remove_herbivores(longhorn_cattle_agent, 18)
@@ -814,7 +839,7 @@ class KneppModel(mesa.Model):
             # September 2018
             if self.schedule.time == 163:
                 self.remove_herbivores(fallow_deer_agent, 19)
-                self.add_herbivores(longhorn_cattle_agent, 4)
+                self.add_herbivores(longhorn_cattle_agent, 4, grazer_move)
             # October 2018
             if self.schedule.time == 164:
                 self.remove_herbivores(longhorn_cattle_agent, 5)
@@ -831,7 +856,7 @@ class KneppModel(mesa.Model):
                 self.remove_herbivores(red_deer_agent, 1)
             # # February 2019
             if self.schedule.time == 168:
-                self.add_pig(tamworth_pig_agent, 0, 0, 1)                                                                                   
+                self.add_pig(tamworth_pig_agent, 0, 0, 1, random_move)                                                                                   
                 self.remove_herbivores(longhorn_cattle_agent, 2)
     
 
@@ -842,7 +867,7 @@ class KneppModel(mesa.Model):
                 self.remove_herbivores(fallow_deer_agent, 7)
                 self.remove_herbivores(red_deer_agent, 7)
                 self.remove_pig(tamworth_pig_agent, 5, 0, 0)                                                                                   
-                self.add_pig(tamworth_pig_agent, 0, 4, 0)  
+                self.add_pig(tamworth_pig_agent, 0, 4, 0, random_move)  
             # April 2019                                                                                
             if self.schedule.time == 170:
                 self.remove_pig(tamworth_pig_agent, 0, 0, 1)
@@ -852,11 +877,11 @@ class KneppModel(mesa.Model):
             # July & Aug 2019
             if self.schedule.time == 173:
                 self.remove_pig(tamworth_pig_agent, 27, 0, 0)
-                self.add_herbivores(longhorn_cattle_agent, 4)
+                self.add_herbivores(longhorn_cattle_agent, 4, grazer_move)
             # Sept 2019
             if self.schedule.time == 175:
                 self.remove_herbivores(fallow_deer_agent, 15)
-                self.add_herbivores(longhorn_cattle_agent, 2)
+                self.add_herbivores(longhorn_cattle_agent, 2, grazer_move)
             # Oct 2019
             if self.schedule.time == 176:
                 self.remove_herbivores(longhorn_cattle_agent, 5)
@@ -870,7 +895,7 @@ class KneppModel(mesa.Model):
                 self.remove_herbivores(fallow_deer_agent, 12)
                 self.remove_herbivores(longhorn_cattle_agent, 7)
                 self.remove_herbivores(red_deer_agent, 4)
-                self.add_pig(tamworth_pig_agent, 0, 0, 1)
+                self.add_pig(tamworth_pig_agent, 0, 0, 1, random_move)
             # January 2020: -24 fallow deer
             if self.schedule.time == 179:
                 self.remove_herbivores(fallow_deer_agent, 24)
@@ -886,8 +911,8 @@ class KneppModel(mesa.Model):
 
             # March & April 2020
             if self.schedule.time == 181:
-                self.add_herbivores(exmoor_pony_agent, 15)
-                self.add_herbivores(longhorn_cattle_agent, 2)
+                self.add_herbivores(exmoor_pony_agent, 15, grazer_move)
+                self.add_herbivores(longhorn_cattle_agent, 2, grazer_move)
                 self.remove_pig(tamworth_pig_agent, 0, 1, 0)
 
 
@@ -902,15 +927,15 @@ class KneppModel(mesa.Model):
                     self.remove_herbivores(exmoor_pony_agent, number_to_subtract)
                 else:
                     number_to_add = self.exmoor_stocking_forecast - int(outputs.iloc[185]['Exmoor pony'])
-                    self.add_herbivores(exmoor_pony_agent, number_to_add)
+                    self.add_herbivores(exmoor_pony_agent, number_to_add, grazer_move)
                     # Longhorn cattle can be culled in July
                     if outputs.iloc[185]['Longhorn cattle'] > self.cattle_stocking_forecast:
                         number_to_subtract = int(random.randint(0,self.cattle_stocking_forecast))
                         self.remove_herbivores(longhorn_cattle_agent, number_to_subtract)
                 if self.introduce_euroBison == True:
-                    self.add_herbivores(european_bison_agent, 50)
+                    self.add_herbivores(european_bison_agent, 50, mixed_diet_move)
                 if self.introduce_elk == True:
-                    self.add_herbivores(european_elk_agent, 50)
+                    self.add_herbivores(european_elk_agent, 50, browser_move)
                 if self.introduce_reindeer == True:
                     self.add_herbivores(reindeer_agent, self.reindeer_stocking_forecast)
             # August 2020
@@ -1003,29 +1028,29 @@ class KneppModel(mesa.Model):
                 # first make sure that exmoor ponies are at their stocking density
                 if results.iloc[-1]['Exmoor pony'] < self.exmoor_stocking_forecast: # shouldn't have to subtract anything since they don't grow
                     number_to_add = int(self.exmoor_stocking_forecast - int(results.iloc[-1]['Exmoor pony']))
-                    self.add_herbivores(exmoor_pony_agent, number_to_add)
+                    self.add_herbivores(exmoor_pony_agent, number_to_add, grazer_move)
                 # reset fallow deer values (they are culled)
                 if results.iloc[-1]['Fallow deer'] > self.fallowDeer_stocking_forecast:
                     number_to_subtract = random.randint(0,self.fallowDeer_stocking_forecast)
                     self.remove_herbivores(fallow_deer_agent, number_to_subtract)
                 else:
                     number_to_add = self.fallowDeer_stocking_forecast - int(results.iloc[-1]['Fallow deer'])
-                    self.add_herbivores(fallow_deer_agent, number_to_add)
+                    self.add_herbivores(fallow_deer_agent, number_to_add,mixed_diet_move)
                 # reset red deer values  (they are culled)
                 if results.iloc[-1]['Red deer'] > self.redDeer_stocking_forecast:
                     number_to_subtract = random.randint(0,self.redDeer_stocking_forecast)
                     self.remove_herbivores(red_deer_agent, number_to_subtract)
                 else:
                     number_to_add = self.redDeer_stocking_forecast - int(results.iloc[-1]['Red deer'])
-                    self.add_herbivores(red_deer_agent, number_to_add)
+                    self.add_herbivores(red_deer_agent, number_to_add, mixed_diet_move)
                 # reset longhorn cattle values (they aren't culled this month)
                 if results.iloc[-1]['Longhorn cattle'] < self.cattle_stocking_forecast:
                     number_to_add = int(self.cattle_stocking_forecast - int(results.iloc[-1]['Longhorn cattle']))
-                    self.add_herbivores(longhorn_cattle_agent, number_to_add)
+                    self.add_herbivores(longhorn_cattle_agent, number_to_add, grazer_move)
                 # reset tamworth pig values (they aren't culled this month)
                 if results.iloc[-1]['Tamworth pigs'] < self.tamworthPig_stocking_forecast:
                     number_to_add = int(self.tamworthPig_stocking_forecast - int(results.iloc[-1]['Tamworth pigs']))
-                    self.add_pig(tamworth_pig_agent, 0,number_to_add,0)
+                    self.add_pig(tamworth_pig_agent, 0,number_to_add,0, random_move)
                 if self.introduce_euroBison == True:
                     if results.iloc[-1]['European bison'] > 50:
                         number_to_remove = int(-50 + int(results.iloc[-1]['European bison']))
@@ -1120,7 +1145,7 @@ class KneppModel(mesa.Model):
                     number_to_subtract = random.randint(0,self.tamworthPig_stocking_forecast)
                     self.remove_pig(tamworth_pig_agent,number_to_subtract,0,0)
                 # add boars
-                self.add_pig(tamworth_pig_agent, 0, 0, 1)
+                self.add_pig(tamworth_pig_agent, 0, 0, 1, random_move)
             # Jan 2022
             if self.schedule.time >= 193 and ((self.schedule.time % 12) + 1) == 11:
                 results = self.datacollector.get_model_vars_dataframe()

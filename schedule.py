@@ -59,6 +59,7 @@ class RandomActivationByBreed(RandomActivation):
         Args:
             breed: Class object of the breed to run.
         """
+
         agent_keys = list(self.agents_by_breed[breed].keys())
         self.model.random.shuffle(agent_keys)
         for agent_key in agent_keys:

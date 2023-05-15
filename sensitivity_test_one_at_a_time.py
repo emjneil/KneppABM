@@ -3,530 +3,703 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from KneppModel_ABM import KneppModel 
+from model import KneppModel 
 import numpy as np
 import pandas as pd
 from scipy.stats import linregress
+import random
 
 
-# # define the parameters
-# chance_reproduceSapling = 0.04206406
-# chance_reproduceYoungScrub =0.1109531
-# chance_regrowGrass = 0.24463218
-# chance_saplingBecomingTree = 0.00289472
-# chance_youngScrubMatures = 0.00601638
-# chance_scrubOutcompetedByTree = 0.03450849
-# chance_grassOutcompetedByTree = 0.28874493
-# chance_grassOutcompetedByScrub = 0.29790348
-# chance_saplingOutcompetedByTree = 0.35425409
-# chance_saplingOutcompetedByScrub =0.25885052
-# chance_youngScrubOutcompetedByScrub = 0.37929889
-# chance_youngScrubOutcompetedByTree = 0.3982258
-# # initial values
-# initial_roeDeer = 0.12
-# initial_grassland = 0.8
-# initial_woodland = 0.14
-# initial_scrubland = 0.01
-# # roe deer
-# roeDeer_reproduce = 0.18215313
-# roeDeer_gain_from_grass = 0.69330732
-# roeDeer_gain_from_Trees = 0.6982617
-# roeDeer_gain_from_Scrub = 0.46792347
-# roeDeer_gain_from_Saplings =0.14360982
-# roeDeer_gain_from_YoungScrub =0.10447744
-# # Fallow deer
-# fallowDeer_reproduce = 0.28586154
-# fallowDeer_gain_from_grass =0.60193723
-# fallowDeer_gain_from_Trees = 0.62907582
-# fallowDeer_gain_from_Scrub = 0.41669232
-# fallowDeer_gain_from_Saplings = 0.13022322
-# fallowDeer_gain_from_YoungScrub = 0.07403832
-# # Red deer
-# redDeer_reproduce = 0.3065381
-# redDeer_gain_from_grass = 0.5464753
-# redDeer_gain_from_Trees = 0.57759807
-# redDeer_gain_from_Scrub = 0.39375145
-# redDeer_gain_from_Saplings = 0.11916663
-# redDeer_gain_from_YoungScrub = 0.06335441
-# # Exmoor ponies
-# ponies_gain_from_grass = 0.46791793
-# ponies_gain_from_Trees = 0.50082365
-# ponies_gain_from_Scrub = 0.34385853
-# ponies_gain_from_Saplings = 0.10451826
-# ponies_gain_from_YoungScrub =0.05673449
-# # Longhorn cattle
-# cows_reproduce = 0.20204395
-# cows_gain_from_grass = 0.44058728
-# cows_gain_from_Trees = 0.45394087
-# cows_gain_from_Scrub = 0.2761602
-# cows_gain_from_Saplings = 0.08643107
-# cows_gain_from_YoungScrub = 0.04245426
-# # Tamworth pigs
-# pigs_reproduce = 0.33496453
-# pigs_gain_from_grass =0.39056552
-# pigs_gain_from_Trees = 0.6909069
-# pigs_gain_from_Scrub = 0.47493354
-# pigs_gain_from_Saplings = 0.07887992
-# pigs_gain_from_YoungScrub = 0.08125611
+def run_sensitivity():
+    # define the parameters
+    best_parameter = pd.read_csv('best_parameter_set.csv')
 
-# # stocking values
-# fallowDeer_stocking = 247
-# cattle_stocking = 81
-# redDeer_stocking = 35
-# tamworthPig_stocking = 7
-# exmoor_stocking = 15
-# # euro bison parameters
-# reproduce_bison = 0
-# # bison should have higher impact than any other consumer
-# bison_gain_from_grass =  0
-# bison_gain_from_Trees =0
-# bison_gain_from_Scrub =0
-# bison_gain_from_Saplings = 0
-# bison_gain_from_YoungScrub = 0  
-# # euro elk parameters
-# reproduce_elk = 0
-# # bison should have higher impact than any other consumer
-# elk_gain_from_grass =  0
-# elk_gain_from_Trees = 0
-# elk_gain_from_Scrub = 0
-# elk_gain_from_Saplings =  0
-# elk_gain_from_YoungScrub =  0
-# # reindeer parameters
-# reproduce_reindeer = 0
-# # reindeer should have impacts between red and fallow deer
-# reindeer_gain_from_grass = 0
-# reindeer_gain_from_Trees =0
-# reindeer_gain_from_Scrub =0
-# reindeer_gain_from_Saplings = 0
-# reindeer_gain_from_YoungScrub = 0
+    chance_reproduceSapling = best_parameter["chance_reproduceSapling"].item()
+    chance_reproduceYoungScrub =  best_parameter["chance_reproduceYoungScrub"].item()
+    chance_regrowGrass =  best_parameter["chance_regrowGrass"].item()
+    chance_saplingBecomingTree =  best_parameter["chance_saplingBecomingTree"].item()
+    chance_youngScrubMatures =  best_parameter["chance_youngScrubMatures"].item()
+    chance_scrubOutcompetedByTree =  best_parameter["chance_scrubOutcompetedByTree"].item()
+    chance_grassOutcompetedByTree =  best_parameter["chance_grassOutcompetedByTree"].item()
+    chance_grassOutcompetedByScrub = best_parameter["chance_grassOutcompetedByScrub"].item()
+
+    initial_roe = 12
+    fallowDeer_stocking = 247
+    cattle_stocking = 81
+    redDeer_stocking = 35
+    tamworthPig_stocking = 7
+    exmoor_stocking = 15
+
+    roe_deer_reproduce = best_parameter["roe_deer_reproduce"].item()
+    roe_deer_gain_from_grass =  best_parameter["roe_deer_gain_from_grass"].item()
+    roe_deer_gain_from_trees =  best_parameter["roe_deer_gain_from_trees"].item()
+    roe_deer_gain_from_scrub =  best_parameter["roe_deer_gain_from_scrub"].item()
+    roe_deer_gain_from_saplings =  best_parameter["roe_deer_gain_from_saplings"].item()
+    roe_deer_gain_from_young_scrub =  best_parameter["roe_deer_gain_from_young_scrub"].item()
+    ponies_gain_from_grass =  best_parameter["ponies_gain_from_grass"].item()
+    ponies_gain_from_trees =  best_parameter["ponies_gain_from_trees"].item()
+    ponies_gain_from_scrub =  best_parameter["ponies_gain_from_scrub"].item()
+    ponies_gain_from_saplings =  best_parameter["ponies_gain_from_saplings"].item()
+    ponies_gain_from_young_scrub =  best_parameter["ponies_gain_from_young_scrub"].item()
+    cattle_reproduce =  best_parameter["cattle_reproduce"].item()
+    cows_gain_from_grass =  best_parameter["cows_gain_from_grass"].item()
+    cows_gain_from_trees =  best_parameter["cows_gain_from_trees"].item()
+    cows_gain_from_scrub =  best_parameter["cows_gain_from_scrub"].item()
+    cows_gain_from_saplings =  best_parameter["cows_gain_from_saplings"].item()
+    cows_gain_from_young_scrub =  best_parameter["cows_gain_from_young_scrub"].item()
+    fallow_deer_reproduce =  best_parameter["fallow_deer_reproduce"].item()
+    fallow_deer_gain_from_grass =  best_parameter["fallow_deer_gain_from_grass"].item()
+    fallow_deer_gain_from_trees =  best_parameter["fallow_deer_gain_from_trees"].item()
+    fallow_deer_gain_from_scrub =  best_parameter["fallow_deer_gain_from_scrub"].item()
+    fallow_deer_gain_from_saplings =  best_parameter["fallow_deer_gain_from_saplings"].item()
+    fallow_deer_gain_from_young_scrub =  best_parameter["fallow_deer_gain_from_young_scrub"].item()  
+    red_deer_reproduce =  best_parameter["red_deer_reproduce"].item()
+    red_deer_gain_from_grass =  best_parameter["red_deer_gain_from_grass"].item()
+    red_deer_gain_from_trees =  best_parameter["red_deer_gain_from_trees"].item()
+    red_deer_gain_from_scrub =  best_parameter["red_deer_gain_from_scrub"].item()
+    red_deer_gain_from_saplings =  best_parameter["red_deer_gain_from_saplings"].item()
+    red_deer_gain_from_young_scrub =  best_parameter["red_deer_gain_from_young_scrub"].item()
+    tamworth_pig_reproduce =  best_parameter["tamworth_pig_reproduce"].item()
+    tamworth_pig_gain_from_grass =  best_parameter["tamworth_pig_gain_from_grass"].item()
+    tamworth_pig_gain_from_trees = best_parameter["tamworth_pig_gain_from_trees"].item()
+    tamworth_pig_gain_from_scrub = best_parameter["tamworth_pig_gain_from_scrub"].item()
+    tamworth_pig_gain_from_saplings =  best_parameter["tamworth_pig_gain_from_saplings"].item()
+    tamworth_pig_gain_from_young_scrub =  best_parameter["tamworth_pig_gain_from_young_scrub"].item()
 
 
-# # keep track of my parameters
-# final_parameters = [
-#     chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures, 
-#     chance_scrubOutcompetedByTree, chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
-#     roeDeer_reproduce, roeDeer_gain_from_grass, roeDeer_gain_from_Trees, roeDeer_gain_from_Scrub, roeDeer_gain_from_Saplings, roeDeer_gain_from_YoungScrub,
-#     ponies_gain_from_grass, ponies_gain_from_Trees, ponies_gain_from_Scrub, ponies_gain_from_Saplings, ponies_gain_from_YoungScrub, 
-#     cows_reproduce, cows_gain_from_grass, cows_gain_from_Trees, cows_gain_from_Scrub, cows_gain_from_Saplings, cows_gain_from_YoungScrub, 
-#     fallowDeer_reproduce, fallowDeer_gain_from_grass, fallowDeer_gain_from_Trees, fallowDeer_gain_from_Scrub, fallowDeer_gain_from_Saplings, fallowDeer_gain_from_YoungScrub, 
-#     redDeer_reproduce, redDeer_gain_from_grass, redDeer_gain_from_Trees, redDeer_gain_from_Scrub, redDeer_gain_from_Saplings, redDeer_gain_from_YoungScrub, 
-#     pigs_reproduce, pigs_gain_from_grass, pigs_gain_from_Trees, pigs_gain_from_Scrub, pigs_gain_from_Saplings, pigs_gain_from_YoungScrub
-#     ]
+    # euro bison parameters
+    european_bison_reproduce = random.uniform(cattle_reproduce-(cattle_reproduce*0.1), cattle_reproduce+(cattle_reproduce*0.1))
+    # bison should have higher impact than any other consumer
+    european_bison_gain_from_grass = random.uniform(cows_gain_from_grass, cows_gain_from_grass+(cows_gain_from_grass*0.1))
+    european_bison_gain_from_trees =random.uniform(cows_gain_from_trees, cows_gain_from_trees+(cows_gain_from_trees*0.1))
+    european_bison_gain_from_scrub =random.uniform(cows_gain_from_scrub, cows_gain_from_scrub+(cows_gain_from_scrub*0.1))
+    european_bison_gain_from_saplings = random.uniform(cows_gain_from_saplings, cows_gain_from_saplings+(cows_gain_from_saplings*0.1))
+    european_bison_gain_from_young_scrub = random.uniform(cows_gain_from_young_scrub, cows_gain_from_young_scrub+(cows_gain_from_young_scrub*0.1))
+    # euro elk parameters
+    european_elk_reproduce = random.uniform(red_deer_reproduce-(red_deer_reproduce*0.1), red_deer_reproduce+(red_deer_reproduce*0.1))
+    # bison should have higher impact than any other consumer
+    european_elk_gain_from_grass =  random.uniform(red_deer_gain_from_grass-(red_deer_gain_from_grass*0.1), red_deer_gain_from_grass)
+    european_elk_gain_from_trees = random.uniform(red_deer_gain_from_trees-(red_deer_gain_from_trees*0.1), red_deer_gain_from_trees)
+    european_elk_gain_from_scrub = random.uniform(red_deer_gain_from_scrub-(red_deer_gain_from_scrub*0.1), red_deer_gain_from_scrub)
+    european_elk_gain_from_saplings =  random.uniform(red_deer_gain_from_saplings-(red_deer_gain_from_saplings*0.1), red_deer_gain_from_saplings)
+    european_elk_gain_from_young_scrub =  random.uniform(red_deer_gain_from_young_scrub-(red_deer_gain_from_young_scrub*0.1), red_deer_gain_from_young_scrub)
 
-# variables = [
-#     # habitat variables
-#     "chance_reproduceSapling", # this is to initialize the initial dominant condition
-#     "chance_reproduceYoungScrub",  # this is to initialize the initial dominant condition
-#     "chance_regrowGrass", # this is to initialize the initial dominant condition
-#     "chance_saplingBecomingTree",
-#     "chance_youngScrubMatures",
-#     "chance_scrubOutcompetedByTree", # if tree matures, chance of scrub decreasing
-#     "chance_grassOutcompetedByTree",
-#     "chance_grassOutcompetedByScrub",
-#     "chance_saplingOutcompetedByTree",
-#     "chance_saplingOutcompetedByScrub",
-#     "chance_youngScrubOutcompetedByScrub",
-#     "chance_youngScrubOutcompetedByTree",
-
-#     # roe deer variables
-#     "roeDeer_reproduce",
-#     "roeDeer_gain_from_grass",
-#     "roeDeer_gain_from_Trees",
-#     "roeDeer_gain_from_Scrub",
-#     "roeDeer_gain_from_Saplings", 
-#     "roeDeer_gain_from_YoungScrub", 
-#     # Exmoor pony variables
-#     "ponies_gain_from_grass", 
-#     "ponies_gain_from_Trees", 
-#     "ponies_gain_from_Scrub", 
-#     "ponies_gain_from_Saplings", 
-#     "ponies_gain_from_YoungScrub", 
-#     # Cow variables
-#     "cows_reproduce", 
-#     "cows_gain_from_grass", 
-#     "cows_gain_from_Trees", 
-#     "cows_gain_from_Scrub", 
-#     "cows_gain_from_Saplings", 
-#     "cows_gain_from_YoungScrub", 
-#     # Fallow deer variables
-#     "fallowDeer_reproduce", 
-#     "fallowDeer_gain_from_grass", 
-#     "fallowDeer_gain_from_Trees", 
-#     "fallowDeer_gain_from_Scrub", 
-#     "fallowDeer_gain_from_Saplings", 
-#     "fallowDeer_gain_from_YoungScrub", 
-#     # Red deer variables
-#     "redDeer_reproduce", 
-#     "redDeer_gain_from_grass", 
-#     "redDeer_gain_from_Trees", 
-#     "redDeer_gain_from_Scrub", 
-#     "redDeer_gain_from_Saplings", 
-#     "redDeer_gain_from_YoungScrub", 
-#     # Pig variables
-#     "pigs_reproduce", 
-#     "pigs_gain_from_grass", 
-#     "pigs_gain_from_Trees", 
-#     "pigs_gain_from_Scrub",
-#     "pigs_gain_from_Saplings", 
-#     "pigs_gain_from_YoungScrub"
-#     ]
+    # reindeer parameters
+    reindeer_reproduce = 0
+    # reindeer should have impacts between red and fallow deer
+    reindeer_gain_from_grass = 0
+    reindeer_gain_from_trees =0
+    reindeer_gain_from_scrub =0
+    reindeer_gain_from_saplings = 0
+    reindeer_gain_from_young_scrub = 0
+    # forecasting parameters
+    fallowDeer_stocking_forecast = 247
+    cattle_stocking_forecast = 81
+    redDeer_stocking_forecast = 35
+    tamworthPig_stocking_forecast = 7
+    exmoor_stocking_forecast = 15
+    introduced_species_stocking_forecast = 0
+    chance_scrub_saves_saplings = best_parameter["chance_scrub_saves_saplings"].item()
 
 
-# # check out the parameters used
-# final_parameters = pd.DataFrame(data=[final_parameters], columns=variables)
+    final_parameters = [
+                chance_youngScrubMatures, chance_saplingBecomingTree, chance_reproduceSapling,chance_reproduceYoungScrub, chance_regrowGrass, 
+                chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_scrubOutcompetedByTree,  
+                roe_deer_reproduce, roe_deer_gain_from_saplings, roe_deer_gain_from_trees, roe_deer_gain_from_scrub, roe_deer_gain_from_young_scrub, roe_deer_gain_from_grass,
+                ponies_gain_from_saplings, ponies_gain_from_trees, ponies_gain_from_scrub, ponies_gain_from_young_scrub, ponies_gain_from_grass, 
+                cattle_reproduce, cows_gain_from_grass, cows_gain_from_trees, cows_gain_from_scrub, cows_gain_from_saplings, cows_gain_from_young_scrub, 
+                fallow_deer_reproduce, fallow_deer_gain_from_saplings, fallow_deer_gain_from_trees, fallow_deer_gain_from_scrub, fallow_deer_gain_from_young_scrub, fallow_deer_gain_from_grass,
+                red_deer_reproduce, red_deer_gain_from_saplings, red_deer_gain_from_trees, red_deer_gain_from_scrub, red_deer_gain_from_young_scrub, red_deer_gain_from_grass,
+                tamworth_pig_reproduce, tamworth_pig_gain_from_saplings,tamworth_pig_gain_from_trees,tamworth_pig_gain_from_scrub,tamworth_pig_gain_from_young_scrub,tamworth_pig_gain_from_grass,
+                chance_scrub_saves_saplings]
 
-# # SENSITIVITY TEST
-# sensitivity_results_list = []
-# sensitivity_parameters = []
-# run_number  = 0
-# # choose my percent above/below number
-# perc_aboveBelow = [-0.1, -0.05,-0.01, 0, 0.01, 0.05, 0.1]
-# final_parameters = final_parameters.iloc[0,0:47]
-# # loop through each one, changing one cell at a time
-# for index, row in final_parameters.iteritems():
-#     for perc_number in perc_aboveBelow:
-#         final_parameters_temp = final_parameters
-#         run_number += 1
-#         ifor_val = row + (row*perc_number)
-#         final_parameters_temp.at[index] = ifor_val
-#         print(run_number)
-#         # choose my parameters 
-#         chance_reproduceSapling = final_parameters_temp.values[0]
-#         chance_reproduceYoungScrub = final_parameters_temp.values[1]
-#         chance_regrowGrass = final_parameters_temp.values[2]
-#         chance_saplingBecomingTree = final_parameters_temp.values[3]
-#         chance_youngScrubMatures = final_parameters_temp.values[4]
-#         chance_scrubOutcompetedByTree = final_parameters_temp.values[5]
-#         chance_grassOutcompetedByTree = final_parameters_temp.values[6]
-#         chance_grassOutcompetedByScrub = final_parameters_temp.values[7]
-#         chance_saplingOutcompetedByTree = final_parameters_temp.values[8]
-#         chance_saplingOutcompetedByScrub = final_parameters_temp.values[9]
-#         chance_youngScrubOutcompetedByScrub = final_parameters_temp.values[10]
-#         chance_youngScrubOutcompetedByTree = final_parameters_temp.values[11]
-#         initial_roeDeer = 0.12
-#         initial_grassland = 0.8
-#         initial_woodland = 0.14
-#         initial_scrubland = 0.01
-#         roeDeer_reproduce = final_parameters_temp.values[12]
-#         roeDeer_gain_from_grass = final_parameters_temp.values[13]
-#         roeDeer_gain_from_Trees = final_parameters_temp.values[14]
-#         roeDeer_gain_from_Scrub = final_parameters_temp.values[15]
-#         roeDeer_gain_from_Saplings = final_parameters_temp.values[16]
-#         roeDeer_gain_from_YoungScrub = final_parameters_temp.values[17]
-#         ponies_gain_from_grass = final_parameters_temp.values[18]
-#         ponies_gain_from_Trees = final_parameters_temp.values[19]
-#         ponies_gain_from_Scrub = final_parameters_temp.values[20]
-#         ponies_gain_from_Saplings = final_parameters_temp.values[21]
-#         ponies_gain_from_YoungScrub = final_parameters_temp.values[22]
-#         cows_reproduce = final_parameters_temp.values[23]
-#         cows_gain_from_grass = final_parameters_temp.values[24]
-#         cows_gain_from_Trees = final_parameters_temp.values[25]
-#         cows_gain_from_Scrub = final_parameters_temp.values[26]
-#         cows_gain_from_Saplings = final_parameters_temp.values[27]
-#         cows_gain_from_YoungScrub = final_parameters_temp.values[28]
-#         fallowDeer_reproduce = final_parameters_temp.values[29]
-#         fallowDeer_gain_from_grass = final_parameters_temp.values[30]
-#         fallowDeer_gain_from_Trees = final_parameters_temp.values[31]
-#         fallowDeer_gain_from_Scrub = final_parameters_temp.values[32]
-#         fallowDeer_gain_from_Saplings = final_parameters_temp.values[33]
-#         fallowDeer_gain_from_YoungScrub = final_parameters_temp.values[34]
-#         redDeer_reproduce = final_parameters_temp.values[35]
-#         redDeer_gain_from_grass = final_parameters_temp.values[36]
-#         redDeer_gain_from_Trees = final_parameters_temp.values[37]
-#         redDeer_gain_from_Scrub = final_parameters_temp.values[38]
-#         redDeer_gain_from_Saplings = final_parameters_temp.values[39]
-#         redDeer_gain_from_YoungScrub = final_parameters_temp.values[40]
-#         pigs_reproduce = final_parameters_temp.values[41]
-#         pigs_gain_from_grass = final_parameters_temp.values[42]
-#         pigs_gain_from_Trees = final_parameters_temp.values[43]
-#         pigs_gain_from_Scrub = final_parameters_temp.values[44]
-#         pigs_gain_from_Saplings = final_parameters_temp.values[45]
-#         pigs_gain_from_YoungScrub = final_parameters_temp.values[46]
-#         # # stocking values
-#         fallowDeer_stocking = 247
-#         cattle_stocking = 81
-#         redDeer_stocking = 35
-#         tamworthPig_stocking = 7
-#         exmoor_stocking = 15
-#         # # euro bison parameters
-#         reproduce_bison = 0
-#         # bison should have higher impact than any other consumer
-#         bison_gain_from_grass =  0
-#         bison_gain_from_Trees =0
-#         bison_gain_from_Scrub =0
-#         bison_gain_from_Saplings = 0
-#         bison_gain_from_YoungScrub = 0  
-#         # euro elk parameters
-#         reproduce_elk = 0
-#         # bison should have higher impact than any other consumer
-#         elk_gain_from_grass =  0
-#         elk_gain_from_Trees = 0
-#         elk_gain_from_Scrub = 0
-#         elk_gain_from_Saplings =  0
-#         elk_gain_from_YoungScrub =  0
-#         # reindeer parameters
-#         reproduce_reindeer = 0
-#         # reindeer should have impacts between red and fallow deer
-#         reindeer_gain_from_grass = 0
-#         reindeer_gain_from_Trees =0
-#         reindeer_gain_from_Scrub =0
-#         reindeer_gain_from_Saplings = 0
-#         reindeer_gain_from_YoungScrub = 0
-#         # run model
-#         model = KneppModel(
-#             chance_reproduceSapling, chance_reproduceYoungScrub, chance_regrowGrass, chance_saplingBecomingTree, chance_youngScrubMatures,
-#             chance_scrubOutcompetedByTree, chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByScrub, chance_youngScrubOutcompetedByTree,
-#             initial_roeDeer, initial_grassland, initial_woodland, initial_scrubland,
-#             roeDeer_reproduce, roeDeer_gain_from_grass, roeDeer_gain_from_Trees, roeDeer_gain_from_Scrub, roeDeer_gain_from_Saplings, roeDeer_gain_from_YoungScrub,
-#             ponies_gain_from_grass, ponies_gain_from_Trees, ponies_gain_from_Scrub, ponies_gain_from_Saplings, ponies_gain_from_YoungScrub,
-#             cows_reproduce, cows_gain_from_grass, cows_gain_from_Trees, cows_gain_from_Scrub, cows_gain_from_Saplings, cows_gain_from_YoungScrub,
-#             fallowDeer_reproduce, fallowDeer_gain_from_grass, fallowDeer_gain_from_Trees, fallowDeer_gain_from_Scrub, fallowDeer_gain_from_Saplings, fallowDeer_gain_from_YoungScrub,
-#             redDeer_reproduce, redDeer_gain_from_grass, redDeer_gain_from_Trees, redDeer_gain_from_Scrub, redDeer_gain_from_Saplings, redDeer_gain_from_YoungScrub,
-#             pigs_reproduce, pigs_gain_from_grass, pigs_gain_from_Trees, pigs_gain_from_Scrub, pigs_gain_from_Saplings, pigs_gain_from_YoungScrub,
-#             fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
-#             reproduce_bison, bison_gain_from_grass, bison_gain_from_Trees, bison_gain_from_Scrub, bison_gain_from_Saplings, bison_gain_from_YoungScrub,
-#             reproduce_elk, elk_gain_from_grass, elk_gain_from_Trees, elk_gain_from_Scrub, elk_gain_from_Saplings, elk_gain_from_YoungScrub,
-#             reproduce_reindeer, reindeer_gain_from_grass, reindeer_gain_from_Trees, reindeer_gain_from_Scrub, reindeer_gain_from_Saplings, reindeer_gain_from_YoungScrub,
-#             width = 25, height = 18, max_time = 184, reintroduction = True,
-#             introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
-#         model.run_model()
-
-#         # remember the results of the model (dominant conditions, # of agents)
-#         sensitivity_results_unfiltered = model.datacollector.get_model_vars_dataframe()
-#         sensitivity_results = sensitivity_results_unfiltered[(sensitivity_results_unfiltered["Time"] == 184)]
-#         sensitivity_results_list.append(sensitivity_results)
-#         # and the parameter changed
-#         sensitivity_parameters.append([index, final_parameters_temp.at[index]])
-
-# # append to dataframe
-# final_sensitivity_results = pd.concat(sensitivity_results_list)
-# final_sensitivity_parameters = pd.DataFrame(sensitivity_parameters)
-# final_sensitivity_parameters.columns = ['Parameter_Changes', 'Parameter_Value']
-# final_sensitivity_results = final_sensitivity_results.reset_index(drop=True)
-# merged_dfs = pd.concat([final_sensitivity_parameters, final_sensitivity_results], axis=1)
-# merged_dfs = merged_dfs.drop('Time', 1)
-# merged_dfs.to_excel("/Users/emilyneil/Desktop/KneppABM/outputs/sensitivity/all_parameter_changes.xlsx")
+    variables = [
+        # habitat variables
+        "chance_youngScrubMatures",
+        "chance_saplingBecomingTree",
+        "chance_reproduceSapling", # this is to initialize the initial dominant condition
+        "chance_reproduceYoungScrub",  # this is to initialize the initial dominant condition
+        "chance_regrowGrass", # this is to initialize the initial dominant condition
+        "chance_grassOutcompetedByTree",
+        "chance_grassOutcompetedByScrub",
+        "chance_scrubOutcompetedByTree", # if tree matures, chance of scrub decreasing
+        # roe deer variables
+        "roe_deer_reproduce",
+        "roe_deer_gain_from_saplings",
+        "roe_deer_gain_from_trees",
+        "roe_deer_gain_from_scrub",
+        "roe_deer_gain_from_young_scrub", 
+        "roe_deer_gain_from_grass", 
+        # Exmoor pony variables
+        "ponies_gain_from_saplings", 
+        "ponies_gain_from_trees", 
+        "ponies_gain_from_scrub", 
+        "ponies_gain_from_young_scrub", 
+        "ponies_gain_from_grass", 
+        # Cow variables
+        "cattle_reproduce", 
+        "cows_gain_from_grass", 
+        "cows_gain_from_trees", 
+        "cows_gain_from_scrub", 
+        "cows_gain_from_saplings", 
+        "cows_gain_from_young_scrub", 
+        # Fallow deer variables
+        "fallow_deer_reproduce", 
+        "fallow_deer_gain_from_saplings", 
+        "fallow_deer_gain_from_trees", 
+        "fallow_deer_gain_from_scrub", 
+        "fallow_deer_gain_from_young_scrub", 
+        "fallow_deer_gain_from_grass", 
+        # Red deer variables
+        "red_deer_reproduce", 
+        "red_deer_gain_from_saplings", 
+        "red_deer_gain_from_trees", 
+        "red_deer_gain_from_scrub", 
+        "red_deer_gain_from_young_scrub", 
+        "red_deer_gain_from_grass", 
+        # Pig variables
+        "tamworth_pig_reproduce", 
+        "tamworth_pig_gain_from_saplings", 
+        "tamworth_pig_gain_from_trees", 
+        "tamworth_pig_gain_from_scrub",
+        "tamworth_pig_gain_from_young_scrub", 
+        "tamworth_pig_gain_from_grass",
+        # last one
+        "chance_scrub_saves_saplings"
+        ]
 
 
-merged_dfs =  pd.read_excel('/Users/emilyneil/Desktop/KneppABM/outputs/sensitivity/all_parameter_changes.xlsx')
+    # check out the parameters used
+    final_parameters = pd.DataFrame(data=[final_parameters], columns=variables)
 
-# group them by variable name
-grouped_dfs = merged_dfs.groupby("Parameter_Changes")
-
-# ROE DEER
-roe_gradients = []
-# find the gradient
-for grouped_name, grouped_data in grouped_dfs:
-    res = linregress(grouped_data["Parameter_Value"], grouped_data["Roe deer"])
-    roe_gradient = [grouped_name, res.slope]
-    roe_gradients.append(roe_gradient)
-roe_gradients = pd.DataFrame(roe_gradients)
-roe_gradients.columns = ['Parameter_names', 'Gradient']
-# take the top 10 most important ones; make sure to turn the negative ones positive when organizing them
-roe_gradients['Gradient'] = roe_gradients['Gradient'].abs()
-roe_gradients = roe_gradients.sort_values(['Gradient'], ascending=[False])
-top_ten = roe_gradients.iloc[0:10,:]
-top_ten.to_excel("/Users/emilyneil/Desktop/KneppABM/outputs/sensitivity/final_df_gradients_roeDeer.xlsx")
-# plot those
-top_ten_roe = merged_dfs[merged_dfs['Parameter_Changes'].isin(top_ten['Parameter_names'])]
-sns.set(font_scale=1)
-ro = sns.relplot(data=top_ten_roe, x='Parameter_Value', y='Roe deer', col='Parameter_Changes', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
-ro.fig.suptitle('Roe deer gradients')
-ro.set_titles('{col_name}')
-plt.tight_layout()
-plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/sensitivity/sensitivity_roe.png')
-plt.show()
+    # SENSITIVITY TEST
+    sensitivity_results_list = []
+    parameter_names = []
+    perc_numbers = []
 
 
+    run_number  = 0
+    # choose my percent above/below number
+    # perc_aboveBelow = [-0.1, -0.05,-0.01, 0, 0.01, 0.05, 0.1]    
+    perc_aboveBelow = [-0.1, 0.1]
 
-# # FALLOW DEER
-fallow_gradients = []
-# find the gradient
-for grouped_name, grouped_data in grouped_dfs:
-    res = linregress(grouped_data["Parameter_Value"], grouped_data["Fallow deer"])
-    fallow_gradient = [grouped_name, res.slope]
-    fallow_gradients.append(fallow_gradient)
-fallow_gradients = pd.DataFrame(fallow_gradients)
-fallow_gradients.columns = ['Parameter_names', 'Gradient']
-# take the top 10 most important ones; make sure to turn the negative ones positive when organizing them
-fallow_gradients['Gradient'] = fallow_gradients['Gradient'].abs()
-fallow_gradients = fallow_gradients.sort_values(['Gradient'], ascending=[False])
-top_ten = fallow_gradients.iloc[0:10,:]
-top_ten.to_excel("/Users/emilyneil/Desktop/KneppABM/outputs/sensitivity/final_df_gradients_fallowDeer.xlsx")
-# plot those
-top_ten_fallow = merged_dfs[merged_dfs['Parameter_Changes'].isin(top_ten['Parameter_names'])]
-ro = sns.relplot(data=top_ten_fallow, x='Parameter_Value', y='Fallow deer', col='Parameter_Changes', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
-ro.fig.suptitle('Fallow deer gradients')
-ro.set_titles('{col_name}')
-plt.tight_layout()
-plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/sensitivity/sensitivity_fallow.png')
-plt.show()
+    final_parameters = final_parameters.iloc[0,0:45]
 
-# # RED DEER
-red_gradients = []
-# find the gradient
-for grouped_name, grouped_data in grouped_dfs:
-    res = linregress(grouped_data["Parameter_Value"], grouped_data["Red deer"])
-    red_gradient = [grouped_name, res.slope]
-    red_gradients.append(red_gradient)
-red_gradients = pd.DataFrame(red_gradients)
-red_gradients.columns = ['Parameter_names', 'Gradient']
-# take the top 10 most important ones; make sure to turn the negative ones positive when organizing them
-red_gradients['Gradient'] = red_gradients['Gradient'].abs()
-red_gradients = red_gradients.sort_values(['Gradient'], ascending=[False])
-top_ten = red_gradients.iloc[0:10,:]
-top_ten.to_excel("/Users/emilyneil/Desktop/KneppABM/outputs/sensitivity/final_df_gradients_redDeer.xlsx")
-# plot those
-top_ten_red = merged_dfs[merged_dfs['Parameter_Changes'].isin(top_ten['Parameter_names'])]
-ro = sns.relplot(data=top_ten_roe, x='Parameter_Value', y='Red deer', col='Parameter_Changes', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
-ro.fig.suptitle('Red deer gradients')
-ro.set_titles('{col_name}')
-plt.tight_layout()
-plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/sensitivity/sensitivity_red.png')
-plt.show()
+    # loop through each one, changing one cell at a time
+    for param_name, df_row in final_parameters.iteritems():
+        for perc_number in perc_aboveBelow:
+            final_parameters_temp = final_parameters
+            run_number += 1
+            ifor_val = df_row + (df_row*perc_number)
+            final_parameters_temp.at[param_name] = ifor_val
 
+            print(run_number)
 
+            # choose my parameters 
+            chance_youngScrubMatures = final_parameters_temp["chance_youngScrubMatures"]
+            chance_saplingBecomingTree = final_parameters_temp["chance_saplingBecomingTree"]
+            chance_reproduceSapling = final_parameters_temp["chance_reproduceSapling"]
+            chance_reproduceYoungScrub = final_parameters_temp["chance_reproduceYoungScrub"]
+            chance_regrowGrass = final_parameters_temp["chance_regrowGrass"]
+            chance_grassOutcompetedByTree = final_parameters_temp["chance_grassOutcompetedByTree"]
+            chance_grassOutcompetedByScrub = final_parameters_temp["chance_grassOutcompetedByScrub"]
+            chance_scrubOutcompetedByTree = final_parameters_temp["chance_scrubOutcompetedByTree"]
 
-# # LONGHORN CATTLE
-cattle_gradients = []
-# find the gradient
-for grouped_name, grouped_data in grouped_dfs:
-    res = linregress(grouped_data["Parameter_Value"], grouped_data["Longhorn cattle"])
-    cattle_gradient = [grouped_name, res.slope]
-    cattle_gradients.append(cattle_gradient)
-cattle_gradients = pd.DataFrame(cattle_gradients)
-cattle_gradients.columns = ['Parameter_names', 'Gradient']
-# take the top 10 most important ones; make sure to turn the negative ones positive when organizing them
-cattle_gradients['Gradient'] = cattle_gradients['Gradient'].abs()
-cattle_gradients = cattle_gradients.sort_values(['Gradient'], ascending=[False])
-top_ten = cattle_gradients.iloc[0:10,:]
-top_ten.to_excel("/Users/emilyneil/Desktop/KneppABM/outputs/sensitivity/final_df_gradients_cattle.xlsx")
-# plot those
-top_ten_cattle = merged_dfs[merged_dfs['Parameter_Changes'].isin(top_ten['Parameter_names'])]
-ro = sns.relplot(data=top_ten_cattle, x='Parameter_Value', y='Longhorn cattle', col='Parameter_Changes', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
-ro.fig.suptitle('Cattle gradients')
-ro.set_titles('{col_name}')
-plt.tight_layout()
-plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/sensitivity/sensitivity_cattle.png')
-plt.show()
+            initial_roe = 12
+            fallowDeer_stocking = 247
+            cattle_stocking = 81
+            redDeer_stocking = 35
+            tamworthPig_stocking = 7
+            exmoor_stocking = 15
 
+            roe_deer_reproduce = final_parameters_temp["roe_deer_reproduce"]
+            roe_deer_gain_from_saplings = final_parameters_temp["roe_deer_gain_from_saplings"]
+            roe_deer_gain_from_trees = final_parameters_temp["roe_deer_gain_from_trees"]
+            roe_deer_gain_from_scrub = final_parameters_temp["roe_deer_gain_from_scrub"]
+            roe_deer_gain_from_young_scrub = final_parameters_temp["roe_deer_gain_from_young_scrub"]
+            roe_deer_gain_from_grass = final_parameters_temp["roe_deer_gain_from_grass"]
+            ponies_gain_from_saplings = final_parameters_temp["ponies_gain_from_saplings"]
+            ponies_gain_from_trees = final_parameters_temp["ponies_gain_from_trees"]
+            ponies_gain_from_scrub = final_parameters_temp["ponies_gain_from_scrub"]
+            ponies_gain_from_young_scrub = final_parameters_temp["ponies_gain_from_young_scrub"]
+            ponies_gain_from_grass = final_parameters_temp["ponies_gain_from_grass"]
+            cattle_reproduce = final_parameters_temp["cattle_reproduce"]
+            cows_gain_from_grass = final_parameters_temp["cows_gain_from_grass"]
+            cows_gain_from_trees = final_parameters_temp["cows_gain_from_trees"]
+            cows_gain_from_scrub = final_parameters_temp["cows_gain_from_scrub"]
+            cows_gain_from_saplings = final_parameters_temp["cows_gain_from_saplings"]
+            cows_gain_from_young_scrub = final_parameters_temp["cows_gain_from_young_scrub"]
+            fallow_deer_reproduce = final_parameters_temp["fallow_deer_reproduce"]
+            fallow_deer_gain_from_saplings = final_parameters_temp["fallow_deer_gain_from_saplings"]
+            fallow_deer_gain_from_trees = final_parameters_temp["fallow_deer_gain_from_trees"]
+            fallow_deer_gain_from_scrub = final_parameters_temp["fallow_deer_gain_from_scrub"]
+            fallow_deer_gain_from_young_scrub = final_parameters_temp["fallow_deer_gain_from_young_scrub"]
+            fallow_deer_gain_from_grass = final_parameters_temp["fallow_deer_gain_from_grass"]
+            red_deer_reproduce = final_parameters_temp["red_deer_reproduce"]
+            red_deer_gain_from_saplings = final_parameters_temp["red_deer_gain_from_saplings"]
+            red_deer_gain_from_trees = final_parameters_temp["red_deer_gain_from_trees"]
+            red_deer_gain_from_scrub = final_parameters_temp["red_deer_gain_from_scrub"]
+            red_deer_gain_from_young_scrub = final_parameters_temp["red_deer_gain_from_young_scrub"]
+            red_deer_gain_from_grass = final_parameters_temp["red_deer_gain_from_grass"]
+            tamworth_pig_reproduce = final_parameters_temp["tamworth_pig_reproduce"]
+            tamworth_pig_gain_from_saplings = final_parameters_temp["tamworth_pig_gain_from_saplings"]
+            tamworth_pig_gain_from_trees = final_parameters_temp["tamworth_pig_gain_from_trees"]
+            tamworth_pig_gain_from_scrub = final_parameters_temp["tamworth_pig_gain_from_scrub"]
+            tamworth_pig_gain_from_young_scrub = final_parameters_temp["tamworth_pig_gain_from_young_scrub"]
+            tamworth_pig_gain_from_grass = final_parameters_temp["tamworth_pig_gain_from_grass"]
+            chance_scrub_saves_saplings = final_parameters_temp["chance_scrub_saves_saplings"]
 
-# # TAMWORTH PIG
-pig_gradients = []
-# find the gradient
-for grouped_name, grouped_data in grouped_dfs:
-    res = linregress(grouped_data["Parameter_Value"], grouped_data["Tamworth pigs"])
-    pig_gradient = [grouped_name, res.slope]
-    pig_gradients.append(pig_gradient)
-pig_gradients = pd.DataFrame(pig_gradients)
-pig_gradients.columns = ['Parameter_names', 'Gradient']
-# take the top 10 most important ones; make sure to turn the negative ones positive when organizing them
-pig_gradients['Gradient'] = pig_gradients['Gradient'].abs()
-pig_gradients = pig_gradients.sort_values(['Gradient'], ascending=[False])
-top_ten = pig_gradients.iloc[0:10,:]
-top_ten.to_excel("/Users/emilyneil/Desktop/KneppABM/outputs/sensitivity/final_df_gradients_pig.xlsx")
-# plot those
-top_ten_pig = merged_dfs[merged_dfs['Parameter_Changes'].isin(top_ten['Parameter_names'])]
-ro = sns.relplot(data=top_ten_pig, x='Parameter_Value', y='Tamworth pigs', col='Parameter_Changes', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
-ro.fig.suptitle('Tamworth pig gradients')
-ro.set_titles('{col_name}')
-plt.tight_layout()
-plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/sensitivity/sensitivity_pig.png')
-plt.show()
+            # euro bison parameters
+            european_bison_reproduce = 0
+            # bison should have higher impact than any other consumer
+            european_bison_gain_from_grass = 0
+            european_bison_gain_from_trees = 0
+            european_bison_gain_from_scrub = 0
+            european_bison_gain_from_saplings = 0
+            european_bison_gain_from_young_scrub = 0
+            # euro elk parameters
+            european_elk_reproduce = 0
+            # bison should have higher impact than any other consumer
+            european_elk_gain_from_grass = 0
+            european_elk_gain_from_trees = 0
+            european_elk_gain_from_scrub = 0
+            european_elk_gain_from_saplings =  0
+            european_elk_gain_from_young_scrub =  0
 
-# # EXMOOR PONY
-pony_gradients = []
-# find the gradient
-for grouped_name, grouped_data in grouped_dfs:
-    res = linregress(grouped_data["Parameter_Value"], grouped_data["Exmoor pony"])
-    pony_gradient = [grouped_name, res.slope]
-    pony_gradients.append(pony_gradient)
-pony_gradients = pd.DataFrame(pony_gradients)
-pony_gradients.columns = ['Parameter_names', 'Gradient']
-# take the top 10 most important ones; make sure to turn the negative ones positive when organizing them
-pony_gradients['Gradient'] = pony_gradients['Gradient'].abs()
-pony_gradients = pony_gradients.sort_values(['Gradient'], ascending=[False])
-top_ten = pony_gradients.iloc[0:10,:]
-top_ten.to_excel("/Users/emilyneil/Desktop/KneppABM/outputs/sensitivity/final_df_gradients_pony.xlsx")
-# plot those
-top_ten_pony = merged_dfs[merged_dfs['Parameter_Changes'].isin(top_ten['Parameter_names'])]
-ro = sns.relplot(data=top_ten_pony, x='Parameter_Value', y='Exmoor pony', col='Parameter_Changes', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
-ro.fig.suptitle('Exmoor pony gradients')
-ro.set_titles('{col_name}')
-plt.tight_layout()
-plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/sensitivity/sensitivity_pony.png')
-plt.show()
+            # reindeer parameters
+            reindeer_reproduce = 0
+            # reindeer should have impacts between red and fallow deer
+            reindeer_gain_from_grass = 0
+            reindeer_gain_from_trees =0
+            reindeer_gain_from_scrub =0
+            reindeer_gain_from_saplings = 0
+            reindeer_gain_from_young_scrub = 0
+            # forecasting parameters
+            fallowDeer_stocking_forecast = 247
+            cattle_stocking_forecast = 81
+            redDeer_stocking_forecast = 35
+            tamworthPig_stocking_forecast = 7
+            exmoor_stocking_forecast = 15
+            introduced_species_stocking_forecast = 0
 
+            random.seed(1)
+            np.random.seed(1)
 
-
-# # GRASSLAND
-grass_gradients = []
-# find the gradient
-for grouped_name, grouped_data in grouped_dfs:
-    res = linregress(grouped_data["Parameter_Value"], grouped_data["Grassland"])
-    grass_gradient = [grouped_name, res.slope]
-    grass_gradients.append(grass_gradient)
-grass_gradients = pd.DataFrame(grass_gradients)
-grass_gradients.columns = ['Parameter_names', 'Gradient']
-# take the top 10 most important ones; make sure to turn the negative ones positive when organizing them
-grass_gradients['Gradient'] = grass_gradients['Gradient'].abs()
-grass_gradients = grass_gradients.sort_values(['Gradient'], ascending=[False])
-top_ten = grass_gradients.iloc[0:10,:]
-top_ten.to_excel("/Users/emilyneil/Desktop/KneppABM/outputs/sensitivity/final_df_gradients_grass.xlsx")
-# plot those
-top_ten_grass = merged_dfs[merged_dfs['Parameter_Changes'].isin(top_ten['Parameter_names'])]
-ro = sns.relplot(data=top_ten_grass, x='Parameter_Value', y='Grassland', col='Parameter_Changes', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
-ro.fig.suptitle('Grassland gradients')
-ro.set_titles('{col_name}')
-plt.tight_layout()
-plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/sensitivity/sensitivity_grass.png')
-plt.show()
+            model = KneppModel(initial_roe, roe_deer_reproduce, roe_deer_gain_from_saplings, roe_deer_gain_from_trees, roe_deer_gain_from_scrub, roe_deer_gain_from_young_scrub, roe_deer_gain_from_grass,
+                                chance_youngScrubMatures, chance_saplingBecomingTree, chance_reproduceSapling,chance_reproduceYoungScrub, chance_regrowGrass, 
+                                chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_scrubOutcompetedByTree, 
+                                ponies_gain_from_saplings, ponies_gain_from_trees, ponies_gain_from_scrub, ponies_gain_from_young_scrub, ponies_gain_from_grass, 
+                                cattle_reproduce, cows_gain_from_grass, cows_gain_from_trees, cows_gain_from_scrub, cows_gain_from_saplings, cows_gain_from_young_scrub, 
+                                fallow_deer_reproduce, fallow_deer_gain_from_saplings, fallow_deer_gain_from_trees, fallow_deer_gain_from_scrub, fallow_deer_gain_from_young_scrub, fallow_deer_gain_from_grass,
+                                red_deer_reproduce, red_deer_gain_from_saplings, red_deer_gain_from_trees, red_deer_gain_from_scrub, red_deer_gain_from_young_scrub, red_deer_gain_from_grass,
+                                tamworth_pig_reproduce, tamworth_pig_gain_from_saplings,tamworth_pig_gain_from_trees,tamworth_pig_gain_from_scrub,tamworth_pig_gain_from_young_scrub,tamworth_pig_gain_from_grass,
+                                european_bison_reproduce, european_bison_gain_from_grass, european_bison_gain_from_trees, european_bison_gain_from_scrub, european_bison_gain_from_saplings, european_bison_gain_from_young_scrub,
+                                european_elk_reproduce, european_elk_gain_from_grass, european_elk_gain_from_trees, european_elk_gain_from_scrub, european_elk_gain_from_saplings, european_elk_gain_from_young_scrub,
+                                reindeer_reproduce, reindeer_gain_from_grass, reindeer_gain_from_trees, reindeer_gain_from_scrub, reindeer_gain_from_saplings, reindeer_gain_from_young_scrub,
+                                fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
+                                fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, introduced_species_stocking_forecast,
+                                chance_scrub_saves_saplings,
+                                max_time = 185, reintroduction = True, introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
 
 
-# # THORNY SCRUB
-scrub_gradients = []
-# find the gradient
-for grouped_name, grouped_data in grouped_dfs:
-    res = linregress(grouped_data["Parameter_Value"], grouped_data["Thorny Scrub"])
-    scrub_gradient = [grouped_name, res.slope]
-    scrub_gradients.append(scrub_gradient)
-scrub_gradients = pd.DataFrame(scrub_gradients)
-scrub_gradients.columns = ['Parameter_names', 'Gradient']
-# take the top 10 most important ones; make sure to turn the negative ones positive when organizing them
-scrub_gradients['Gradient'] = scrub_gradients['Gradient'].abs()
-scrub_gradients = scrub_gradients.sort_values(['Gradient'], ascending=[False])
-top_ten = scrub_gradients.iloc[0:10,:]
-top_ten.to_excel("/Users/emilyneil/Desktop/KneppABM/outputs/sensitivity/final_df_gradients_scrub.xlsx")
-# plot those
-top_ten_scrub = merged_dfs[merged_dfs['Parameter_Changes'].isin(top_ten['Parameter_names'])]
-ro = sns.relplot(data=top_ten_scrub , x='Parameter_Value', y='Thorny Scrub', col='Parameter_Changes', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
-ro.fig.suptitle('Scrub gradients')
-ro.set_titles('{col_name}')
-plt.tight_layout()
-plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/sensitivity/sensitivity_scrub.png')
-plt.show()
+            model.reset_randomizer(seed=1)
+
+            model.run_model()
+
+            # remember the results of the model 
+            final_results = model.datacollector.get_model_vars_dataframe()
+
+            # how many filters were passed? 
+            passed_filters = 0
+            # pre-reintroduction model
+            my_time = final_results.loc[final_results['Time'] == 49]
+
+            for index, row in my_time.iterrows():
+                if (row["Roe deer"] <= 40) & (row["Roe deer"] >= 12) & (row["Grassland"] <= 80) & (row["Grassland"] >= 20) & (row["Woodland"] <= 17) & (row["Woodland"] >= 5.8) & (row["Thorny Scrub"] <= 51.8) & (row["Thorny Scrub"] >= 4.3):
+                    passed_filters+=1
+            # April 2015
+            my_time = final_results.loc[final_results['Time'] == 122]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) & (row["Longhorn cattle"] <= 140) & (row["Longhorn cattle"] >= 90) & (row["Tamworth pigs"] <= 32) & (row["Tamworth pigs"] >= 12):
+                    passed_filters+=1
+            # May 2015
+            my_time = final_results.loc[final_results['Time'] == 123]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 154) & (row["Longhorn cattle"] >= 104) & (row["Tamworth pigs"] <= 24) & (row["Tamworth pigs"] >= 4) & (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9):
+                    passed_filters+=1
+            # June 2015
+            my_time = final_results.loc[final_results['Time'] == 124]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 154) & (row["Longhorn cattle"] >= 104) & (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) & (row["Tamworth pigs"] <= 24) & (row["Tamworth pigs"] >= 4):
+                    passed_filters+=1
+            # July 2015
+            my_time = final_results.loc[final_results['Time'] == 125]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 154) & (row["Longhorn cattle"] >= 104) & (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) & (row["Tamworth pigs"] <= 24) & (row["Tamworth pigs"] >= 4):
+                    passed_filters+=1
+            # Aug 2015
+            my_time = final_results.loc[final_results['Time'] == 126]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 154) & (row["Longhorn cattle"] >= 104) & (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) & (row["Tamworth pigs"] <= 24) & (row["Tamworth pigs"] >= 4):
+                    passed_filters+=1
+            # Sept 2015
+            my_time = final_results.loc[final_results['Time'] == 127]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 155) & (row["Longhorn cattle"] >= 105) & (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) & (row["Tamworth pigs"] <= 24) & (row["Tamworth pigs"] >= 4):
+                    passed_filters+=1
+            # Oct 2015
+            my_time = final_results.loc[final_results['Time'] == 128]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 116) & (row["Longhorn cattle"] >= 66) & (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) & (row["Tamworth pigs"] <= 24) & (row["Tamworth pigs"] >= 4):
+                    passed_filters+=1
+            # Nov 2015
+            my_time = final_results.loc[final_results['Time'] == 129]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 116) & (row["Longhorn cattle"] >= 66) & (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) & (row["Tamworth pigs"] <= 23) & (row["Tamworth pigs"] >= 3):
+                    passed_filters+=1
+            # Dec 2015
+            my_time = final_results.loc[final_results['Time'] == 130]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 111) & (row["Longhorn cattle"] >= 61) &(row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) &(row["Tamworth pigs"] <= 23) & (row["Tamworth pigs"] >= 3):
+                    passed_filters+=1
+            # Jan 2016
+            my_time = final_results.loc[final_results['Time'] == 131]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 111) & (row["Longhorn cattle"] >= 61) & (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) & (row["Tamworth pigs"] <= 20) & (row["Tamworth pigs"] >= 1):
+                    passed_filters+=1
+            # Feb 2016
+            my_time = final_results.loc[final_results['Time'] == 132]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) & (row["Longhorn cattle"] <= 111) & (row["Longhorn cattle"] >= 61) &(row["Tamworth pigs"] <= 20) & (row["Tamworth pigs"] >= 1):
+                    passed_filters+=1
+            # March 2016
+            my_time = final_results.loc[final_results['Time'] == 133]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 12) & (row["Exmoor pony"] >= 10) & (row["Longhorn cattle"] <= 111) & (row["Longhorn cattle"] >= 61) & (row["Fallow deer"] <= 190) & (row["Fallow deer"] >= 90) & (row["Red deer"] <= 31) & (row["Red deer"] >= 21) & (row["Tamworth pigs"] <= 19) & (row["Tamworth pigs"] >= 1):
+                    passed_filters+=1
+            # April 2016
+            my_time = final_results.loc[final_results['Time'] == 134]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 12) & (row["Exmoor pony"] >= 10) & (row["Longhorn cattle"] <= 128) & (row["Longhorn cattle"] >= 78) & (row["Tamworth pigs"] <= 19) & (row["Tamworth pigs"] >= 1):
+                    passed_filters+=1
+            # May 2016
+            my_time = final_results.loc[final_results['Time'] == 135]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 12) & (row["Exmoor pony"] >= 10) & (row["Longhorn cattle"] <= 133) & (row["Longhorn cattle"] >= 83) &(row["Tamworth pigs"] <= 27) & (row["Tamworth pigs"] >= 7):
+                    passed_filters+=1
+            # June 2016
+            my_time = final_results.loc[final_results['Time'] == 136]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 12) & (row["Exmoor pony"] >= 10) & (row["Longhorn cattle"] <= 114) & (row["Longhorn cattle"] >= 64) & (row["Tamworth pigs"] <= 27) & (row["Tamworth pigs"] >= 7):
+                    passed_filters+=1
+            # July 2016
+            my_time = final_results.loc[final_results['Time'] == 137]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 12) & (row["Exmoor pony"] >= 10) & (row["Longhorn cattle"] <= 112) & (row["Longhorn cattle"] >= 62) & (row["Tamworth pigs"] <= 27) & (row["Tamworth pigs"] >= 7):
+                    passed_filters+=1
+            # Aug 2016
+            my_time = final_results.loc[final_results['Time'] == 138]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 12) & (row["Exmoor pony"] >= 10) & (row["Longhorn cattle"] <= 112) & (row["Longhorn cattle"] >= 62) & (row["Tamworth pigs"] <= 27) & (row["Tamworth pigs"] >= 7):
+                    passed_filters+=1
+            # Sept 2016
+            my_time = final_results.loc[final_results['Time'] == 139]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 12) & (row["Exmoor pony"] >= 10) &(row["Longhorn cattle"] <= 122) & (row["Longhorn cattle"] >= 72) & (row["Tamworth pigs"] <= 27) & (row["Tamworth pigs"] >= 7):
+                    passed_filters+=1
+            # Oct 2016
+            my_time = final_results.loc[final_results['Time'] == 140]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 12) & (row["Exmoor pony"] >= 10) & (row["Longhorn cattle"] <= 122) & (row["Longhorn cattle"] >= 72) & (row["Tamworth pigs"] <= 27) & (row["Tamworth pigs"] >= 7):
+                    passed_filters+=1
+            # Nov 2016
+            my_time = final_results.loc[final_results['Time'] == 141]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 12) & (row["Exmoor pony"] >= 10) &(row["Longhorn cattle"] <= 117) & (row["Longhorn cattle"] >= 67) &(row["Tamworth pigs"] <= 27) & (row["Tamworth pigs"] >= 7):
+                    passed_filters+=1
+            # Dec 2016
+            my_time = final_results.loc[final_results['Time'] == 142]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 12) & (row["Exmoor pony"] >= 10) &(row["Longhorn cattle"] <= 104) & (row["Longhorn cattle"] >= 54)& (row["Tamworth pigs"] <= 23) & (row["Tamworth pigs"] >= 3):
+                    passed_filters+=1
+            # Jan 2017
+            my_time = final_results.loc[final_results['Time'] == 143]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 12) & (row["Exmoor pony"] >= 10) & (row["Longhorn cattle"] <= 104) & (row["Longhorn cattle"] >= 54) & (row["Tamworth pigs"] <= 19) & (row["Tamworth pigs"] >= 1):
+                    passed_filters+=1
+            # Feb 2017
+            my_time = final_results.loc[final_results['Time'] == 144]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 12) & (row["Exmoor pony"] >= 10) & (row["Longhorn cattle"] <= 104) & (row["Longhorn cattle"] >= 54) & (row["Tamworth pigs"] <= 17) & (row["Tamworth pigs"] >= 1):
+                    passed_filters+=1
+            # March 2017
+            my_time = final_results.loc[final_results['Time'] == 145]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) & (row["Fallow deer"] <= 215) & (row["Fallow deer"] >= 115) &(row["Longhorn cattle"] <= 104) & (row["Longhorn cattle"] >= 54) &(row["Tamworth pigs"] <= 17) & (row["Tamworth pigs"] >= 1):
+                    passed_filters+=1
+            # April 2017
+            my_time = final_results.loc[final_results['Time'] == 146]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) &(row["Longhorn cattle"] <= 125) & (row["Longhorn cattle"] >= 75) &(row["Tamworth pigs"] <= 32) & (row["Tamworth pigs"] >= 12):
+                    passed_filters+=1
+            # May 2017
+            my_time = final_results.loc[final_results['Time'] == 147]
+            for index, row in my_time.iterrows():
+                if  (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) &(row["Longhorn cattle"] <= 134) & (row["Longhorn cattle"] >= 84) &(row["Tamworth pigs"] <= 32) & (row["Tamworth pigs"] >= 12):
+                    passed_filters+=1
+            # June 2017
+            my_time = final_results.loc[final_results['Time'] == 148]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) &(row["Longhorn cattle"] <= 119) & (row["Longhorn cattle"] >= 69) &(row["Tamworth pigs"] <= 32) & (row["Tamworth pigs"] >= 12):
+                    passed_filters+=1
+            # July 2017
+            my_time = final_results.loc[final_results['Time'] == 149]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) &(row["Longhorn cattle"] <= 119) & (row["Longhorn cattle"] >= 69)&(row["Tamworth pigs"] <= 32) & (row["Tamworth pigs"] >= 12):
+                    passed_filters+=1
+            # Aug 2017
+            my_time = final_results.loc[final_results['Time'] == 150]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) &(row["Longhorn cattle"] <= 119) & (row["Longhorn cattle"] >= 69)&(row["Tamworth pigs"] <= 32) & (row["Tamworth pigs"] >= 12):
+                    passed_filters+=1
+            # Sept 2017
+            my_time = final_results.loc[final_results['Time'] == 151]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) &(row["Longhorn cattle"] <= 115) & (row["Longhorn cattle"] >= 65)& (row["Tamworth pigs"] <= 32) & (row["Tamworth pigs"] >= 12):
+                    passed_filters+=1
+            # Oct 2017
+            my_time = final_results.loc[final_results['Time'] == 152]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) &(row["Longhorn cattle"] <= 113) & (row["Longhorn cattle"] >= 63)&(row["Tamworth pigs"] <= 32) & (row["Tamworth pigs"] >= 12):
+                    passed_filters+=1
+            # Nov 2017
+            my_time = final_results.loc[final_results['Time'] == 153]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) &(row["Longhorn cattle"] <= 113) & (row["Longhorn cattle"] >= 63)&(row["Tamworth pigs"] <= 32) & (row["Tamworth pigs"] >= 12):
+                    passed_filters+=1
+            # Dec 2017
+            my_time = final_results.loc[final_results['Time'] == 154]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) &(row["Longhorn cattle"] <= 113) & (row["Longhorn cattle"] >= 63)&(row["Tamworth pigs"] <= 28) & (row["Tamworth pigs"] >= 8):
+                    passed_filters+=1
+            # January 2018
+            my_time = final_results.loc[final_results['Time'] == 155]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) &(row["Longhorn cattle"] <= 113) & (row["Longhorn cattle"] >= 63)&(row["Tamworth pigs"] <= 21) & (row["Tamworth pigs"] >= 1):
+                    passed_filters+=1
+            # February 2018
+            my_time = final_results.loc[final_results['Time'] == 156]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 11) & (row["Exmoor pony"] >= 9) &(row["Longhorn cattle"] <= 113) & (row["Longhorn cattle"] >= 63)&(row["Tamworth pigs"] <= 26) & (row["Tamworth pigs"] >= 6):
+                    passed_filters+=1
+            # March 2018
+            my_time = final_results.loc[final_results['Time'] == 157]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 10) & (row["Exmoor pony"] >= 8) & (row["Longhorn cattle"] <= 113) & (row["Longhorn cattle"] >= 63) &(row["Red deer"] <= 29) & (row["Red deer"] >= 19) &(row["Tamworth pigs"] <= 26) & (row["Tamworth pigs"] >= 6):
+                    passed_filters+=1
+            # April 2018
+            my_time = final_results.loc[final_results['Time'] == 158]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 10) & (row["Exmoor pony"] >= 8) & (row["Longhorn cattle"] <= 126) & (row["Longhorn cattle"] >= 76) &(row["Tamworth pigs"] <= 26) & (row["Tamworth pigs"] >= 6):
+                    passed_filters+=1
+            # May 2018
+            my_time = final_results.loc[final_results['Time'] == 159]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 10) & (row["Exmoor pony"] >= 8) &(row["Longhorn cattle"] <= 142) & (row["Longhorn cattle"] >= 92)&(row["Tamworth pigs"] <= 33) & (row["Tamworth pigs"] >= 13):
+                    passed_filters+=1
+            # June 2018
+            my_time = final_results.loc[final_results['Time'] == 160]
+            for index, row in my_time.iterrows(): 
+                if (row["Exmoor pony"] <= 10) & (row["Exmoor pony"] >= 8) & (row["Longhorn cattle"] <= 128) & (row["Longhorn cattle"] >= 78)& (row["Tamworth pigs"] <= 33) & (row["Tamworth pigs"] >= 13):
+                    passed_filters+=1
+            # July 2018
+            my_time = final_results.loc[final_results['Time'] == 161]
+            for index, row in my_time.iterrows():
+                if  (row["Exmoor pony"] <= 10) & (row["Exmoor pony"] >= 8) &(row["Longhorn cattle"] <= 128) & (row["Longhorn cattle"] >= 78)&(row["Tamworth pigs"] <= 32) & (row["Tamworth pigs"] >= 12):
+                    passed_filters+=1
+            # Aug 2018
+            my_time = final_results.loc[final_results['Time'] == 162]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 127) & (row["Longhorn cattle"] >= 77) &(row["Tamworth pigs"] <= 32) & (row["Tamworth pigs"] >= 12):
+                    passed_filters+=1
+            # Sept 2018
+            my_time = final_results.loc[final_results['Time'] == 163]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 131) & (row["Longhorn cattle"] >= 81) & (row["Tamworth pigs"] <= 32) & (row["Tamworth pigs"] >= 12):
+                    passed_filters+=1
+            # Oct 2018
+            my_time = final_results.loc[final_results['Time'] == 164]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 126) & (row["Longhorn cattle"] >= 76) & (row["Tamworth pigs"] <= 31) & (row["Tamworth pigs"] >= 11):
+                    passed_filters+=1
+            # Nov 2018
+            my_time = final_results.loc[final_results['Time'] == 165]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 118) & (row["Longhorn cattle"] >= 68) & (row["Tamworth pigs"] <= 19) & (row["Tamworth pigs"] >= 1):
+                    passed_filters+=1
+            # Dec 2018
+            my_time = final_results.loc[final_results['Time'] == 166]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 114) & (row["Longhorn cattle"] >= 64) & (row["Tamworth pigs"] <= 19) & (row["Tamworth pigs"] >= 1):
+                    passed_filters+=1
+            # Jan 2019
+            my_time = final_results.loc[final_results['Time'] == 167]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 114) & (row["Longhorn cattle"] >= 64) & (row["Tamworth pigs"] <= 19) & (row["Tamworth pigs"] >= 1):
+                    passed_filters+=1
+            # Feb 2019
+            my_time = final_results.loc[final_results['Time'] == 168]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 112) & (row["Longhorn cattle"] >= 62) &(row["Tamworth pigs"] <= 20) & (row["Tamworth pigs"] >= 1):
+                    passed_filters+=1
+            # March 2019
+            my_time = final_results.loc[final_results['Time'] == 169]
+            for index, row in my_time.iterrows():
+                if (row["Fallow deer"] <= 303) & (row["Fallow deer"] >= 253) &(row["Longhorn cattle"] <= 112) & (row["Longhorn cattle"] >= 62) &(row["Red deer"] <= 42) & (row["Red deer"] >= 32) & (row["Tamworth pigs"] <= 19) & (row["Tamworth pigs"] >= 1):
+                    passed_filters+=1
+            # April 2019
+            my_time = final_results.loc[final_results['Time'] == 170]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 126) & (row["Longhorn cattle"] >= 76) &(row["Tamworth pigs"] <= 18) & (row["Tamworth pigs"] >= 1):
+                    passed_filters+=1
+            # May 2019
+            my_time = final_results.loc[final_results['Time'] == 171]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 135) & (row["Longhorn cattle"] >= 85) & (row["Tamworth pigs"] <= 18) & (row["Tamworth pigs"] >= 1):
+                    passed_filters+=1
+            # June 2019
+            my_time = final_results.loc[final_results['Time'] == 172]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 114) & (row["Longhorn cattle"] >= 64) & (row["Tamworth pigs"] <= 18) & (row["Tamworth pigs"] >= 1):
+                    passed_filters+=1
+            # July 2019
+            my_time = final_results.loc[final_results['Time'] == 173]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 116) & (row["Longhorn cattle"] >= 66) &(row["Tamworth pigs"] <= 19) & (row["Tamworth pigs"] >= 1):
+                    passed_filters+=1
+            # Aug 2019
+            my_time = final_results.loc[final_results['Time'] == 174]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 116) & (row["Longhorn cattle"] >= 66) & (row["Tamworth pigs"] <= 19) & (row["Tamworth pigs"] >= 1):
+                    passed_filters+=1
+            # Sept 2019
+            my_time = final_results.loc[final_results['Time'] == 175]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 118) & (row["Longhorn cattle"] >= 68) & (row["Tamworth pigs"] <= 19) & (row["Tamworth pigs"] >= 1):
+                    passed_filters+=1
+            # Oct 2019
+            my_time = final_results.loc[final_results['Time'] == 176]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 113) & (row["Longhorn cattle"] >= 63) &(row["Tamworth pigs"] <= 19) & (row["Tamworth pigs"] >= 1):
+                    passed_filters+=1
+            # Nov 2019
+            my_time = final_results.loc[final_results['Time'] == 177]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 112) & (row["Longhorn cattle"] >= 62) & (row["Tamworth pigs"] <= 19) & (row["Tamworth pigs"] >= 1):
+                    passed_filters+=1
+            # Dec 2019
+            my_time = final_results.loc[final_results['Time'] == 178]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 105) & (row["Longhorn cattle"] >= 55) & (row["Tamworth pigs"] <= 20) & (row["Tamworth pigs"] >= 1):
+                    passed_filters+=1
+            # Jan 2020
+            my_time = final_results.loc[final_results['Time'] == 179]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 105) & (row["Longhorn cattle"] >= 55) & (row["Tamworth pigs"] <= 20) & (row["Tamworth pigs"] >= 1):
+                    passed_filters+=1
+            # Feb 2020
+            my_time = final_results.loc[final_results['Time'] == 180]
+            for index, row in my_time.iterrows():
+                if (row["Longhorn cattle"] <= 104) & (row["Longhorn cattle"] >= 54) & (row["Tamworth pigs"] <= 18) & (row["Tamworth pigs"] >= 1):
+                    passed_filters+=1
+            # March 2020
+            my_time = final_results.loc[final_results['Time'] == 181]
+            for index, row in my_time.iterrows():
+                if (row["Fallow deer"] <= 272) & (row["Fallow deer"] >= 222) & (row["Red deer"] <= 40) & (row["Red deer"] >= 32) &(row["Longhorn cattle"] <= 106) & (row["Longhorn cattle"] >= 56)&(row["Tamworth pigs"] <= 17) & (row["Tamworth pigs"] >= 1):
+                    passed_filters+=1
+            # April 2020
+            my_time = final_results.loc[final_results['Time'] == 182]
+            for index, row in my_time.iterrows():
+                if (row["Exmoor pony"] <= 17) & (row["Exmoor pony"] >= 14) &(row["Longhorn cattle"] <= 106) & (row["Longhorn cattle"] >= 56) &(row["Tamworth pigs"] <= 17) & (row["Tamworth pigs"] >= 1):
+                    passed_filters+=1
+            # May 2020
+            my_time = final_results.loc[final_results['Time'] == 183]
+            for index, row in my_time.iterrows():
+                if (row["Tamworth pigs"] <= 29) & (row["Tamworth pigs"] >= 9) &(row["Exmoor pony"] <= 17) & (row["Exmoor pony"] >= 14) &(row["Longhorn cattle"] <= 106) & (row["Longhorn cattle"] >= 56) &(row["Roe deer"] <= 80) & (row["Roe deer"] >= 20) & (row["Grassland"] <= 36.8) & (row["Grassland"] >= 16.8) & (row["Thorny Scrub"] <= 61.8) & (row["Thorny Scrub"] >= 41.8) &(row["Woodland"] <= 31.5) & (row["Woodland"] >= 11.5):
+                    passed_filters+=1
+
+            print(passed_filters, perc_number, param_name)
+
+            sensitivity_results_list.append(passed_filters/63)
+            perc_numbers.append(str(perc_number))
+            parameter_names.append(param_name)
+
+
+    # append to dataframe
+    final_sensitivity_results = pd.concat([pd.DataFrame({'Filters': sensitivity_results_list}), pd.DataFrame({'Percentage': perc_numbers}),(pd.DataFrame({'Parameter_Name': parameter_names}).reset_index(drop=True))], axis=1).reset_index(drop=True)
+    print(final_sensitivity_results)
+    final_sensitivity_results.to_excel("all_parameter_changes.xlsx")
+
+
+run_sensitivity()
 
 
 
-# # WOODLAND
-woodland_gradients = []
-# find the gradient
-for grouped_name, grouped_data in grouped_dfs:
-    res = linregress(grouped_data["Parameter_Value"], grouped_data["Woodland"])
-    woodland_gradient = [grouped_name, res.slope]
-    woodland_gradients.append(woodland_gradient)
-woodland_gradients = pd.DataFrame(woodland_gradients)
-woodland_gradients.columns = ['Parameter_names', 'Gradient']
-# take the top 10 most important ones; make sure to turn the negative ones positive when organizing them
-woodland_gradients['Gradient'] = woodland_gradients['Gradient'].abs()
-woodland_gradients = woodland_gradients.sort_values(['Gradient'], ascending=[False])
-top_ten = woodland_gradients.iloc[0:10,:]
-top_ten.to_excel("/Users/emilyneil/Desktop/KneppABM/outputs/sensitivity/final_df_gradients_woodland.xlsx")
-# plot those
-top_ten_woodland = merged_dfs[merged_dfs['Parameter_Changes'].isin(top_ten['Parameter_names'])]
-ro = sns.relplot(data=top_ten_woodland, x='Parameter_Value', y='Woodland', col='Parameter_Changes', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
-ro.fig.suptitle('Woodland gradients')
-ro.set_titles('{col_name}')
-plt.tight_layout()
-plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/sensitivity/sensitivity_woodland.png')
-plt.show()
+
+
+def graph_sensitivity(): 
+
+    df =  pd.read_excel('all_parameter_changes.xlsx', engine='openpyxl')
+
+    # manually find the top 3-10 with steepest gradient - then look at those
+    df["Filters"] = df["Filters"] * 100
+
+    df["Top_Parameters"] = ["All other parameters" if cell != "chance_youngScrubMatures" and cell !="chance_youngScrubMatures" and cell != "chance_saplingBecomingTree" and cell != "chance_saplingBecomingTree" and cell != "chance_reproduceSapling" else cell for cell in df.Parameter_Name] 
+
+    df["Top_Parameters"] = ["Scrub diagonal" if cell == "chance_youngScrubMatures" else cell for cell in df["Top_Parameters"]]
+    df["Top_Parameters"] = ["Grass diagonal" if cell == "chance_youngScrubMatures" else cell for cell in df["Top_Parameters"]]
+    df["Top_Parameters"] = ["Grass impact on fallow deer" if cell == "chance_saplingBecomingTree" else cell for cell in df["Top_Parameters"]]
+    df["Top_Parameters"] = ["Scrub impact on grassland" if cell == "chance_saplingBecomingTree" else cell for cell in df["Top_Parameters"]]
+    df["Top_Parameters"] = ["Woodland impact on ponies" if cell == "chance_reproduceSapling" else cell for cell in df["Top_Parameters"]]
+    print(df)
+
+
+    # now plot it
+    g = sns.lineplot(data=df, x="Percentage", y="Filters", hue="Top_Parameters", palette="Paired", marker="o")
+    g.set(ylim=(0, 100))
+
+    # plt.legend(title='Parameters', ncol=2)
+    plt.title('Sensitivity test results')
+    plt.xlabel('Delta')
+    plt.ylabel('Percentage of filters passed')
+    plt.legend(title='Parameters', loc='lower right')
+    plt.tight_layout()
+    plt.savefig('sensitivity_test.png')
+
+    plt.show()
+    
+# graph_sensitivity()
+
+# # ROE DEER
+# roe_gradients = []
+# # find the gradient
+# for grouped_name, grouped_data in grouped_dfs:
+#     res = linregress(grouped_data["Parameter_Value"], grouped_data["Roe deer"])
+#     roe_gradient = [grouped_name, res.slope]
+#     roe_gradients.append(roe_gradient)
+# roe_gradients = pd.DataFrame(roe_gradients)
+# roe_gradients.columns = ['Parameter_names', 'Gradient']
+# # take the top 10 most important ones; make sure to turn the negative ones positive when organizing them
+# roe_gradients['Gradient'] = roe_gradients['Gradient'].abs()
+# roe_gradients = roe_gradients.sort_values(['Gradient'], ascending=[False])
+# top_ten = roe_gradients.iloc[0:10,:]
+# top_ten.to_excel("/Users/emilyneil/Desktop/KneppABM/outputs/sensitivity/final_df_gradients_roeDeer.xlsx")
+# # plot those
+# top_ten_roe = merged_dfs[merged_dfs['Parameter_Changes'].isin(top_ten['Parameter_names'])]
+# sns.set(font_scale=1)
+# ro = sns.relplot(data=top_ten_roe, x='Parameter_Value', y='Roe deer', col='Parameter_Changes', col_wrap=5, kind='scatter',facet_kws={'sharey': False, 'sharex': False})
+# ro.fig.suptitle('Roe deer gradients')
+# ro.set_titles('{col_name}')
+# plt.tight_layout()
+# plt.savefig('/Users/emilyneil/Desktop/KneppABM/outputs/sensitivity/sensitivity_roe.png')
+# plt.show()

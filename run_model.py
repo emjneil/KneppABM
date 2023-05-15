@@ -10,47 +10,31 @@ import matplotlib.pyplot as plt
 # # # # Run the model # # # # 
 
 
-def run_all_models():
+def create_params():
     
-    print("now doing run 9")
-
     # define number of simulations
-    number_simulations =  10000
+    number_simulations =  10
     # make list of variables
-    final_results_list = []
     final_parameters = []
     run_number = 0
-
+       
 
     for _ in range(number_simulations):
         # keep track of the runs 
         run_number += 1
-        print(run_number)
-        # choose my percent above/below number
-        # perc_aboveBelow = 0.5
 
         # import the param ranges
         param_ranges = pd.read_excel("ranges.xlsx")
 
         # define the parameters
         chance_reproduceSapling = random.uniform(param_ranges.loc[param_ranges.index[0], 'chance_reproduceSapling'], param_ranges.loc[param_ranges.index[1], 'chance_reproduceSapling'])
-        chance_reproduceYoungScrub = random.uniform(param_ranges.loc[param_ranges.index[0], 'chance_reproduceYoungScrub'], param_ranges.loc[param_ranges.index[1], 'chance_reproduceSapling'])
-        # chance_reproduceYoungScrub = random.uniform(0.1109531-(0.1109531*perc_aboveBelow), 0.1109531+(0.1109531*perc_aboveBelow))
+        chance_reproduceYoungScrub = random.uniform(param_ranges.loc[param_ranges.index[0], 'chance_reproduceYoungScrub'], param_ranges.loc[param_ranges.index[1], 'chance_reproduceYoungScrub'])
         chance_regrowGrass = random.uniform(param_ranges.loc[param_ranges.index[0], 'chance_regrowGrass'], param_ranges.loc[param_ranges.index[1], 'chance_regrowGrass'])
         chance_saplingBecomingTree = random.uniform(param_ranges.loc[param_ranges.index[0], 'chance_saplingBecomingTree'], param_ranges.loc[param_ranges.index[1], 'chance_saplingBecomingTree'])
         chance_youngScrubMatures =random.uniform(param_ranges.loc[param_ranges.index[0], 'chance_youngScrubMatures'], param_ranges.loc[param_ranges.index[1], 'chance_youngScrubMatures'])
         chance_scrubOutcompetedByTree = random.uniform(param_ranges.loc[param_ranges.index[0], 'chance_scrubOutcompetedByTree'], param_ranges.loc[param_ranges.index[1], 'chance_scrubOutcompetedByTree'])
         chance_grassOutcompetedByTree = random.uniform(param_ranges.loc[param_ranges.index[0], 'chance_grassOutcompetedByTree'], param_ranges.loc[param_ranges.index[1], 'chance_grassOutcompetedByTree'])
         chance_grassOutcompetedByScrub = random.uniform(param_ranges.loc[param_ranges.index[0], 'chance_grassOutcompetedByScrub'], param_ranges.loc[param_ranges.index[1], 'chance_grassOutcompetedByScrub'])
-        chance_saplingOutcompetedByTree = random.uniform(param_ranges.loc[param_ranges.index[0], 'chance_saplingOutcompetedByTree'], param_ranges.loc[param_ranges.index[1], 'chance_saplingOutcompetedByTree'])
-        chance_saplingOutcompetedByScrub = random.uniform(param_ranges.loc[param_ranges.index[0], 'chance_saplingOutcompetedByScrub'], param_ranges.loc[param_ranges.index[1], 'chance_saplingOutcompetedByScrub'])
-        chance_youngScrubOutcompetedByScrub =random.uniform(param_ranges.loc[param_ranges.index[0], 'chance_youngScrubOutcompetedByScrub'], param_ranges.loc[param_ranges.index[1], 'chance_youngScrubOutcompetedByScrub'])
-        chance_youngScrubOutcompetedByTree = random.uniform(param_ranges.loc[param_ranges.index[0], 'chance_youngScrubOutcompetedByTree'], param_ranges.loc[param_ranges.index[1], 'chance_youngScrubOutcompetedByTree'])
-
-        # initial values
-        initial_grassland = 0.8
-        initial_woodland = 0.14
-        initial_scrubland = 0.01
 
         # roe deer
         roe_deer_reproduce = random.uniform(param_ranges.loc[param_ranges.index[0], 'roe_deer_reproduce'], param_ranges.loc[param_ranges.index[1], 'roe_deer_reproduce'])
@@ -59,6 +43,7 @@ def run_all_models():
         roe_deer_gain_from_scrub =random.uniform(param_ranges.loc[param_ranges.index[0], 'roe_deer_gain_from_scrub'], param_ranges.loc[param_ranges.index[1], 'roe_deer_gain_from_scrub'])
         roe_deer_gain_from_saplings = random.uniform(param_ranges.loc[param_ranges.index[0], 'roe_deer_gain_from_saplings'], param_ranges.loc[param_ranges.index[1], 'roe_deer_gain_from_saplings'])
         roe_deer_gain_from_young_scrub = random.uniform(param_ranges.loc[param_ranges.index[0], 'roe_deer_gain_from_young_scrub'], param_ranges.loc[param_ranges.index[1], 'roe_deer_gain_from_young_scrub'])
+        
         # Fallow deer
         fallow_deer_reproduce = random.uniform(param_ranges.loc[param_ranges.index[0], 'fallow_deer_reproduce'], param_ranges.loc[param_ranges.index[1], 'fallow_deer_reproduce'])
         fallow_deer_gain_from_grass = random.uniform(param_ranges.loc[param_ranges.index[0], 'fallow_deer_gain_from_grass'], param_ranges.loc[param_ranges.index[1], 'fallow_deer_gain_from_grass'])
@@ -66,6 +51,7 @@ def run_all_models():
         fallow_deer_gain_from_scrub = random.uniform(param_ranges.loc[param_ranges.index[0], 'fallow_deer_gain_from_scrub'], param_ranges.loc[param_ranges.index[1], 'fallow_deer_gain_from_scrub'])
         fallow_deer_gain_from_saplings = random.uniform(param_ranges.loc[param_ranges.index[0], 'fallow_deer_gain_from_saplings'], param_ranges.loc[param_ranges.index[1], 'fallow_deer_gain_from_saplings'])
         fallow_deer_gain_from_young_scrub = random.uniform(param_ranges.loc[param_ranges.index[0], 'fallow_deer_gain_from_young_scrub'], param_ranges.loc[param_ranges.index[1], 'fallow_deer_gain_from_young_scrub'])
+       
         # Red deer
         red_deer_reproduce = random.uniform(param_ranges.loc[param_ranges.index[0], 'red_deer_reproduce'], param_ranges.loc[param_ranges.index[1], 'red_deer_reproduce'])
         red_deer_gain_from_grass = random.uniform(param_ranges.loc[param_ranges.index[0], 'red_deer_gain_from_grass'], param_ranges.loc[param_ranges.index[1], 'red_deer_gain_from_grass'])
@@ -73,12 +59,14 @@ def run_all_models():
         red_deer_gain_from_scrub =random.uniform(param_ranges.loc[param_ranges.index[0], 'red_deer_gain_from_scrub'], param_ranges.loc[param_ranges.index[1], 'red_deer_gain_from_scrub'])
         red_deer_gain_from_saplings = random.uniform(param_ranges.loc[param_ranges.index[0], 'red_deer_gain_from_saplings'], param_ranges.loc[param_ranges.index[1], 'red_deer_gain_from_saplings'])
         red_deer_gain_from_young_scrub = random.uniform(param_ranges.loc[param_ranges.index[0], 'red_deer_gain_from_young_scrub'], param_ranges.loc[param_ranges.index[1], 'red_deer_gain_from_young_scrub'])
+       
         # Exmoor ponies
         ponies_gain_from_grass = random.uniform(param_ranges.loc[param_ranges.index[0], 'ponies_gain_from_grass'], param_ranges.loc[param_ranges.index[1], 'ponies_gain_from_grass'])
         ponies_gain_from_trees = random.uniform(param_ranges.loc[param_ranges.index[0], 'ponies_gain_from_trees'], param_ranges.loc[param_ranges.index[1], 'ponies_gain_from_trees'])
         ponies_gain_from_scrub = random.uniform(param_ranges.loc[param_ranges.index[0], 'ponies_gain_from_scrub'], param_ranges.loc[param_ranges.index[1], 'ponies_gain_from_scrub'])
         ponies_gain_from_saplings = random.uniform(param_ranges.loc[param_ranges.index[0], 'ponies_gain_from_saplings'], param_ranges.loc[param_ranges.index[1], 'ponies_gain_from_saplings'])
         ponies_gain_from_young_scrub = random.uniform(param_ranges.loc[param_ranges.index[0], 'ponies_gain_from_young_scrub'], param_ranges.loc[param_ranges.index[1], 'ponies_gain_from_young_scrub'])
+       
         # Longhorn cattle
         cattle_reproduce = random.uniform(param_ranges.loc[param_ranges.index[0], 'cattle_reproduce'], param_ranges.loc[param_ranges.index[1], 'cattle_reproduce'])
         cows_gain_from_grass = random.uniform(param_ranges.loc[param_ranges.index[0], 'cows_gain_from_grass'], param_ranges.loc[param_ranges.index[1], 'cows_gain_from_grass'])
@@ -86,6 +74,7 @@ def run_all_models():
         cows_gain_from_scrub = random.uniform(param_ranges.loc[param_ranges.index[0], 'cows_gain_from_scrub'], param_ranges.loc[param_ranges.index[1], 'cows_gain_from_scrub'])
         cows_gain_from_saplings = random.uniform(param_ranges.loc[param_ranges.index[0], 'cows_gain_from_saplings'], param_ranges.loc[param_ranges.index[1], 'cows_gain_from_saplings'])
         cows_gain_from_young_scrub = random.uniform(param_ranges.loc[param_ranges.index[0], 'cows_gain_from_young_scrub'], param_ranges.loc[param_ranges.index[1], 'cows_gain_from_young_scrub'])
+     
         # Tamworth pigs
         tamworth_pig_reproduce = random.uniform(param_ranges.loc[param_ranges.index[0], 'tamworth_pig_reproduce'], param_ranges.loc[param_ranges.index[1], 'tamworth_pig_reproduce'])
         tamworth_pig_gain_from_grass = random.uniform(param_ranges.loc[param_ranges.index[0], 'tamworth_pig_gain_from_grass'], param_ranges.loc[param_ranges.index[1], 'tamworth_pig_gain_from_grass'])
@@ -93,7 +82,10 @@ def run_all_models():
         tamworth_pig_gain_from_scrub = random.uniform(param_ranges.loc[param_ranges.index[0], 'tamworth_pig_gain_from_scrub'], param_ranges.loc[param_ranges.index[1], 'tamworth_pig_gain_from_scrub'])
         tamworth_pig_gain_from_saplings = random.uniform(param_ranges.loc[param_ranges.index[0], 'tamworth_pig_gain_from_saplings'], param_ranges.loc[param_ranges.index[1], 'tamworth_pig_gain_from_saplings'])
         tamworth_pig_gain_from_young_scrub = random.uniform(param_ranges.loc[param_ranges.index[0], 'tamworth_pig_gain_from_young_scrub'], param_ranges.loc[param_ranges.index[1], 'tamworth_pig_gain_from_young_scrub'])
-        
+
+        # chance of scrub saving saplings
+        chance_scrub_saves_saplings = random.uniform(param_ranges.loc[param_ranges.index[0], 'chance_scrub_saves_saplings'], param_ranges.loc[param_ranges.index[1], 'chance_scrub_saves_saplings'])
+
         # stocking values
         initial_roe = 12
         fallowDeer_stocking = 247
@@ -134,11 +126,12 @@ def run_all_models():
         exmoor_stocking_forecast = 15
         introduced_species_stocking_forecast = 0
 
+
         # keep track of my parameters
         parameters_used = [
             initial_roe, roe_deer_reproduce, roe_deer_gain_from_saplings, roe_deer_gain_from_trees, roe_deer_gain_from_scrub, roe_deer_gain_from_young_scrub, roe_deer_gain_from_grass,
             chance_youngScrubMatures, chance_saplingBecomingTree, chance_reproduceSapling,chance_reproduceYoungScrub, chance_regrowGrass, 
-            chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_scrubOutcompetedByTree, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByTree, chance_youngScrubOutcompetedByScrub, 
+            chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_scrubOutcompetedByTree,  
             ponies_gain_from_saplings, ponies_gain_from_trees, ponies_gain_from_scrub, ponies_gain_from_young_scrub, ponies_gain_from_grass, 
             cattle_reproduce, cows_gain_from_grass, cows_gain_from_trees, cows_gain_from_scrub, cows_gain_from_saplings, cows_gain_from_young_scrub, 
             fallow_deer_reproduce, fallow_deer_gain_from_saplings, fallow_deer_gain_from_trees, fallow_deer_gain_from_scrub, fallow_deer_gain_from_young_scrub, fallow_deer_gain_from_grass,
@@ -149,14 +142,146 @@ def run_all_models():
             reindeer_reproduce, reindeer_gain_from_grass, reindeer_gain_from_trees, reindeer_gain_from_scrub, reindeer_gain_from_saplings, reindeer_gain_from_young_scrub,
             fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
             fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, introduced_species_stocking_forecast,
+            chance_scrub_saves_saplings, 
             run_number]
+
 
         # append to dataframe
         final_parameters.append(parameters_used)
+        
+    parameter_names = [
+    "initial_roe", "roe_deer_reproduce", "roe_deer_gain_from_saplings", "roe_deer_gain_from_trees", "roe_deer_gain_from_scrub", "roe_deer_gain_from_young_scrub", "roe_deer_gain_from_grass",
+    "chance_youngScrubMatures", "chance_saplingBecomingTree", "chance_reproduceSapling","chance_reproduceYoungScrub", "chance_regrowGrass", 
+    "chance_grassOutcompetedByTree", "chance_grassOutcompetedByScrub", "chance_scrubOutcompetedByTree", 
+    "ponies_gain_from_saplings", "ponies_gain_from_trees", "ponies_gain_from_scrub", "ponies_gain_from_young_scrub", "ponies_gain_from_grass", 
+    "cattle_reproduce", "cows_gain_from_grass", "cows_gain_from_trees", "cows_gain_from_scrub", "cows_gain_from_saplings", "cows_gain_from_young_scrub", 
+    "fallow_deer_reproduce", "fallow_deer_gain_from_saplings", "fallow_deer_gain_from_trees", "fallow_deer_gain_from_scrub", "fallow_deer_gain_from_young_scrub", "fallow_deer_gain_from_grass",
+    "red_deer_reproduce", "red_deer_gain_from_saplings", "red_deer_gain_from_trees", "red_deer_gain_from_scrub", "red_deer_gain_from_young_scrub", "red_deer_gain_from_grass",
+    "tamworth_pig_reproduce", "tamworth_pig_gain_from_saplings","tamworth_pig_gain_from_trees","tamworth_pig_gain_from_scrub","tamworth_pig_gain_from_young_scrub","tamworth_pig_gain_from_grass",
+    "european_bison_reproduce", "european_bison_gain_from_grass", "european_bison_gain_from_trees", "european_bison_gain_from_scrub", "european_bison_gain_from_saplings", "european_bison_gain_from_young_scrub",
+    "european_elk_reproduce", "european_elk_gain_from_grass", "european_elk_gain_from_trees", "european_elk_gain_from_scrub", "european_elk_gain_from_saplings", "european_elk_gain_from_young_scrub",
+    "reindeer_reproduce", "reindeer_gain_from_grass", "reindeer_gain_from_trees", "reindeer_gain_from_scrub", "reindeer_gain_from_saplings", "reindeer_gain_from_young_scrub",
+    "fallowDeer_stocking", "cattle_stocking", "redDeer_stocking", "tamworthPig_stocking", "exmoor_stocking",
+    "fallowDeer_stocking_forecast", "cattle_stocking_forecast", "redDeer_stocking_forecast", "tamworthPig_stocking_forecast", "exmoor_stocking_forecast", "introduced_species_stocking_forecast",
+    "chance_scrub_saves_saplings",
+    "run_number"]
+
+    # check out the parameters used
+    final_parameters = pd.DataFrame(data=final_parameters, columns=parameter_names)
+
+    # and save it to csv
+    final_parameters.to_csv('all_parameters_25.csv')
+
+
+
+
+
+def run_all_models():
+
+    print("run 25")
+
+    # first create the parameters
+    create_params()
+
+    final_parameters = pd.read_csv("all_parameters_25.csv").drop("Unnamed: 0", axis=1)
+
+    final_results_list = []
+
+    for index, row in final_parameters.iterrows():
+
+        print(row["run_number"])
+
+        chance_reproduceSapling = row["chance_reproduceSapling"]
+        chance_reproduceYoungScrub =  row["chance_reproduceYoungScrub"]
+        chance_regrowGrass =  row["chance_regrowGrass"]
+        chance_saplingBecomingTree =  row["chance_saplingBecomingTree"]
+        chance_youngScrubMatures =  row["chance_youngScrubMatures"]
+        chance_scrubOutcompetedByTree =  row["chance_scrubOutcompetedByTree"]
+        chance_grassOutcompetedByTree =  row["chance_grassOutcompetedByTree"]
+        chance_grassOutcompetedByScrub = row["chance_grassOutcompetedByScrub"]
+
+        initial_roe = 12
+        fallowDeer_stocking = 247
+        cattle_stocking = 81
+        redDeer_stocking = 35
+        tamworthPig_stocking = 7
+        exmoor_stocking = 15
+
+        roe_deer_reproduce = row["roe_deer_reproduce"]
+        roe_deer_gain_from_grass =  row["roe_deer_gain_from_grass"]
+        roe_deer_gain_from_trees =  row["roe_deer_gain_from_trees"]
+        roe_deer_gain_from_scrub =  row["roe_deer_gain_from_scrub"]
+        roe_deer_gain_from_saplings =  row["roe_deer_gain_from_saplings"]
+        roe_deer_gain_from_young_scrub =  row["roe_deer_gain_from_young_scrub"]
+        ponies_gain_from_grass =  row["ponies_gain_from_grass"]
+        ponies_gain_from_trees =  row["ponies_gain_from_trees"]
+        ponies_gain_from_scrub =  row["ponies_gain_from_scrub"]
+        ponies_gain_from_saplings =  row["ponies_gain_from_saplings"]
+        ponies_gain_from_young_scrub =  row["ponies_gain_from_young_scrub"]
+        cattle_reproduce =  row["cattle_reproduce"]
+        cows_gain_from_grass =  row["cows_gain_from_grass"]
+        cows_gain_from_trees =  row["cows_gain_from_trees"]
+        cows_gain_from_scrub =  row["cows_gain_from_scrub"]
+        cows_gain_from_saplings =  row["cows_gain_from_saplings"]
+        cows_gain_from_young_scrub =  row["cows_gain_from_young_scrub"]
+        fallow_deer_reproduce =  row["fallow_deer_reproduce"]
+        fallow_deer_gain_from_grass =  row["fallow_deer_gain_from_grass"]
+        fallow_deer_gain_from_trees =  row["fallow_deer_gain_from_trees"]
+        fallow_deer_gain_from_scrub =  row["fallow_deer_gain_from_scrub"]
+        fallow_deer_gain_from_saplings =  row["fallow_deer_gain_from_saplings"]
+        fallow_deer_gain_from_young_scrub =  row["fallow_deer_gain_from_young_scrub"]   
+        red_deer_reproduce =  row["red_deer_reproduce"]
+        red_deer_gain_from_grass =  row["red_deer_gain_from_grass"]
+        red_deer_gain_from_trees =  row["red_deer_gain_from_trees"]
+        red_deer_gain_from_scrub =  row["red_deer_gain_from_scrub"]
+        red_deer_gain_from_saplings =  row["red_deer_gain_from_saplings"]
+        red_deer_gain_from_young_scrub =  row["red_deer_gain_from_young_scrub"]
+        tamworth_pig_reproduce =  row["tamworth_pig_reproduce"]
+        tamworth_pig_gain_from_grass =  row["tamworth_pig_gain_from_grass"]
+        tamworth_pig_gain_from_trees = row["tamworth_pig_gain_from_trees"]
+        tamworth_pig_gain_from_scrub = row["tamworth_pig_gain_from_scrub"]
+        tamworth_pig_gain_from_saplings =  row["tamworth_pig_gain_from_saplings"]
+        tamworth_pig_gain_from_young_scrub =  row["tamworth_pig_gain_from_young_scrub"]
+
+        # euro bison parameters
+        european_bison_reproduce = 0
+        # bison should have higher impact than any other consumer
+        european_bison_gain_from_grass =  0
+        european_bison_gain_from_trees =0
+        european_bison_gain_from_scrub =0
+        european_bison_gain_from_saplings = 0
+        european_bison_gain_from_young_scrub = 0  
+        # euro elk parameters
+        european_elk_reproduce = 0
+        # bison should have higher impact than any other consumer
+        european_elk_gain_from_grass =  0
+        european_elk_gain_from_trees = 0
+        european_elk_gain_from_scrub = 0
+        european_elk_gain_from_saplings =  0
+        european_elk_gain_from_young_scrub =  0
+        # reindeer parameters
+        reindeer_reproduce = 0
+        # reindeer should have impacts between red and fallow deer
+        reindeer_gain_from_grass = 0
+        reindeer_gain_from_trees =0
+        reindeer_gain_from_scrub =0
+        reindeer_gain_from_saplings = 0
+        reindeer_gain_from_young_scrub = 0
+        # forecasting parameters
+        fallowDeer_stocking_forecast = 247
+        cattle_stocking_forecast = 81
+        redDeer_stocking_forecast = 35
+        tamworthPig_stocking_forecast = 7
+        exmoor_stocking_forecast = 15
+        introduced_species_stocking_forecast = 0
+        chance_scrub_saves_saplings = row["chance_scrub_saves_saplings"]
+
+        random.seed(1)
+        np.random.seed(1)
 
         model = KneppModel(initial_roe, roe_deer_reproduce, roe_deer_gain_from_saplings, roe_deer_gain_from_trees, roe_deer_gain_from_scrub, roe_deer_gain_from_young_scrub, roe_deer_gain_from_grass,
                             chance_youngScrubMatures, chance_saplingBecomingTree, chance_reproduceSapling,chance_reproduceYoungScrub, chance_regrowGrass, 
-                            chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_scrubOutcompetedByTree, chance_saplingOutcompetedByTree, chance_saplingOutcompetedByScrub, chance_youngScrubOutcompetedByTree, chance_youngScrubOutcompetedByScrub, 
+                            chance_grassOutcompetedByTree, chance_grassOutcompetedByScrub, chance_scrubOutcompetedByTree, 
                             ponies_gain_from_saplings, ponies_gain_from_trees, ponies_gain_from_scrub, ponies_gain_from_young_scrub, ponies_gain_from_grass, 
                             cattle_reproduce, cows_gain_from_grass, cows_gain_from_trees, cows_gain_from_scrub, cows_gain_from_saplings, cows_gain_from_young_scrub, 
                             fallow_deer_reproduce, fallow_deer_gain_from_saplings, fallow_deer_gain_from_trees, fallow_deer_gain_from_scrub, fallow_deer_gain_from_young_scrub, fallow_deer_gain_from_grass,
@@ -167,36 +292,23 @@ def run_all_models():
                             reindeer_reproduce, reindeer_gain_from_grass, reindeer_gain_from_trees, reindeer_gain_from_scrub, reindeer_gain_from_saplings, reindeer_gain_from_young_scrub,
                             fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
                             fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, introduced_species_stocking_forecast,
+                            chance_scrub_saves_saplings,
                             max_time = 185, reintroduction = True, introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
+        
+        # set the seed
+        model.reset_randomizer(seed=1)
 
         model.run_model()
 
         # remember the results of the model (dominant conditions, # of agents)
         results = model.datacollector.get_model_vars_dataframe()
-        results['run_number'] = run_number
+        results['run_number'] =  row["run_number"]
         final_results_list.append(results)
+
     
     # append to dataframe
     final_results = pd.concat(final_results_list)
 
-    parameter_names = [
-        "initial_roe", "roe_deer_reproduce", "roe_deer_gain_from_saplings", "roe_deer_gain_from_trees", "roe_deer_gain_from_scrub", "roe_deer_gain_from_young_scrub", "roe_deer_gain_from_grass",
-        "chance_youngScrubMatures", "chance_saplingBecomingTree", "chance_reproduceSapling","chance_reproduceYoungScrub", "chance_regrowGrass", 
-        "chance_grassOutcompetedByTree", "chance_grassOutcompetedByScrub", "chance_scrubOutcompetedByTree", "chance_saplingOutcompetedByTree", "chance_saplingOutcompetedByScrub", "chance_youngScrubOutcompetedByTree", "chance_youngScrubOutcompetedByScrub", 
-        "ponies_gain_from_saplings", "ponies_gain_from_trees", "ponies_gain_from_scrub", "ponies_gain_from_young_scrub", "ponies_gain_from_grass", 
-        "cattle_reproduce", "cows_gain_from_grass", "cows_gain_from_trees", "cows_gain_from_scrub", "cows_gain_from_saplings", "cows_gain_from_young_scrub", 
-        "fallow_deer_reproduce", "fallow_deer_gain_from_saplings", "fallow_deer_gain_from_trees", "fallow_deer_gain_from_scrub", "fallow_deer_gain_from_young_scrub", "fallow_deer_gain_from_grass",
-        "red_deer_reproduce", "red_deer_gain_from_saplings", "red_deer_gain_from_trees", "red_deer_gain_from_scrub", "red_deer_gain_from_young_scrub", "red_deer_gain_from_grass",
-        "tamworth_pig_reproduce", "tamworth_pig_gain_from_saplings","tamworth_pig_gain_from_trees","tamworth_pig_gain_from_scrub","tamworth_pig_gain_from_young_scrub","tamworth_pig_gain_from_grass",
-        "european_bison_reproduce", "european_bison_gain_from_grass", "european_bison_gain_from_trees", "european_bison_gain_from_scrub", "european_bison_gain_from_saplings", "european_bison_gain_from_young_scrub",
-        "european_elk_reproduce", "european_elk_gain_from_grass", "european_elk_gain_from_trees", "european_elk_gain_from_scrub", "european_elk_gain_from_saplings", "european_elk_gain_from_young_scrub",
-        "reindeer_reproduce", "reindeer_gain_from_grass", "reindeer_gain_from_trees", "reindeer_gain_from_scrub", "reindeer_gain_from_saplings", "reindeer_gain_from_young_scrub",
-        "fallowDeer_stocking", "cattle_stocking", "redDeer_stocking", "tamworthPig_stocking", "exmoor_stocking",
-        "fallowDeer_stocking_forecast", "cattle_stocking_forecast", "redDeer_stocking_forecast", "tamworthPig_stocking_forecast", "exmoor_stocking_forecast", "introduced_species_stocking_forecast",
-        "run_number"]
-
-    # check out the parameters used
-    final_parameters = pd.DataFrame(data=final_parameters, columns=parameter_names)
 
     # which filters were the most difficult to pass?
     difficult_filters = pd.DataFrame({
@@ -594,8 +706,6 @@ def run_all_models():
             accepted_runs.append(row["run_number"])
             difficult_filters.loc[47,'times_passed'] += 1
     final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
-  
-
     # March 2019
     my_time = final_results.loc[final_results['Time'] == 169]
     accepted_runs = []
@@ -684,7 +794,6 @@ def run_all_models():
             accepted_runs.append(row["run_number"])
             difficult_filters.loc[58,'times_passed'] += 1
     final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
-  
     # Feb 2020
     my_time = final_results.loc[final_results['Time'] == 180]
     accepted_runs = []
@@ -714,32 +823,15 @@ def run_all_models():
     my_time = final_results.loc[final_results['Time'] == 183]
     accepted_runs = []
     for index, row in my_time.iterrows():
-        if (row["Tamworth pigs"] <= 29) & (row["Tamworth pigs"] >= 9) &(row["Exmoor pony"] <= 17) & (row["Exmoor pony"] >= 14) &(row["Longhorn cattle"] <= 106) & (row["Longhorn cattle"] >= 56) &(row["Roe deer"] <= 80) & (row["Roe deer"] >= 20) & (row["Grassland"] <= 36.8) & (row["Grassland"] >= 16.8) & (row["Thorny Scrub"] <= 61.8) & (row["Thorny Scrub"] >= 41.8) &(row["Woodland"] <= 26.5) & (row["Woodland"] >= 16.5):
+        if (row["Tamworth pigs"] <= 29) & (row["Tamworth pigs"] >= 9) &(row["Exmoor pony"] <= 17) & (row["Exmoor pony"] >= 14) &(row["Longhorn cattle"] <= 106) & (row["Longhorn cattle"] >= 56) &(row["Roe deer"] <= 80) & (row["Roe deer"] >= 20) & (row["Grassland"] <= 36.8) & (row["Grassland"] >= 16.8) & (row["Thorny Scrub"] <= 61.8) & (row["Thorny Scrub"] >= 41.8) &(row["Woodland"] <= 31.5) & (row["Woodland"] >= 11.5):
             accepted_runs.append(row["run_number"])
             difficult_filters.loc[62,'times_passed'] += 1
     final_results['passed_filters'] = np.where(final_results['run_number'].isin(accepted_runs),final_results['passed_filters']+1,final_results['passed_filters']) 
 
-    difficult_filters.to_csv('difficult_filters_9.csv')
+    difficult_filters.to_csv('difficult_filters_25.csv')
 
-    # get the top 1% of results 
-    last_year = final_results.loc[final_results['Time'] == 183] # pick one year to look at
-    best_results = last_year.nlargest(100, 'passed_filters')
-    # keep track of how many passed filters
-    filters_passed_graph = best_results[["passed_filters"]]/63
-    filters_passed_graph.to_excel('filters_passed_graph_9.xlsx')
+    # save the results
+    final_results.to_csv('final_results_25.csv')
 
-    # accepted parameters
-    accepted_parameters = final_parameters[final_parameters['run_number'].isin(best_results['run_number'])]
-    # tag the accepted simulations
-    final_results['accepted?'] = np.where(final_results['run_number'].isin(accepted_parameters['run_number']), 'Accepted', 'Rejected')
-    final_results.to_csv('final_results_9.csv')
-
-    # save to csv - all parameters
-    final_parameters["accepted?"] = np.where(final_parameters['run_number'].isin(best_results['run_number']), 'Accepted', 'Rejected')
-    final_parameters.to_csv('all_parameters_9.csv')
-    accepted_parameters.to_csv('accepted_parameters_9.csv')
-
-    return number_simulations, final_results, accepted_parameters
 
 run_all_models()
-
