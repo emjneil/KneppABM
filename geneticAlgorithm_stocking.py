@@ -13,11 +13,8 @@ import random
 
 def objectiveFunction(x):
 
-    accepted_parameters = pd.read_csv('combined_accepted_parameters.csv') 
+    accepted_parameters = pd.read_csv('best_parameter_set.csv') 
     accepted_parameters.drop(['Unnamed: 0'], axis=1, inplace=True)
-    # visualize the best run
-    accepted_parameters = accepted_parameters.loc[(accepted_parameters['run_number'] == 55724)]
-
 
     # define the parameters 
     chance_reproduceSapling = accepted_parameters["chance_reproduceSapling"].item()
@@ -72,13 +69,14 @@ def objectiveFunction(x):
     tamworth_pig_gain_from_saplings =  accepted_parameters["tamworth_pig_gain_from_saplings"].item()
     tamworth_pig_gain_from_young_scrub =  accepted_parameters["tamworth_pig_gain_from_young_scrub"].item()
 
-    european_bison_reproduce = 0
+    # euro bison parameters
+    european_bison_reproduce = random.uniform(cattle_reproduce-(cattle_reproduce*0.1), cattle_reproduce+(cattle_reproduce*0.1))
     # bison should have higher impact than any other consumer
-    european_bison_gain_from_grass =  0
-    european_bison_gain_from_trees =0
-    european_bison_gain_from_scrub =0
-    european_bison_gain_from_saplings = 0
-    european_bison_gain_from_young_scrub = 0  
+    european_bison_gain_from_grass = random.uniform(cows_gain_from_grass, cows_gain_from_grass+(cows_gain_from_grass*0.1))
+    european_bison_gain_from_trees =random.uniform(cows_gain_from_trees, cows_gain_from_trees+(cows_gain_from_trees*0.1))
+    european_bison_gain_from_scrub =random.uniform(cows_gain_from_scrub, cows_gain_from_scrub+(cows_gain_from_scrub*0.1))
+    european_bison_gain_from_saplings = random.uniform(cows_gain_from_saplings, cows_gain_from_saplings+(cows_gain_from_saplings*0.1))
+    european_bison_gain_from_young_scrub = random.uniform(cows_gain_from_young_scrub, cows_gain_from_young_scrub+(cows_gain_from_young_scrub*0.1))
     # euro elk parameters
     european_elk_reproduce = random.uniform(red_deer_reproduce-(red_deer_reproduce*0.1), red_deer_reproduce+(red_deer_reproduce*0.1))
     # bison should have higher impact than any other consumer
@@ -132,7 +130,7 @@ def objectiveFunction(x):
                         fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
                         fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, introduced_species_stocking_forecast,
                         chance_scrub_saves_saplings,
-                        max_time = 485, reintroduction = True, introduce_euroBison = False, introduce_elk = True, introduce_reindeer = False)
+                        max_time = 485, reintroduction = True, introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
 
 
     model.reset_randomizer(seed=1)
@@ -164,12 +162,12 @@ def objectiveFunction(x):
 def run_optimizer():
     # Define the bounds
     bds = np.array([
-        [-1,2],[-1,2],[-1,2],[-1,2],[-1,2]])
-        # [0,0],[0,0],[0,0],[0,0],[-0,0]])
+        [-1, 2],[-1, 2],[-1, 2],[-1, 2],[-1, 2]])
+        # [1,1],[1,1],[1,1],[1,1],[1,1]])
 
     # popsize and maxiter are defined at the top of the page, was 10x100
-    algorithm_param = {'max_num_iteration':5,
-                    'population_size':50,\
+    algorithm_param = {'max_num_iteration':3,
+                    'population_size':10,\
                     'mutation_probability':0.1,\
                     'elit_ratio': 0.01,\
                     'crossover_probability': 0.5,\
@@ -184,6 +182,9 @@ def run_optimizer():
     # return excel with rows = output values and number of filters passed
     pd.DataFrame(outputs).to_excel('stocking_density_outputs.xlsx', header=False, index=False)
     return optimization.output_dict
+
+
+
 
 
 
@@ -351,7 +352,7 @@ def graph_results():
     final_df = final_df.join(perc6, on=['Time', 'Ecosystem Element'])
 
     final_df = final_df.reset_index(drop=True)
-    final_df.to_csv("stocking_experiment.csv")
+    final_df.to_csv("stocking_experiment_1.csv")
 
 
 graph_results()

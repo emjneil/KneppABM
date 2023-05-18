@@ -7,13 +7,9 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 
-def forecasting():
+def forecasting(): # change eurobison or elk to TRUE in the model to test these reintroductions
 
     accepted_parameters = pd.read_csv('combined_accepted_parameters.csv')
-
-    # run the first 25 (experiment)
-    # accepted_parameters = accepted_parameters.loc[(accepted_parameters['run_number'] == 2)]
-    accepted_parameters = accepted_parameters.iloc[0:25]
 
     # run forecasting
     final_results_list = []
@@ -101,12 +97,12 @@ def forecasting():
         reindeer_gain_from_scrub =0
         reindeer_gain_from_saplings = 0
         reindeer_gain_from_young_scrub = 0
-        # forecasting parameters
-        fallowDeer_stocking_forecast = 247
-        cattle_stocking_forecast = 81
-        redDeer_stocking_forecast = 35
-        tamworthPig_stocking_forecast = 7
-        exmoor_stocking_forecast = 15
+        # forecasting parameters - REMEMBER TO CHANGE THESE
+        fallowDeer_stocking_forecast = 247 + (0.6*247)
+        cattle_stocking_forecast = 81 + (0.5*81)
+        redDeer_stocking_forecast = 35 + (-0.5*35)
+        tamworthPig_stocking_forecast = 7 + (0.4*7)
+        exmoor_stocking_forecast = 15 + (-0.8*15)
         introduced_species_stocking_forecast = 0
         chance_scrub_saves_saplings = row["chance_scrub_saves_saplings"]
 
@@ -127,7 +123,7 @@ def forecasting():
                             fallowDeer_stocking, cattle_stocking, redDeer_stocking, tamworthPig_stocking, exmoor_stocking,
                             fallowDeer_stocking_forecast, cattle_stocking_forecast, redDeer_stocking_forecast, tamworthPig_stocking_forecast, exmoor_stocking_forecast, introduced_species_stocking_forecast,
                             chance_scrub_saves_saplings,
-                            max_time = 185, reintroduction = True, introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
+                            max_time = 485, reintroduction = True, introduce_euroBison = False, introduce_elk = False, introduce_reindeer = False)
 
 
         model.reset_randomizer(seed=1)
@@ -218,7 +214,7 @@ def forecasting():
     axes[7].set_title("Woodland")
     axes[8].set_title("Thorny scrub")
     axes[9].set_title("Bare ground")
-    # axes[10].set_title("European bison")
+    # axes[10].set_title("European elk")
 
     # add filter lines
     f.axes[0].vlines(x=50,ymin=12,ymax=40, color='r')
@@ -468,7 +464,7 @@ def forecasting():
 
     f.fig.suptitle('Forecasting fifty years into the future')
     plt.tight_layout()
-    plt.savefig('forecasting_experiment_1.png')
+    plt.savefig('forecasting_experiment.png')
     plt.show()
 
     return forecasting, final_df
