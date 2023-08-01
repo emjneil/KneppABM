@@ -197,20 +197,19 @@ class roe_deer_agent(mg.GeoAgent):
         living = True
         # move & reduce energy
         self.move(self, FieldAgent)
-        self.energy -= 1
+        self.energy = 0
         # eat
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
-        self.energy += self.eat(self, habitat_patch, my_dietary_preference="browser", gain_from_saplings = self.model.roe_deer_gain_from_saplings, gain_from_trees=self.model.roe_deer_gain_from_trees, gain_from_scrub=self.model.roe_deer_gain_from_scrub, gain_from_young_scrub=self.model.roe_deer_gain_from_young_scrub, gain_from_grass=self.model.roe_deer_gain_from_grass)
+        self.energy = self.eat(self, habitat_patch, my_dietary_preference="browser", gain_from_saplings = self.model.roe_deer_gain_from_saplings, gain_from_trees=self.model.roe_deer_gain_from_trees, gain_from_scrub=self.model.roe_deer_gain_from_scrub, gain_from_young_scrub=self.model.roe_deer_gain_from_young_scrub, gain_from_grass=self.model.roe_deer_gain_from_grass)
         # if roe deer's energy is less than 0, die 
-        if self.energy <= 0:
+        if self.energy < 1:
             self.model.space.remove_herbivore_agent(self)
             self.model.schedule.remove(self)
             living = False
         # I can reproduce in May & June (years run March-March)
         if living and (random.random() < self.model.roe_deer_reproduce/np.log10(self.model.schedule.get_breed_count(roe_deer_agent)+ 1)) and (3 <= self.model.get_month() < 5):
             # Create a new deer and divide energy:
-            self.energy = np.random.uniform(0, self.energy)
-            fawn = roe_deer_agent(uuid.uuid4().int, self.model, crs=self.crs, geometry=self.geometry, field_id=self.field_id, energy=self.energy, move = self.move, eat = self.eat)
+            fawn = roe_deer_agent(uuid.uuid4().int, self.model, crs=self.crs, geometry=self.geometry, field_id=self.field_id, energy=0, move = self.move, eat = self.eat)
             self.model.space.add_herbivore_agent(fawn, field_id=self.field_id)
             self.model.schedule.add(fawn)
 
@@ -228,12 +227,12 @@ class exmoor_pony_agent(mg.GeoAgent):
     def step(self):
         # move & reduce energy
         self.move(self, FieldAgent)
-        self.energy -= 1
+        self.energy = 0
         # eat
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
-        self.energy += self.eat(self, habitat_patch, my_dietary_preference="grazer", gain_from_saplings = self.model.ponies_gain_from_saplings, gain_from_trees=self.model.ponies_gain_from_trees, gain_from_scrub=self.model.ponies_gain_from_scrub, gain_from_young_scrub=self.model.ponies_gain_from_young_scrub, gain_from_grass=self.model.ponies_gain_from_grass)
+        self.energy = self.eat(self, habitat_patch, my_dietary_preference="grazer", gain_from_saplings = self.model.ponies_gain_from_saplings, gain_from_trees=self.model.ponies_gain_from_trees, gain_from_scrub=self.model.ponies_gain_from_scrub, gain_from_young_scrub=self.model.ponies_gain_from_young_scrub, gain_from_grass=self.model.ponies_gain_from_grass)
         # if energy is less than 0, die 
-        if self.energy <= 0:
+        if self.energy < 1:
             self.model.space.remove_herbivore_agent(self)
             self.model.schedule.remove(self)
      
@@ -253,20 +252,19 @@ class longhorn_cattle_agent(mg.GeoAgent):
         living = True
         # move & reduce energy
         self.move(self, FieldAgent)
-        self.energy -= 1
+        self.energy = 0
         # eat
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
-        self.energy += self.eat(self, habitat_patch, my_dietary_preference="grazer", gain_from_saplings = self.model.cows_gain_from_saplings, gain_from_trees=self.model.cows_gain_from_trees, gain_from_scrub=self.model.cows_gain_from_scrub, gain_from_young_scrub=self.model.cows_gain_from_young_scrub, gain_from_grass=self.model.cows_gain_from_grass)
+        self.energy = self.eat(self, habitat_patch, my_dietary_preference="grazer", gain_from_saplings = self.model.cows_gain_from_saplings, gain_from_trees=self.model.cows_gain_from_trees, gain_from_scrub=self.model.cows_gain_from_scrub, gain_from_young_scrub=self.model.cows_gain_from_young_scrub, gain_from_grass=self.model.cows_gain_from_grass)
         # if energy is less than 0, die 
-        if self.energy <= 0:
+        if self.energy < 1:
             self.model.space.remove_herbivore_agent(self)
             self.model.schedule.remove(self)
             living = False
         # I can reproduce in April, May, June (years run March-March)
         if living and (random.random() < self.model.cattle_reproduce/np.log10(self.model.schedule.get_breed_count(longhorn_cattle_agent)+ 1)) and (2 <= self.model.get_month() < 5):
             # Create a new roe deer and divide energy:
-            self.energy = np.random.uniform(0, self.energy)
-            calf = longhorn_cattle_agent(uuid.uuid4().int, self.model, crs=self.crs, geometry=self.geometry, field_id=self.field_id, energy=self.energy, move=self.move, eat=self.eat)
+            calf = longhorn_cattle_agent(uuid.uuid4().int, self.model, crs=self.crs, geometry=self.geometry, field_id=self.field_id, energy=0, move=self.move, eat=self.eat)
             self.model.space.add_herbivore_agent(calf, field_id=self.field_id)
             self.model.schedule.add(calf)
 
@@ -286,20 +284,19 @@ class fallow_deer_agent(mg.GeoAgent):
         living = True
         # move & reduce energy
         self.move(self, FieldAgent)
-        self.energy -= 1
+        self.energy = 0
         # eat
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
-        self.energy += self.eat(self, habitat_patch, my_dietary_preference="intermediate_feeder", gain_from_saplings = self.model.fallow_deer_gain_from_saplings, gain_from_trees=self.model.fallow_deer_gain_from_trees, gain_from_scrub=self.model.fallow_deer_gain_from_scrub, gain_from_young_scrub=self.model.fallow_deer_gain_from_young_scrub, gain_from_grass=self.model.fallow_deer_gain_from_grass)
+        self.energy = self.eat(self, habitat_patch, my_dietary_preference="intermediate_feeder", gain_from_saplings = self.model.fallow_deer_gain_from_saplings, gain_from_trees=self.model.fallow_deer_gain_from_trees, gain_from_scrub=self.model.fallow_deer_gain_from_scrub, gain_from_young_scrub=self.model.fallow_deer_gain_from_young_scrub, gain_from_grass=self.model.fallow_deer_gain_from_grass)
         # if energy is less than 0, die 
-        if self.energy <= 0:
+        if self.energy < 1:
             self.model.space.remove_herbivore_agent(self)
             self.model.schedule.remove(self)
             living = False
         # I can reproduce in May and June (years run March-March)
         if living and (random.random() < self.model.fallow_deer_reproduce/np.log10(self.model.schedule.get_breed_count(fallow_deer_agent)+ 1)) and (3 <= self.model.get_month() < 5):
             # Create a new deer and divide energy:
-            self.energy = np.random.uniform(0, self.energy)
-            fawn = fallow_deer_agent(uuid.uuid4().int, self.model, crs=self.crs, geometry=self.geometry, field_id=self.field_id, energy=self.energy, move=self.move, eat=self.eat)
+            fawn = fallow_deer_agent(uuid.uuid4().int, self.model, crs=self.crs, geometry=self.geometry, field_id=self.field_id, energy=0, move=self.move, eat=self.eat)
             self.model.space.add_herbivore_agent(fawn, field_id=self.field_id)
             self.model.schedule.add(fawn)
 
@@ -318,20 +315,19 @@ class red_deer_agent(mg.GeoAgent):
         living = True
         # move & reduce energy
         self.move(self, FieldAgent)
-        self.energy -= 1
+        self.energy = 0
         # eat
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
-        self.energy += self.eat(self, habitat_patch, my_dietary_preference="intermediate_feeder", gain_from_saplings = self.model.red_deer_gain_from_saplings, gain_from_trees=self.model.red_deer_gain_from_trees, gain_from_scrub=self.model.red_deer_gain_from_scrub, gain_from_young_scrub=self.model.red_deer_gain_from_young_scrub, gain_from_grass=self.model.red_deer_gain_from_grass)
+        self.energy = self.eat(self, habitat_patch, my_dietary_preference="intermediate_feeder", gain_from_saplings = self.model.red_deer_gain_from_saplings, gain_from_trees=self.model.red_deer_gain_from_trees, gain_from_scrub=self.model.red_deer_gain_from_scrub, gain_from_young_scrub=self.model.red_deer_gain_from_young_scrub, gain_from_grass=self.model.red_deer_gain_from_grass)
         # if energy is less than 0, die 
-        if self.energy <= 0:
+        if self.energy < 1:
             self.model.space.remove_herbivore_agent(self)
             self.model.schedule.remove(self)
             living = False
         # I can reproduce in May and June (years run March-March)
         if living and (random.random() < self.model.red_deer_reproduce/np.log10(self.model.schedule.get_breed_count(red_deer_agent)+ 1)) and (3 <= self.model.get_month() < 5):
             # Create a new roe deer and divide energy:
-            self.energy = np.random.uniform(0, self.energy)
-            fawn = red_deer_agent(uuid.uuid4().int, self.model, crs=self.crs, geometry=self.geometry, field_id=self.field_id, energy=self.energy, move=self.move, eat=self.eat)
+            fawn = red_deer_agent(uuid.uuid4().int, self.model, crs=self.crs, geometry=self.geometry, field_id=self.field_id, energy=0, move=self.move, eat=self.eat)
             self.model.space.add_herbivore_agent(fawn, field_id=self.field_id)
             self.model.schedule.add(fawn)
 
@@ -354,12 +350,12 @@ class tamworth_pig_agent(mg.GeoAgent):
         living = True
         # move & reduce energy
         self.move(self, FieldAgent)
-        self.energy -= 1
+        self.energy = 0
         # eat
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
-        self.energy += self.eat(self, habitat_patch, my_dietary_preference="random", gain_from_saplings = self.model.tamworth_pig_gain_from_saplings, gain_from_trees=self.model.tamworth_pig_gain_from_trees, gain_from_scrub=self.model.tamworth_pig_gain_from_scrub, gain_from_young_scrub=self.model.tamworth_pig_gain_from_young_scrub, gain_from_grass=self.model.tamworth_pig_gain_from_grass)
+        self.energy = self.eat(self, habitat_patch, my_dietary_preference="random", gain_from_saplings = self.model.tamworth_pig_gain_from_saplings, gain_from_trees=self.model.tamworth_pig_gain_from_trees, gain_from_scrub=self.model.tamworth_pig_gain_from_scrub, gain_from_young_scrub=self.model.tamworth_pig_gain_from_young_scrub, gain_from_grass=self.model.tamworth_pig_gain_from_grass)
         # if energy is less than 0, die 
-        if self.energy <= 0:
+        if self.energy < 1:
             self.model.space.remove_herbivore_agent(self)
             self.model.schedule.remove(self)
             living = False
@@ -377,15 +373,13 @@ class tamworth_pig_agent(mg.GeoAgent):
         # if there are, set the timer so other pigs reproduce in a few months
         if len(boars_here) > 0 and self.condition == "sow" and living and self.pregnancy_timer == None and (random.random() < self.model.tamworth_pig_reproduce/np.log10(self.model.schedule.get_breed_count(tamworth_pig_agent)+ 1)):
             self.pregnancy_timer = random.randint(2,4)
-            # divide my energy
-            self.energy = np.random.uniform(0, self.energy)
 
 
     def giveBirth(self):
         # Pick a number of piglets to have
         number_piglets = np.random.binomial(n=10, p=0.5)
         for _ in range(number_piglets):
-            piglet = tamworth_pig_agent(uuid.uuid4().int, self.model, crs=self.crs, geometry=self.geometry, field_id=self.field_id, energy=self.energy, condition="piglet", move=self.move, eat=self.eat)
+            piglet = tamworth_pig_agent(uuid.uuid4().int, self.model, crs=self.crs, geometry=self.geometry, field_id=self.field_id, energy=0, condition="piglet", move=self.move, eat=self.eat)
             self.model.space.add_herbivore_agent(piglet, field_id=self.field_id)
             self.model.schedule.add(piglet)
 
@@ -405,20 +399,19 @@ class reindeer_agent(mg.GeoAgent):
         living = True
         # move & reduce energy
         mixed_diet_move(self, FieldAgent)
-        self.energy -= 1
+        self.energy = 0
         # eat
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
-        self.energy += self.eat(self, habitat_patch, my_dietary_preference="intermediate_feeder", gain_from_saplings = self.model.reindeer_gain_from_saplings, gain_from_trees=self.model.reindeer_gain_from_trees, gain_from_scrub=self.model.reindeer_gain_from_scrub, gain_from_young_scrub=self.model.reindeer_gain_from_young_scrub, gain_from_grass=self.model.reindeer_gain_from_grass)
+        self.energy = self.eat(self, habitat_patch, my_dietary_preference="intermediate_feeder", gain_from_saplings = self.model.reindeer_gain_from_saplings, gain_from_trees=self.model.reindeer_gain_from_trees, gain_from_scrub=self.model.reindeer_gain_from_scrub, gain_from_young_scrub=self.model.reindeer_gain_from_young_scrub, gain_from_grass=self.model.reindeer_gain_from_grass)
         # if energy is less than 0, die 
-        if self.energy <= 0:
+        if self.energy < 1:
             self.model.space.remove_herbivore_agent(self)
             self.model.schedule.remove(self)
             living = False
         # I can reproduce in April, May and June (years run March-March)
         if living and (random.random() < self.model.reindeer_reproduce/np.log10(self.model.schedule.get_breed_count(reindeer_agent)+ 1)) and (2 <= self.model.get_month() < 5):
             # Create a new roe deer and divide energy:
-            self.energy = np.random.uniform(0, self.energy)
-            fawn = reindeer_agent(uuid.uuid4().int, self.model, crs=self.crs, geometry=self.geometry, field_id=self.field_id, energy=self.energy)
+            fawn = reindeer_agent(uuid.uuid4().int, self.model, crs=self.crs, geometry=self.geometry, field_id=self.field_id, energy=0)
             self.model.space.add_herbivore_agent(fawn, field_id=self.field_id)
             self.model.schedule.add(fawn)
 
@@ -438,20 +431,19 @@ class european_elk_agent(mg.GeoAgent):
         living = True
         # move & reduce energy
         self.move(self, FieldAgent)
-        self.energy -= 1
+        self.energy = 0
         # eat
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
-        self.energy += self.eat(self, habitat_patch, my_dietary_preference="browser", gain_from_saplings = self.model.european_elk_gain_from_saplings, gain_from_trees=self.model.european_elk_gain_from_trees, gain_from_scrub=self.model.european_elk_gain_from_scrub, gain_from_young_scrub=self.model.european_elk_gain_from_young_scrub, gain_from_grass=self.model.european_elk_gain_from_grass)
+        self.energy = self.eat(self, habitat_patch, my_dietary_preference="browser", gain_from_saplings = self.model.european_elk_gain_from_saplings, gain_from_trees=self.model.european_elk_gain_from_trees, gain_from_scrub=self.model.european_elk_gain_from_scrub, gain_from_young_scrub=self.model.european_elk_gain_from_young_scrub, gain_from_grass=self.model.european_elk_gain_from_grass)
         # if energy is less than 0, die 
-        if self.energy <= 0:
+        if self.energy < 1:
             self.model.space.remove_herbivore_agent(self)
             self.model.schedule.remove(self)
             living = False
         # I can reproduce in April, May and June (years run March-March)
         if living and (random.random() < self.model.european_elk_reproduce/np.log10(self.model.schedule.get_breed_count(european_elk_agent)+ 1)) and (2 <= self.model.get_month() < 5):
             # Create a new roe deer and divide energy:
-            self.energy = np.random.uniform(0, self.energy)
-            fawn = european_elk_agent(uuid.uuid4().int, self.model, crs=self.crs, geometry=self.geometry, field_id=self.field_id, energy=self.energy, move=self.move, eat=self.eat)
+            fawn = european_elk_agent(uuid.uuid4().int, self.model, crs=self.crs, geometry=self.geometry, field_id=self.field_id, energy=0, move=self.move, eat=self.eat)
             self.model.space.add_herbivore_agent(fawn, field_id=self.field_id)
             self.model.schedule.add(fawn)
 
@@ -471,19 +463,18 @@ class european_bison_agent(mg.GeoAgent):
         living = True
         # move & reduce energy
         self.move(self, FieldAgent)
-        self.energy -= 1
+        self.energy = 0
         # eat
         habitat_patch = self.model.space.get_region_by_id(self.field_id)
-        self.energy += self.eat(self, habitat_patch, my_dietary_preference="intermediate_feeder", gain_from_saplings = self.model.european_bison_gain_from_saplings, gain_from_trees=self.model.european_bison_gain_from_trees, gain_from_scrub=self.model.european_bison_gain_from_scrub, gain_from_young_scrub=self.model.european_bison_gain_from_young_scrub, gain_from_grass=self.model.european_bison_gain_from_grass)
+        self.energy = self.eat(self, habitat_patch, my_dietary_preference="intermediate_feeder", gain_from_saplings = self.model.european_bison_gain_from_saplings, gain_from_trees=self.model.european_bison_gain_from_trees, gain_from_scrub=self.model.european_bison_gain_from_scrub, gain_from_young_scrub=self.model.european_bison_gain_from_young_scrub, gain_from_grass=self.model.european_bison_gain_from_grass)
         # if energy is less than 0, die 
-        if self.energy <= 0:
+        if self.energy < 1:
             self.model.space.remove_herbivore_agent(self)
             self.model.schedule.remove(self)
             living = False
         # I can reproduce in April, May and June (years run March-March)
         if living and (random.random() < self.model.european_bison_reproduce/np.log10(self.model.schedule.get_breed_count(european_bison_agent)+ 1)) and (2 <= self.model.get_month() < 5):
             # Create a new roe deer and divide energy:
-            self.energy = np.random.uniform(0, self.energy)
-            fawn = european_bison_agent(uuid.uuid4().int, self.model, crs=self.crs, geometry=self.geometry, field_id=self.field_id, energy=self.energy, move=self.move, eat=self.eat)
+            fawn = european_bison_agent(uuid.uuid4().int, self.model, crs=self.crs, geometry=self.geometry, field_id=self.field_id, energy=0, move=self.move, eat=self.eat)
             self.model.space.add_herbivore_agent(fawn, field_id=self.field_id)
             self.model.schedule.add(fawn)
