@@ -144,7 +144,7 @@ class KneppModel(mesa.Model):
         # then add the herbivores as points
         for _ in range(initial_roe): # number of roe deer
             field = random.choice(fields) # randomly pick field
-            energy = 0,
+            energy = np.random.uniform(0, 1),
             roe = roe_deer_agent(
                 unique_id=uuid.uuid4().int,
                 model = self,
@@ -361,7 +361,7 @@ class KneppModel(mesa.Model):
                 crs=self.space.crs,
                 geometry=field.random_point(),
                 field_id=field.unique_id,
-                energy = 0,
+                energy = np.random.uniform(0, 1),
                 move = movement, 
                 eat = eat_habitats
             )
@@ -389,7 +389,7 @@ class KneppModel(mesa.Model):
                 crs=self.space.crs,
                 geometry=field.random_point(),
                 field_id=field.unique_id,
-                energy = 0,
+                energy = np.random.uniform(0, 1),
                 condition = "piglet",
                 move = movement, 
                 eat = eat_habitats
@@ -403,7 +403,7 @@ class KneppModel(mesa.Model):
                 crs=self.space.crs,
                 geometry=field.random_point(),
                 field_id=field.unique_id,
-                energy = 0,
+                energy = np.random.uniform(0, 1),
                 condition = "sow",
                 move = movement, 
                 eat = eat_habitats
@@ -417,7 +417,7 @@ class KneppModel(mesa.Model):
                 crs=self.space.crs,
                 geometry=field.random_point(),
                 field_id=field.unique_id,
-                energy = 0,
+                energy = np.random.uniform(0, 1),
                 condition = "boar",
                 move = movement, 
                 eat = eat_habitats
